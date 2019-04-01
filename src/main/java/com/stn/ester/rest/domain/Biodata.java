@@ -13,7 +13,7 @@ public class Biodata extends AppDomain{
     private String lastName;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",insertable = false,updatable = false)
     @JsonBackReference
     private User user;
 
