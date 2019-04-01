@@ -1,11 +1,14 @@
 package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
-public class User{
+public class User implements AppDomain{
 
     @Id
     @GeneratedValue
@@ -20,6 +23,12 @@ public class User{
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "user",cascade = CascadeType.ALL)
     @JsonManagedReference
     private Biodata biodata;
+
+    @CreatedDate
+    private Date createdDate;
+
+    @LastModifiedDate
+    private Date lastModifiedDate;
 
     public User() {
     }

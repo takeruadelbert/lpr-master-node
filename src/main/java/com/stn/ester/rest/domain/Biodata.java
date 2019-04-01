@@ -1,11 +1,14 @@
 package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
-public class Biodata{
+public class Biodata implements AppDomain{
 
     @Id
     @GeneratedValue
@@ -18,6 +21,12 @@ public class Biodata{
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
+
+    @CreatedDate
+    private Date createdDate;
+
+    @LastModifiedDate
+    private Date lastModifiedDate;
 
     public Biodata() {
     }

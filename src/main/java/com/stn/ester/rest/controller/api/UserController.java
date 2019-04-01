@@ -20,17 +20,17 @@ public class UserController {
     }
 
     @RequestMapping(value="", method = RequestMethod.GET)
-    public Page<User> index(@RequestParam(name="page") Integer page, @RequestParam(name="size") Integer size){
+    public Page<Object> index(@RequestParam(name="page") Integer page, @RequestParam(name="size") Integer size){
         return userService.index(page,size);
     }
 
     @RequestMapping(value ="", method = RequestMethod.POST)
-    public User create(@RequestBody User domain){
+    public Object create(@RequestBody User domain){
         return userService.create(domain);
     }
 
     @RequestMapping(value ="/{id}", method = RequestMethod.GET)
-    public User get(@PathVariable long id){
+    public Object get(@PathVariable long id){
         return userService.get(id);
     }
 
