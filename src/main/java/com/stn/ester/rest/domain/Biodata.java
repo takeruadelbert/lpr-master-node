@@ -1,11 +1,10 @@
 package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Biodata extends AppDomain{
