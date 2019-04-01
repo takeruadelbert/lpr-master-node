@@ -8,11 +8,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class User implements AppDomain{
-
-    @Id
-    @GeneratedValue
-    private long id;
+public class User extends AppDomain{
 
     @Column(nullable = false,unique = true)
     private String username;
@@ -24,21 +20,8 @@ public class User implements AppDomain{
     @JsonManagedReference
     private Biodata biodata;
 
-    @CreatedDate
-    private Date createdDate;
-
-    @LastModifiedDate
-    private Date lastModifiedDate;
 
     public User() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getUsername() {

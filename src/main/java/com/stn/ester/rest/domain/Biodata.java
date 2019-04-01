@@ -8,11 +8,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class Biodata implements AppDomain{
-
-    @Id
-    @GeneratedValue
-    private long id;
+public class Biodata extends AppDomain{
 
     private String firstName;
     private String lastName;
@@ -22,21 +18,8 @@ public class Biodata implements AppDomain{
     @JsonBackReference
     private User user;
 
-    @CreatedDate
-    private Date createdDate;
-
-    @LastModifiedDate
-    private Date lastModifiedDate;
 
     public Biodata() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id=id;
     }
 
     public String getFirstName() {
