@@ -17,7 +17,6 @@ public class User extends AppDomain{
     @JsonManagedReference
     private Biodata biodata;
 
-
     public User() {
     }
 
@@ -44,5 +43,10 @@ public class User extends AppDomain{
 
     public void setBiodata(Biodata biodata) {
         this.biodata = biodata;
+    }
+
+    @Override
+    public String underscoreName() {
+        return "user";
     }
 }

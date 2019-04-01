@@ -6,12 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService extends AppService{
+public class BiodataService extends AppService{
 
     @Autowired
-    public UserService(UserRepository userRepository, BiodataRepository biodataRepository){
-        super("user");
-        super.repositories.put("user",userRepository);
+    public BiodataService(BiodataRepository biodataRepository){
+        super("biodata");
         super.repositories.put("biodata",biodataRepository);
     }
 

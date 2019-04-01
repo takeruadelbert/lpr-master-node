@@ -44,4 +44,6 @@ public abstract class AppDomain {
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
+
+    public abstract String underscoreName();
 }

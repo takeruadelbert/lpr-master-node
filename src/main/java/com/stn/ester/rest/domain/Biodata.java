@@ -13,7 +13,7 @@ public class Biodata extends AppDomain{
     private String lastName;
 
     @OneToOne
-    @JoinColumn(name = "user_id",insertable = false,updatable = false)
+    @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
 
@@ -45,4 +45,8 @@ public class Biodata extends AppDomain{
         this.user = user;
     }
 
+    @Override
+    public String underscoreName() {
+        return "biodata";
+    }
 }
