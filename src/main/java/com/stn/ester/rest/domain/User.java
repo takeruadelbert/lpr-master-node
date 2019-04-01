@@ -1,28 +1,33 @@
 package com.stn.ester.rest.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import javax.persistence.*;
 
 @Entity
-public class User implements AppDomain{
+public class User{
 
     @Id
     @GeneratedValue
     private long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String username;
 
+    @Column(unique = true)
     private String email;
 
-    @Override
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user",cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Biodata biodata;
+
+    public User() {
+    }
+
     public long getId() {
         return id;
     }
 
-    @Override
     public void setId(long id) {
         this.id = id;
     }
@@ -41,5 +46,14 @@ public class User implements AppDomain{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+
+    public Biodata getBiodata() {
+        return biodata;
+    }
+
+    public void setBiodata(Biodata biodata) {
+        this.biodata = biodata;
     }
 }
