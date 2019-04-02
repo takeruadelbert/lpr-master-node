@@ -36,7 +36,7 @@ public abstract class AppService {
     }
 
     public Object update (Long id,AppDomain object){
-        Object old=repositories.get(baseRepoName).findById(id).get();
+        AppDomain old=(AppDomain)repositories.get(baseRepoName).findById(id).get();
         if (old==null){
             return null;
         }
@@ -44,16 +44,20 @@ public abstract class AppService {
         return repositories.get(baseRepoName).save(old);
     }
 
-    private void preUpdate(Object src,Object target){
+    private void preUpdate(AppDomain src,AppDomain target){
+        if (target.isPreparedForUpdate())
+            return;
         BeanUtils.copyProperties(src, target, UpdaterHelper.getNullPropertyNames(src));
+        target.setPreparedForUpdate(true);
         final BeanWrapper bw = new BeanWrapperImpl(target);
         java.beans.PropertyDescriptor[] pds = bw.getPropertyDescriptors();
         for(java.beans.PropertyDescriptor pd : pds) {
             Object srcValue = bw.getPropertyValue(pd.getName());
             if (srcValue != null && AppDomain.class.isAssignableFrom(srcValue.getClass()) ){
                 AppDomain toCompare=(AppDomain) srcValue;
-                Object toSave=repositories.get(toCompare.underscoreName()).findById(toCompare.getId()).get();
-                BeanUtils.copyProperties(srcValue,toSave, UpdaterHelper.getNullPropertyNames(srcValue));
+                AppDomain toSave=(AppDomain)repositories.get(toCompare.underscoreName()).findById(toCompare.getId()).get();
+                preUpdate(toCompare,toSave);
+                //BeanUtils.copyProperties(srcValue,toSave, UpdaterHelper.getNullPropertyNames(srcValue));
                 bw.setPropertyValue(pd.getName(),toSave);
             }
         }
