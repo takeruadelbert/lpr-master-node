@@ -57,7 +57,6 @@ public abstract class AppService {
                 AppDomain toCompare=(AppDomain) srcValue;
                 AppDomain toSave=(AppDomain)repositories.get(toCompare.underscoreName()).findById(toCompare.getId()).get();
                 preUpdate(toCompare,toSave);
-                //BeanUtils.copyProperties(srcValue,toSave, UpdaterHelper.getNullPropertyNames(srcValue));
                 bw.setPropertyValue(pd.getName(),toSave);
             }
         }
