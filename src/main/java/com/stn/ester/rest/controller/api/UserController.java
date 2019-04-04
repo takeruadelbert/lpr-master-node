@@ -10,21 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
-public class UserController extends AppController<UserService>{
+public class UserController extends AppController<UserService,User>{
 
     @Autowired
     public UserController(UserService userService){
         super(userService);
     }
-
-    @RequestMapping(value ="", method = RequestMethod.POST)
-    public Object create(@RequestBody User domain){
-        return service.create(domain);
-    }
-
-    @RequestMapping(value ="/{id}", method = RequestMethod.PUT)
-    public Object update(@PathVariable long id,@RequestBody User domain){
-        return service.update(id,domain);
-    }
-
 }
