@@ -19,19 +19,9 @@ public class BiodataController {
         this.biodataService=biodataService;
     }
 
-    @RequestMapping(value="", method = RequestMethod.GET)
-    public Page<Object> index(@RequestParam(name="page") Integer page, @RequestParam(name="size") Integer size){
-        return biodataService.index(page,size);
-    }
-
     @RequestMapping(value ="", method = RequestMethod.POST)
     public Object create(@RequestBody Biodata domain){
         return biodataService.create(domain);
-    }
-
-    @RequestMapping(value ="/{id}", method = RequestMethod.GET)
-    public Object get(@PathVariable long id){
-        return biodataService.get(id);
     }
 
     @RequestMapping(value ="/{id}", method = RequestMethod.PUT)
