@@ -8,6 +8,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,13 +33,18 @@ public abstract class AppService {
     }
 
     public Object get(Long id){
-        return repositories.get(baseRepoName).findById(id).get();
+        if (repositories.get(baseRepoName).existsById(id)) {
+            return repositories.get(
+                    baseRepoName).findById(id).get();
+        }else{
+            throw new ResourceNotFoundException();
+        }
     }
 
     public Object update (Long id,AppDomain object){
         AppDomain old=(AppDomain)repositories.get(baseRepoName).findById(id).get();
         if (old==null){
-            return null;
+            throw new ResourceNotFoundException();
         }
         preUpdate(object,old);
         return repositories.get(baseRepoName).save(old);
