@@ -1,4 +1,4 @@
-package com.stn.ester.rest.controller.api;
+package com.stn.ester.rest.controller;
 
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.User;
