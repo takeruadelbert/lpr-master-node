@@ -51,7 +51,7 @@ public abstract class AppService {
     }
 
     private void preUpdate(AppDomain src,AppDomain target){
-        if (target.isPreparedForUpdate())
+        if (target.isPreparedForUpdate)
             return;
         BeanUtils.copyProperties(src, target, UpdaterHelper.getNullPropertyNames(src));
         target.setPreparedForUpdate(true);

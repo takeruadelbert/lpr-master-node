@@ -26,7 +26,7 @@ public abstract class AppDomain {
     Date lastModifiedDate;
 
     @Transient
-    boolean isPreparedForUpdate=false;
+    public boolean isPreparedForUpdate=false;
 
     public long getId() {
         return id;
@@ -34,10 +34,6 @@ public abstract class AppDomain {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public boolean isPreparedForUpdate() {
-        return isPreparedForUpdate;
     }
 
     public void setPreparedForUpdate(boolean preparedForUpdate) {
