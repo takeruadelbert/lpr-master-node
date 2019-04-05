@@ -1,5 +1,6 @@
 package com.stn.ester.rest.domain;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -17,9 +18,11 @@ public abstract class AppDomain {
     long id;
 
     @CreatedDate
+    @CreationTimestamp
     Date createdDate;
 
     @LastModifiedDate
+    @CreationTimestamp
     Date lastModifiedDate;
 
     @Transient
