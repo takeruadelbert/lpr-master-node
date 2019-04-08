@@ -11,6 +11,8 @@ import javax.persistence.*;
 @Entity
 public class User extends AppDomain{
 
+    public static final String unique_name="user";
+
     @Column(nullable = false,unique = true)
     private String username;
 
@@ -53,6 +55,6 @@ public class User extends AppDomain{
 
     @Override
     public String underscoreName() {
-        return "user";
+        return User.unique_name;
     }
 }

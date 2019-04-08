@@ -3,6 +3,7 @@ package com.stn.ester.rest.service;
 import com.stn.ester.rest.dao.jpa.BiodataRepository;
 import com.stn.ester.rest.dao.jpa.UserRepository;
 import com.stn.ester.rest.domain.AppDomain;
+import com.stn.ester.rest.domain.Biodata;
 import com.stn.ester.rest.domain.User;
 import com.stn.ester.rest.exception.InvalidLoginException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,9 @@ public class UserService extends AppService{
 
     @Autowired
     public UserService(UserRepository userRepository, BiodataRepository biodataRepository){
-        super("user");
-        super.repositories.put("user",userRepository);
-        super.repositories.put("biodata",biodataRepository);
+        super(User.unique_name);
+        super.repositories.put(User.unique_name,userRepository);
+        super.repositories.put(Biodata.unique_name,biodataRepository);
         this.userRepository=userRepository;
     }
 
