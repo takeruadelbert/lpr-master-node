@@ -1,5 +1,6 @@
 package com.stn.ester.rest.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -25,6 +26,7 @@ public abstract class AppDomain {
     @CreationTimestamp
     Date lastModifiedDate;
 
+    @JsonIgnore
     @Transient
     public boolean isPreparedForUpdate=false;
 
@@ -34,6 +36,12 @@ public abstract class AppDomain {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    @JsonIgnore
+    @Transient
+    public boolean isPreparedForUpdate() {
+        return isPreparedForUpdate;
     }
 
     public void setPreparedForUpdate(boolean preparedForUpdate) {
