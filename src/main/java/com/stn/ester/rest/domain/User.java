@@ -22,9 +22,6 @@ public class User extends AppDomain{
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String token;
-
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "user",cascade = CascadeType.ALL)
     @JsonManagedReference
     private Biodata biodata;
@@ -43,14 +40,6 @@ public class User extends AppDomain{
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     @Override
