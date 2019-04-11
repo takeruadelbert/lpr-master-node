@@ -10,6 +10,8 @@ import java.util.Date;
 @Entity
 public class LoginSession extends AppDomain {
 
+    public static final String unique_name="login_session";
+
     private String token;
 
     private Date expire;
@@ -25,6 +27,6 @@ public class LoginSession extends AppDomain {
 
     @Override
     public String underscoreName() {
-        return "login_session";
+        return LoginSession.unique_name;
     }
 }
