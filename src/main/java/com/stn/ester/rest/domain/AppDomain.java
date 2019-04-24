@@ -5,17 +5,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Date;
 
 @MappedSuperclass
 public abstract class AppDomain {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
 
     @CreatedDate
