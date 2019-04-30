@@ -2,11 +2,9 @@ package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.BiodataRepository;
 import com.stn.ester.rest.dao.jpa.LoginSessionRepository;
+import com.stn.ester.rest.dao.jpa.UserGroupRepository;
 import com.stn.ester.rest.dao.jpa.UserRepository;
-import com.stn.ester.rest.domain.AppDomain;
-import com.stn.ester.rest.domain.Biodata;
-import com.stn.ester.rest.domain.LoginSession;
-import com.stn.ester.rest.domain.User;
+import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.exception.InvalidLoginException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
@@ -22,6 +21,7 @@ public class UserService extends AppService{
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;
+    private UserGroupRepository userGroupRepository;
 
     @Value("${ester.session.login.timeout}")
     private int sessionTimeout;
@@ -30,15 +30,18 @@ public class UserService extends AppService{
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, BiodataRepository biodataRepository,LoginSessionRepository loginSessionRepository){
+    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository){
         super(User.unique_name);
         super.repositories.put(User.unique_name,userRepository);
         super.repositories.put(Biodata.unique_name,biodataRepository);
+        super.repositories.put(UserGroup.unique_name,userGroupRepository);
         this.userRepository=userRepository;
         this.loginSessionRepository=loginSessionRepository;
+        this.userGroupRepository=userGroupRepository;
     }
 
     @Override
+    @Transactional
     public Object create(AppDomain o) {
         ((User) o).setPassword(passwordEncoder.encode(((User) o).getPassword()));
         return super.create(o);

@@ -3,8 +3,12 @@ package com.stn.ester.rest.controller;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.User;
 import com.stn.ester.rest.service.AppService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 public abstract class AppController<T extends AppService,U extends AppDomain> {
 
@@ -12,6 +16,9 @@ public abstract class AppController<T extends AppService,U extends AppDomain> {
     protected static final String DEFAULT_PAGE_NUM = "0";
 
     protected T service;
+
+    @Autowired
+    protected ModelMapper modelMapper;
 
     public AppController(T service){
         this.service=service;
@@ -33,7 +40,12 @@ public abstract class AppController<T extends AppService,U extends AppDomain> {
     }
 
     @RequestMapping(value ="/{id}", method = RequestMethod.PUT)
-    public Object update(@PathVariable long id,@RequestBody U domain){
+    public Object update(@PathVariable long id, @RequestBody U domain){
         return service.update(id,domain);
+    }
+
+    @RequestMapping(value="/{id}",method=RequestMethod.DELETE)
+    public void delete(@PathVariable long id){
+        service.delete(id);
     }
 }

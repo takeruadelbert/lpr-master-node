@@ -10,6 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +21,9 @@ public abstract class AppService {
 
     protected HashMap<String,PagingAndSortingRepository> repositories;
     protected String baseRepoName;
+
+    @PersistenceContext
+    protected EntityManager entityManager;
 
     public AppService(String baseRepoName){
         repositories=new HashMap();
@@ -28,8 +34,11 @@ public abstract class AppService {
         return repositories.get(baseRepoName).findAll(PageRequest.of(page,size));
     }
 
+    @Transactional
     public Object create(AppDomain o){
-        return repositories.get(baseRepoName).save(o);
+        Object saved=repositories.get(baseRepoName).save(o);
+        entityManager.refresh(saved);
+        return saved;
     }
 
     public Object get(Long id){
@@ -50,6 +59,10 @@ public abstract class AppService {
         return repositories.get(baseRepoName).save(old);
     }
 
+    public void delete(Long id){
+        repositories.get(baseRepoName).deleteById(id);
+    }
+
     private void preUpdate(AppDomain src,AppDomain target){
         if (target.isPreparedForUpdate)
             return;
@@ -61,9 +74,9 @@ public abstract class AppService {
             Object srcValue = bw.getPropertyValue(pd.getName());
             if (srcValue != null && AppDomain.class.isAssignableFrom(srcValue.getClass()) ){
                 AppDomain toCompare=(AppDomain) srcValue;
-                AppDomain toSave=(AppDomain)repositories.get(toCompare.underscoreName()).findById(toCompare.getId()).get();
-                preUpdate(toCompare,toSave);
-                bw.setPropertyValue(pd.getName(),toSave);
+                AppDomain toSave = (AppDomain) repositories.get(toCompare.underscoreName()).findById(toCompare.getId()).get();
+                preUpdate(toCompare, toSave);
+                bw.setPropertyValue(pd.getName(), toSave);
             }
         }
     }
