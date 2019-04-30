@@ -61,9 +61,4 @@ public class UserService extends AppService{
         return o;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 }
