@@ -37,7 +37,7 @@ public class User extends AppDomain {
 
     @JsonProperty("userGroupId")
     @Column(name = "user_group_id")
-    private long userGroupId;
+    private Long userGroupId;
 
     @JsonSetter("userGroupId")
     public void setUserGroupId(long userGroupId) {
