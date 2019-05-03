@@ -1,0 +1,18 @@
+package com.stn.ester.rest.controller;
+
+import com.stn.ester.rest.domain.AccessGroup;
+import com.stn.ester.rest.service.AccessGroupService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/access_groups")
+public class AccessGroupController extends AppController<AccessGroupService, AccessGroup> {
+
+    @Autowired
+    public AccessGroupController(AccessGroupService accessGroupService) {
+        super(accessGroupService);
+    }
+
+}
