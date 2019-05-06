@@ -24,7 +24,7 @@ public class MenuService extends AppService {
     public Object get(Long id){
         if (repositories.get(baseRepoName).existsById(id)) {
             Object o = menuRepository.findById(id).get();
-            Set<Menu> subMenu=menuRepository.findByParentMenuId(id);
+            Set<Menu> subMenu=menuRepository.findAllByParentMenuId(id);
             ((Menu) o).mergeSubMenu(subMenu);
             return o;
         }else{

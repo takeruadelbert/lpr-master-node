@@ -2,6 +2,7 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
@@ -38,6 +39,7 @@ public class Menu extends AppDomain {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="parent_menu_id", insertable = false, updatable = false)
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Menu parentMenu;
 
     @JsonProperty("parentMenuId")

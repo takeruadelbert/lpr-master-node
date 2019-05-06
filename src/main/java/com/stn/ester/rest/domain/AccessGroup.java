@@ -1,8 +1,10 @@
 package com.stn.ester.rest.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
@@ -14,6 +16,8 @@ public class AccessGroup extends AppDomain {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_group_id", insertable = false, updatable = false)
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private UserGroup userGroup;
 
     @JsonProperty("userGroupId")
@@ -44,6 +48,22 @@ public class AccessGroup extends AppDomain {
     private boolean editable;
     private boolean addable;
     private boolean deleteable;
+
+    public void setViewable(boolean viewable) {
+        this.viewable = viewable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public void setAddable(boolean addable) {
+        this.addable = addable;
+    }
+
+    public void setDeleteable(boolean deleteable) {
+        this.deleteable = deleteable;
+    }
 
     @Override
     public String underscoreName() {

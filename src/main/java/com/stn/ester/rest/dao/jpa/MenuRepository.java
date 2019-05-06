@@ -9,5 +9,5 @@ import java.util.Set;
 @Repository
 public interface MenuRepository extends PagingAndSortingRepository<Menu,Long> {
 
-    Set<Menu> findByParentMenuId(Long id);
+    Set<Menu> findAllByParentMenuId(Long id);
 }
