@@ -2,6 +2,7 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -17,10 +18,12 @@ public abstract class AppDomain {
 
     @CreatedDate
     @CreationTimestamp
+    @JsonIgnore
     Date createdDate;
 
     @LastModifiedDate
-    @CreationTimestamp
+    @UpdateTimestamp
+    @JsonIgnore
     Date lastModifiedDate;
 
     @JsonIgnore
