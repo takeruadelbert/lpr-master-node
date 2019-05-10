@@ -19,10 +19,16 @@ public class LoginSession extends AppDomain {
     @ManyToOne
     private User user;
 
+    private LoginSession(){}
+
     public LoginSession(String token, Date expire, User user) {
         this.token = token;
         this.expire = expire;
         this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     @Override

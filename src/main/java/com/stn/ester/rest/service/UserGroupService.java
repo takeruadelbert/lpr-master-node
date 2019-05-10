@@ -24,6 +24,13 @@ public class UserGroupService extends AppService {
         this.accessGroupRepository=accessGroupRepository;
     }
 
+    public Long getIdByName(String name){
+        UserGroup userGroup=userGroupRepository.findByName(name);
+        if (userGroup!=null)
+            return userGroup.getId();
+        return null;
+    }
+
     public UserGroup getAccessGroup(Long id){
         if (!this.userGroupRepository.existsById(id))
             throw new ResourceNotFoundException();

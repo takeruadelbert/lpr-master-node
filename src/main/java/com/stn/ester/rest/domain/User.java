@@ -62,6 +62,10 @@ public class User extends AppDomain {
         this.password = password;
     }
 
+    public Long getUserGroupId() {
+        return userGroupId;
+    }
+
     @Override
     public String underscoreName() {
         return User.unique_name;

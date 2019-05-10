@@ -9,5 +9,7 @@ import java.util.Set;
 @Repository
 public interface AccessGroupRepository extends PagingAndSortingRepository<AccessGroup, Long> {
 
-    Set<AccessGroup> findAllByUserGroupId(Long id);
+    Set<AccessGroup> findAllByUserGroupId(Long userGroupId);
+
+    Set<AccessGroup> findAllByUserGroupIdAndViewable(Long userGroupId,boolean viewable);
 }

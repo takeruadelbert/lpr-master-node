@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserGroupRepository extends PagingAndSortingRepository<UserGroup, Long> {
+
+    UserGroup findByName(String name);
 }

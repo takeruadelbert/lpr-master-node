@@ -54,6 +54,10 @@ public class Menu extends AppDomain {
             this.parentMenuId=parentMenuId;
     }
 
+    public Long getParentMenuId() {
+        return parentMenuId;
+    }
+
     public void mergeSubMenu(List<Menu> subMenu){
         this.subMenu.addAll(subMenu);
     }

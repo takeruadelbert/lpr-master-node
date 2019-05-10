@@ -6,7 +6,9 @@ import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -19,8 +21,9 @@ public class UserController extends AppController<UserService,User>{
     }
 
     @RequestMapping(value ="/login", method = RequestMethod.POST)
-    public Map login(@RequestBody Map<String,String> payload){
-        return service.login(payload.get("username"),payload.get("password"));
+    public Map login(@RequestBody Map<String,String> payload, HttpSession session){
+        Map<String,Object> loginToken=service.login(payload.get("username"),payload.get("password"),session);
+        return loginToken;
     }
 
 }

@@ -65,6 +65,10 @@ public class AccessGroup extends AppDomain {
         this.deleteable = deleteable;
     }
 
+    public long getMenuId() {
+        return menuId;
+    }
+
     @Override
     public String underscoreName() {
         return AccessGroup.unique_name;

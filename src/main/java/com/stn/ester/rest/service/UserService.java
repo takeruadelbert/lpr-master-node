@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -47,7 +48,7 @@ public class UserService extends AppService{
         return super.create(o);
     }
 
-    public Map login(String username, String password){
+    public Map login(String username, String password, HttpSession session){
         User user=userRepository.findByUsername(username).orElse(null);
         if (user == null || !passwordEncoder.matches(password,user.getPassword())){
             throw new InvalidLoginException("Username or password invalid.");
@@ -57,11 +58,23 @@ public class UserService extends AppService{
         Calendar calendar=Calendar.getInstance();
         calendar.add(Calendar.SECOND,sessionTimeout);
         LoginSession loginSession=new LoginSession(token,calendar.getTime(),user);
-        loginSessionRepository.save(loginSession);
+        LoginSession savedLoginSession=loginSessionRepository.save(loginSession);
         Map o=new HashMap();
         o.put("username",username);
         o.put("token",token);
+
+        Map<String,Object> loginInfoSession=new HashMap();
+
+        loginInfoSession.put("token",token);
+        loginInfoSession.put("username",username);
+        loginInfoSession.put("loginSessionId",savedLoginSession.getId());
+
+        session.setAttribute("login",loginInfoSession);
         return o;
+    }
+
+    public LoginSession isValidToken(String token){
+        return loginSessionRepository.isTokenExist(token);
     }
 
 }
