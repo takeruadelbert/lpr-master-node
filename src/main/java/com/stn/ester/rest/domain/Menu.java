@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -34,6 +35,7 @@ public class Menu extends AppDomain {
     }
 
     @Transient
+    @EqualsAndHashCode.Exclude
     private Set<Menu> subMenu=new HashSet<Menu>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -52,7 +54,7 @@ public class Menu extends AppDomain {
             this.parentMenuId=parentMenuId;
     }
 
-    public void mergeSubMenu(Set<Menu> subMenu){
+    public void mergeSubMenu(List<Menu> subMenu){
         this.subMenu.addAll(subMenu);
     }
 

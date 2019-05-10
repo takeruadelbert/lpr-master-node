@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ public class Module extends AppDomain {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "module" ,cascade = CascadeType.ALL)
     @JsonManagedReference
+    @EqualsAndHashCode.Exclude
     private Set<ModuleLink> moduleLink =  new HashSet<>();
 
     @Override
