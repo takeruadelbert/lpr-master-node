@@ -63,6 +63,8 @@ public abstract class AppService {
         repositories.get(baseRepoName).deleteById(id);
     }
 
+    // TODO
+    // check prepare for level 2 or more
     private void preUpdate(AppDomain src, AppDomain target) {
         if (target.isPreparedForUpdate)
             return;
