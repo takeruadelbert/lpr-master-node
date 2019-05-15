@@ -31,6 +31,10 @@ public class LoginSession extends AppDomain {
         return user;
     }
 
+    public void setExpire(Date expire) {
+        this.expire = expire;
+    }
+
     @Override
     public String underscoreName() {
         return LoginSession.unique_name;

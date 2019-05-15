@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value= HttpStatus.UNAUTHORIZED)
 public class InvalidLoginException extends RuntimeException {
     public InvalidLoginException() {
-        super();
+        super("Username or password invalid.");
     }
 
     public InvalidLoginException(String message, Throwable cause) {

@@ -51,7 +51,7 @@ public class UserService extends AppService{
     public Map login(String username, String password, HttpSession session){
         User user=userRepository.findByUsername(username).orElse(null);
         if (user == null || !passwordEncoder.matches(password,user.getPassword())){
-            throw new InvalidLoginException("Username or password invalid.");
+            throw new InvalidLoginException();
         }
         UUID randomUUID = UUID.randomUUID();
         String token=randomUUID.toString();
@@ -77,4 +77,15 @@ public class UserService extends AppService{
         return loginSessionRepository.isTokenExist(token);
     }
 
+    public LoginSession tokenHeartbeat(String token){
+        LoginSession loginSession = loginSessionRepository.isTokenExist(token);
+        if (loginSession==null){
+            return null;
+        }
+        Calendar calendar=Calendar.getInstance();
+        calendar.add(Calendar.SECOND,sessionTimeout);
+        loginSession.setExpire(calendar.getTime());
+        LoginSession savedLoginSession=loginSessionRepository.save(loginSession);
+        return savedLoginSession;
+    }
 }
