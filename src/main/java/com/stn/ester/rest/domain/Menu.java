@@ -38,7 +38,7 @@ public class Menu extends AppDomain {
     @EqualsAndHashCode.Exclude
     private Set<Menu> subMenu=new HashSet<Menu>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="parent_menu_id", insertable = false, updatable = false)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
