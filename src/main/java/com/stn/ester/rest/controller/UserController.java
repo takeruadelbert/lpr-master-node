@@ -2,7 +2,7 @@ package com.stn.ester.rest.controller;
 
 import com.stn.ester.rest.domain.LoginSession;
 import com.stn.ester.rest.domain.User;
-import com.stn.ester.rest.dto.UserDto;
+// import com.stn.ester.rest.dto.UserDto;
 import com.stn.ester.rest.exception.SessionExpireException;
 import com.stn.ester.rest.exception.UnauthorizedException;
 import com.stn.ester.rest.service.UserService;

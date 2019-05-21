@@ -21,6 +21,11 @@ public class Biodata extends AppDomain{
     @JsonBackReference
     private User user;
 
+    @OneToOne
+    @JoinColumn(name = "gender_id")
+    @JsonBackReference
+    private Gender gender;
+
     @Override
     public String underscoreName() {
         return Biodata.unique_name;
