@@ -26,14 +26,6 @@ public class Gender extends AppDomain {
     @Column(nullable = false)
     private String name;
 
-    public String getLabel() {
-        return label;
-    }
-
-    public String getName() {
-        return name;
-    }
-
     @Override
     public String underscoreName() {
         return null;
