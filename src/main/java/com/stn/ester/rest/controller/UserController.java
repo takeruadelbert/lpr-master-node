@@ -7,12 +7,18 @@ import com.stn.ester.rest.exception.SessionExpireException;
 import com.stn.ester.rest.exception.UnauthorizedException;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.*;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/users")

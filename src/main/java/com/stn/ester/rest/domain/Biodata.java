@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.sql.Blob;
 
 @Data
 @Entity

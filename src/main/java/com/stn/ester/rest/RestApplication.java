@@ -1,5 +1,7 @@
 package com.stn.ester.rest;
 
+import org.omg.CORBA.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,5 +23,4 @@ public class RestApplication {
     public void init(){
         TimeZone.setDefault(TimeZone.getTimeZone(timezone));
     }
-
 }
