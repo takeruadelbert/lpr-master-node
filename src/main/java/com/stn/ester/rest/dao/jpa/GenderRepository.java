@@ -1,0 +1,12 @@
+package com.stn.ester.rest.dao.jpa;
+
+import java.util.Optional;
+
+import com.stn.ester.rest.domain.Gender;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface GenderRepository extends PagingAndSortingRepository<Gender, Long> {
+    Optional<Gender> findByLabel(String label);
+}

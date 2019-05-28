@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/biodata")
+@RequestMapping("/biodatas")
 public class BiodataController extends AppController<BiodataService,Biodata>{
 
     @Autowired
