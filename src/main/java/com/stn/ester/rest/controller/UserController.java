@@ -2,15 +2,12 @@ package com.stn.ester.rest.controller;
 
 import com.stn.ester.rest.domain.LoginSession;
 import com.stn.ester.rest.domain.User;
-import com.stn.ester.rest.exception.SessionExpireException;
 import com.stn.ester.rest.exception.UnauthorizedException;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController

@@ -2,16 +2,14 @@ package com.stn.ester.rest.controller;
 
 import com.stn.ester.rest.domain.LoginSession;
 import com.stn.ester.rest.domain.Menu;
-import com.stn.ester.rest.exception.InvalidLoginException;
 import com.stn.ester.rest.exception.UnauthorizedException;
-import com.stn.ester.rest.service.LoginSessionService;
 import com.stn.ester.rest.service.MenuService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
-import java.util.HashMap;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("menus")

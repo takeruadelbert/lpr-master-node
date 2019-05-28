@@ -1,7 +1,6 @@
 package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.BiodataRepository;
-import com.stn.ester.rest.dao.jpa.UserRepository;
 import com.stn.ester.rest.domain.Biodata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

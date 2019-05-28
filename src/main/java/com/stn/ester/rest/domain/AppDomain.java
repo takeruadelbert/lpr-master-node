@@ -28,7 +28,10 @@ public abstract class AppDomain {
 
     @JsonIgnore
     @Transient
-    public boolean isPreparedForUpdate=false;
+    public boolean isPreparedForUpdate = false;
+
+    @JsonIgnore
+    public boolean deleted = false;
 
     public long getId() {
         return id;

@@ -1,6 +1,5 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import lombok.Data;
