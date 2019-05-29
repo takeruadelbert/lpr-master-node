@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Blob;
 
 @Data
 @Entity
@@ -17,7 +16,7 @@ public class Biodata extends AppDomain{
     @Column(nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String lastName;
 
     @Column(nullable = false)
@@ -27,7 +26,7 @@ public class Biodata extends AppDomain{
     private String address;
 
     @Column(nullable = false)
-    private Integer phone_number;
+    private String phone_number;
 
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -49,17 +48,17 @@ public class Biodata extends AppDomain{
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "type_identity_id", insertable = false, updatable = false)
-    private TypeIdentity typeIdentity;
+    @JoinColumn(name = "identity_type_id", insertable = false, updatable = false)
+    private IdentityType identityType;
 
-    @JsonProperty("typeIdentityId")
-    @Column(name = "type_identity_id")
-    private Long typeIdentityId;
+    @JsonProperty("identityTypeId")
+    @Column(name = "identity_type_id")
+    private Long identityTypeId;
 
-    @JsonSetter("typeIdentityId")
-    public void setTypeIdentityId(long typeIdentityId) {
-        if (typeIdentityId != 0)
-            this.typeIdentityId = typeIdentityId;
+    @JsonSetter("identityTypeId")
+    public void setIdentityTypeId(long identityTypeId) {
+        if (identityTypeId != 0)
+            this.identityTypeId = identityTypeId;
     }
 
     @Override
