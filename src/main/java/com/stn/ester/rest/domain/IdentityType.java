@@ -12,9 +12,9 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class TypeIdentity extends AppDomain {
+public class IdentityType extends AppDomain {
 
-    public static final String unique_name = "type_identity";
+    public static final String unique_name = "identity_type";
 
     public String label;
 

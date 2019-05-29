@@ -48,17 +48,17 @@ public class Biodata extends AppDomain{
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "type_identity_id", insertable = false, updatable = false)
-    private TypeIdentity typeIdentity;
+    @JoinColumn(name = "identity_type_id", insertable = false, updatable = false)
+    private IdentityType identityType;
 
-    @JsonProperty("typeIdentityId")
-    @Column(name = "type_identity_id")
-    private Long typeIdentityId;
+    @JsonProperty("identityTypeId")
+    @Column(name = "identity_type_id")
+    private Long identityTypeId;
 
-    @JsonSetter("typeIdentityId")
-    public void setTypeIdentityId(long typeIdentityId) {
-        if (typeIdentityId != 0)
-            this.typeIdentityId = typeIdentityId;
+    @JsonSetter("identityTypeId")
+    public void setIdentityTypeId(long identityTypeId) {
+        if (identityTypeId != 0)
+            this.identityTypeId = identityTypeId;
     }
 
     @Override
