@@ -20,7 +20,7 @@ public class Biodata extends AppDomain{
     private String lastName;
 
     @Column(nullable = false)
-    private Integer identity_number;
+    private String identity_number;
 
     @Column(nullable = false)
     private String address;
