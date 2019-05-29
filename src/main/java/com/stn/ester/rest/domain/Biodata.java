@@ -16,7 +16,7 @@ public class Biodata extends AppDomain{
     @Column(nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String lastName;
 
     @Column(nullable = false)
@@ -26,7 +26,7 @@ public class Biodata extends AppDomain{
     private String address;
 
     @Column(nullable = false)
-    private Integer phone_number;
+    private String phone_number;
 
     @OneToOne
     @JoinColumn(name = "user_id")

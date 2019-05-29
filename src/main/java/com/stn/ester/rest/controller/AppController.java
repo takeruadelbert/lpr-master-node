@@ -1,14 +1,11 @@
 package com.stn.ester.rest.controller;
 
 import com.stn.ester.rest.domain.AppDomain;
-import com.stn.ester.rest.domain.User;
 import com.stn.ester.rest.service.AppService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 public abstract class AppController<T extends AppService,U extends AppDomain> {
 

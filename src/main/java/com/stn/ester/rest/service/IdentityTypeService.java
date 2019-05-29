@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 public class IdentityTypeService extends AppService {
 
     @Autowired
-    public IdentityTypeService(IdentityTypeRepository identityTypeRepository) {
+    public IdentityTypeService(IdentityTypeRepository typeIdentityRepository) {
         super(IdentityType.unique_name);
-        super.repositories.put(IdentityType.unique_name, identityTypeRepository);
+        super.repositories.put(IdentityType.unique_name, typeIdentityRepository);
     }
 }

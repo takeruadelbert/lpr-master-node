@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.*;
 public class IdentityTypeController extends AppController<IdentityTypeService, IdentityType> {
 
     @Autowired
-    public IdentityTypeController(IdentityTypeService identityTypeService) { super(identityTypeService);}
+    public IdentityTypeController(IdentityTypeService identityTypeServiceService) { super(identityTypeServiceService);}
 }

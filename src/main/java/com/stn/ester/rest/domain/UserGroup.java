@@ -1,6 +1,5 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import javax.persistence.Column;

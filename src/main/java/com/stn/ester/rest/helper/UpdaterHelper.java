@@ -1,12 +1,10 @@
 package com.stn.ester.rest.helper;
 
-import com.stn.ester.rest.domain.AppDomain;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
