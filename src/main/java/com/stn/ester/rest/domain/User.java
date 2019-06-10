@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 @Data
 @Entity
@@ -13,12 +14,16 @@ public class User extends AppDomain {
 
     public static final String unique_name = "user";
 
+    @NotBlank(message = "Username is mandatory.")
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Email(message = "Invalid Email Format.")
+    @NotBlank(message = "Email is mandatory.")
     @Column(unique = true)
     private String email;
 
+    @Pattern(regexp = "^[A-Za-z0-9]+$", message = "Password must be Alphanumeric.")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -32,6 +37,7 @@ public class User extends AppDomain {
     @JoinColumn(name = "user_group_id", insertable = false, updatable = false)
     private UserGroup userGroup;
 
+    @NotBlank(message = "User Group is mandatory.")
     @JsonProperty("userGroupId")
     @Column(name = "user_group_id")
     private Long userGroupId;

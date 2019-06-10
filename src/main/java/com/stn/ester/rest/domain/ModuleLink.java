@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Entity
@@ -14,7 +15,9 @@ public class ModuleLink extends AppDomain {
 
     public static final String unique_name="module_link";
 
+    @NotBlank(message = "Name is mandatory.")
     private String name;
+    @NotBlank(message = "Alias is mandatory.")
     private String alias;
 
     @Enumerated(EnumType.STRING)

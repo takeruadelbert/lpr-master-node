@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,8 +15,10 @@ public class UserGroup extends AppDomain {
 
     public static final String unique_name="user_group";
 
+    @NotBlank(message = "Label is mandatory.")
     private String label;
 
+    @NotBlank(message = "Name is mandatory.")
     @Column(unique = true)
     private String name;
 

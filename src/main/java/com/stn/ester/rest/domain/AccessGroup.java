@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
@@ -20,6 +22,7 @@ public class AccessGroup extends AppDomain {
     @EqualsAndHashCode.Exclude
     private UserGroup userGroup;
 
+    @NotBlank(message = "User Group is mandatory.")
     @JsonProperty("userGroupId")
     @Column(name = "user_group_id")
     private long userGroupId;
@@ -34,6 +37,7 @@ public class AccessGroup extends AppDomain {
     @JoinColumn(name = "menu_id", insertable = false, updatable = false)
     private Menu menu;
 
+    @NotBlank(message = "Menu is mandatory.")
     @JsonProperty("menuId")
     @Column(name = "menu_id")
     private long menuId;

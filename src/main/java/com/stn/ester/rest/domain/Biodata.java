@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
@@ -13,6 +15,7 @@ public class Biodata extends AppDomain{
 
     public static final String unique_name="biodata";
 
+    @NotBlank(message = "First Name is mandatory.")
     @Column(nullable = false)
     private String firstName;
 

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +16,10 @@ public class Module extends AppDomain {
 
     public static final String unique_name="module";
 
+    @NotBlank(message = "Name is mandatory.")
     private String name;
+
+    @NotBlank(message = "Alias is mandatory.")
     private String alias;
 
     @Enumerated(EnumType.STRING)
