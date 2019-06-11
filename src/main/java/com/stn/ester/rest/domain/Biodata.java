@@ -8,7 +8,6 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.sql.Blob;
 
 @Data
 @Entity
@@ -31,9 +30,6 @@ public class Biodata extends AppDomain{
 
     @Column(nullable = true)
     private String phoneNumber;
-
-    @Column(nullable = true)
-    private Blob file;
 
     @OneToOne
     @JoinColumn(name = "user_id")
