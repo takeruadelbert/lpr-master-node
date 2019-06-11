@@ -20,13 +20,13 @@ public class Biodata extends AppDomain{
     private String lastName;
 
     @Column(nullable = false)
-    private String identity_number;
+    private String identityNumber;
 
     @Column(nullable = false)
     private String address;
 
     @Column(nullable = false)
-    private String phone_number;
+    private String phoneNumber;
 
     @OneToOne
     @JoinColumn(name = "user_id")
