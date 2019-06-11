@@ -37,7 +37,7 @@ public class User extends AppDomain {
     @JoinColumn(name = "user_group_id", insertable = false, updatable = false)
     private UserGroup userGroup;
 
-    @NotBlank(message = "User Group is mandatory.")
+    @NotNull(message = "User Group is mandatory.")
     @JsonProperty("userGroupId")
     @Column(name = "user_group_id")
     private Long userGroupId;

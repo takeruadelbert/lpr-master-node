@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class Menu extends AppDomain {
     @JoinColumn(name = "module_id", insertable = false, updatable = false)
     private Module module;
 
-    @NotBlank(message = "Module is mandatory.")
+    @NotNull(message = "Module is mandatory.")
     @JsonProperty("moduleId")
     @Column(name = "module_id")
     private Long moduleId;
