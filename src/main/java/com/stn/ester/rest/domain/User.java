@@ -23,7 +23,8 @@ public class User extends AppDomain {
     @Column(unique = true)
     private String email;
 
-    @Pattern(regexp = "^[A-Za-z0-9]+$", message = "Password must be Alphanumeric.")
+    @NotBlank(message = "Password is mandatory.")
+//    @Pattern(regexp = "^[A-Za-z0-9]*$", message = "Password must be Alphanumeric.")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
