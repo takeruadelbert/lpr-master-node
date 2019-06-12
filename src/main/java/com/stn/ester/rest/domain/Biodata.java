@@ -22,13 +22,13 @@ public class Biodata extends AppDomain{
     @Column(nullable = true)
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String identityNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String address;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String phoneNumber;
 
     @OneToOne
