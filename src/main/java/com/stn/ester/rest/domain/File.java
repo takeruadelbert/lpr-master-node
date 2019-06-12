@@ -1,9 +1,6 @@
 package com.stn.ester.rest.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -20,6 +17,11 @@ public class File extends AppDomain {
     public static final String unique_name = "file";
 
     public String file;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user;
 
     @Override
     public String underscoreName() {
