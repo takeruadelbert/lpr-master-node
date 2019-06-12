@@ -44,5 +44,4 @@ public class UserController extends AppController<UserService, User> {
             return loginSession;
         }
     }
-
 }
