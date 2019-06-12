@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class MenuService extends AppService {
@@ -87,4 +84,14 @@ public class MenuService extends AppService {
         return subMenus;
     }
 
+    public Object getAllMenuSubmenu() {
+        List<Menu> menus = menuRepository.findAllByParentMenuIdIsNull();
+        List<Object> result = new ArrayList();
+        if (!menus.isEmpty()) {
+            for (Menu menu : menus) {
+                result.add(this.get(menu.getId()));
+            }
+        }
+        return result;
+    }
 }

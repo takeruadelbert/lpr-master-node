@@ -34,4 +34,9 @@ public class MenuController extends AppController<MenuService, Menu> {
         Long userGroupId=loginSession.getUser().getUserGroupId();
         return this.menuService.getByUserGroupId(userGroupId);
     }
+
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public Object viewMenuSubMenu() {
+        return this.menuService.getAllMenuSubmenu();
+    }
 }
