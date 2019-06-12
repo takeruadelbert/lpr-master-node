@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,4 +45,19 @@ public class UserController extends AppController<UserService, User> {
             return loginSession;
         }
     }
+
+    @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
+        if (file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/gif")) {
+            File convertFile = new File(System.getProperty("user.dir") + "\\assets\\image\\" + file.getOriginalFilename()); //set path directory
+            convertFile.createNewFile();
+            FileOutputStream fout = new FileOutputStream(convertFile);
+            fout.write(file.getBytes());
+            fout.close();
+            return "Image is successfully uploaded";
+        } else {
+            return "Image not uploaded";
+        }
+    }
+
 }
