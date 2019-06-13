@@ -1,10 +1,12 @@
 package com.stn.ester.rest.dao.jpa;
 
+import com.stn.ester.rest.dao.jpa.base.AppRepository;
+import com.stn.ester.rest.dao.jpa.projections.IdList;
 import com.stn.ester.rest.domain.LoginSession;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface LoginSessionRepository extends PagingAndSortingRepository<LoginSession,Long> {
+public interface LoginSessionRepository extends AppRepository<LoginSession,Long, IdList> {
 
     LoginSession findByToken(String token);
 
