@@ -11,4 +11,9 @@ public class IdentityTypeController extends AppController<IdentityTypeService, I
 
     @Autowired
     public IdentityTypeController(IdentityTypeService identityTypeServiceService) { super(identityTypeServiceService);}
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public Object getIdentityTypeList() {
+        return service.getListByName();
+    }
 }
