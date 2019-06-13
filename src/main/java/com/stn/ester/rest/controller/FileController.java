@@ -13,8 +13,5 @@ public class FileController extends AppController<FileService, File> {
     private FileService fileService;
 
     @Autowired
-    public FileController(FileService fileService) {
-        super(fileService);
-        this.fileService=fileService;
-    }
+    public FileController(FileService fileService) { super(fileService);}
 }
