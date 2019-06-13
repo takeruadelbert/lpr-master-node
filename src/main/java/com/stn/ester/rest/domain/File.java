@@ -16,7 +16,7 @@ import org.springframework.data.annotation.ReadOnlyProperty;
 public class File extends AppDomain {
     public static final String unique_name = "file";
 
-    @Column(length = 5000)
+    @Column(columnDefinition = "TEXT")
     public String file;
 
     @OneToOne
