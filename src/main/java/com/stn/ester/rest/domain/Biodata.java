@@ -63,6 +63,45 @@ public class Biodata extends AppDomain{
         if (identityTypeId != 0)
             this.identityTypeId = identityTypeId;
     }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "country_id", insertable = false, updatable = false)
+    private Country country;
+
+    @JsonProperty("countryId")
+    @Column(name = "country_id")
+    private Long countryId;
+
+    @JsonSetter("countryId")
+    public void setCountryId(long countryId) {
+        if(countryId != 0)
+            this.countryId = countryId;
+    }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "state_id", insertable = false, updatable = false)
+    private State state;
+
+    @JsonProperty("stateId")
+    @Column(name = "state_id")
+    private Long stateId;
+
+    public void setStateId(long stateId) {
+        if(stateId != 0)
+            this.stateId = stateId;
+    }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "city_id", insertable = false, updatable = false)
+    private City city;
+
+    @JsonProperty("cityId")
+    @Column(name = "city_id")
+    private Long cityId;
+
+    public void setCityId(long cityId) {
+        if(cityId != 0)
+            this.cityId = cityId;
+    }
 
     @Override
     public String underscoreName() {
