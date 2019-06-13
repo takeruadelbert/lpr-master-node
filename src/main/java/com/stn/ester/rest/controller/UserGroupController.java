@@ -6,6 +6,8 @@ import com.stn.ester.rest.service.UserGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -33,5 +35,12 @@ public class UserGroupController extends AppController<UserGroupService, UserGro
         Long userGroupId=Long.parseLong(o.get("id").toString());
         this.accessGroupService.updateAll(userGroupId,accessGroups);
         return service.getAccessGroup(id);
+    }
+
+    @Override
+    @Transactional
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public Object create(@Valid @RequestBody UserGroup userGroup) {
+        return service.create(userGroup);
     }
 }
