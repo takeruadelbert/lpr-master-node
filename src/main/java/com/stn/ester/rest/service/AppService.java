@@ -1,5 +1,6 @@
 package com.stn.ester.rest.service;
 
+import com.stn.ester.rest.dao.jpa.base.AppRepository;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.helper.UpdaterHelper;
 import org.springframework.beans.BeanUtils;
@@ -7,7 +8,7 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import javax.persistence.EntityManager;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 
 public abstract class AppService {
 
-    protected HashMap<String, PagingAndSortingRepository> repositories;
+    protected HashMap<String, AppRepository> repositories;
     protected String baseRepoName;
 
     @PersistenceContext
@@ -30,6 +31,10 @@ public abstract class AppService {
 
     public Page<Object> index(Integer page, Integer size) {
         return repositories.get(baseRepoName).findAll(PageRequest.of(page, size));
+    }
+
+    public Page<Object> index(Integer page, Integer size, Specification spec) {
+        return repositories.get(baseRepoName).findAll(spec, PageRequest.of(page, size));
     }
 
     @Transactional
