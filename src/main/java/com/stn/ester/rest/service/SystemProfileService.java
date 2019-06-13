@@ -4,7 +4,6 @@ import com.stn.ester.rest.dao.jpa.SystemProfileRepository;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.SystemProfile;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -24,9 +23,10 @@ public class SystemProfileService extends AppService {
     public Object updateSingleData(AppDomain object) {
         Long id = Long.valueOf(1);
         if(systemProfileRepository.existsById(id)) {
-            return this.update(id, object);
+            object.setId(id);
+            return super.update(id, object);
         } else {
-            return this.create(object);
+            return super.create(object);
         }
     }
 }

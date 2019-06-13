@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class UserService extends AppService{
+public class UserService extends AppService {
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;

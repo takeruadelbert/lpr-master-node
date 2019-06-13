@@ -1,23 +1,33 @@
 package com.stn.ester.rest.service;
 
+import com.stn.ester.rest.dao.jpa.base.AppRepository;
+import com.stn.ester.rest.dao.jpa.projections.IdLabelList;
+import com.stn.ester.rest.dao.jpa.projections.IdNameList;
+import com.stn.ester.rest.dao.jpa.projections.NameLabelList;
+import com.stn.ester.rest.dao.jpa.projections.OptionList;
 import com.stn.ester.rest.domain.AppDomain;
+import com.stn.ester.rest.exception.ListNotFoundException;
 import com.stn.ester.rest.helper.UpdaterHelper;
+import com.stn.ester.rest.service.base.OptionBehaviour;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 
-public abstract class AppService {
+public abstract class AppService implements OptionBehaviour {
 
-    protected HashMap<String, PagingAndSortingRepository> repositories;
+    protected HashMap<String, AppRepository> repositories;
     protected String baseRepoName;
 
     @PersistenceContext
@@ -83,4 +93,76 @@ public abstract class AppService {
         }
     }
 
+    @Override
+    public Object getListById() {
+        String projectionType = this.getReflectionType();
+        if (projectionType.isEmpty())
+            throw new ListNotFoundException();
+        // check projection type
+        HashMap<String, String> result = new HashMap<>();
+        String[] temp = projectionType.split("\\.");
+        switch (temp[temp.length - 1]) {
+            case "IdNameList":
+                List<IdNameList> list = repositories.get(baseRepoName).findAllProjectedBy();
+                if (list.size() > 0) {
+                    for (IdNameList option : list) {
+                        result.put(option.getId(), option.getName());
+                    }
+                }
+                return result;
+            case "IdLabelList":
+                List<IdLabelList> labelLists = repositories.get(baseRepoName).findAllProjectedBy();
+                if (labelLists.size() > 0) {
+                    for (IdLabelList option : labelLists) {
+                        result.put(option.getId(), option.getLabel());
+                    }
+                }
+                return result;
+            default:
+                throw new ListNotFoundException();
+        }
+    }
+
+    @Override
+    public Object getListByName() {
+        String projectionType = this.getReflectionType();
+        if (projectionType.isEmpty())
+            throw new NotImplementedException();
+        // check projection type
+        HashMap<String, String> result = new HashMap<>();
+        String[] temp = projectionType.split("\\.");
+        switch (temp[temp.length - 1]) {
+            case "NameLabelList":
+                List<NameLabelList> list = repositories.get(baseRepoName).findAllProjectedBy();
+                if (list.size() > 0) {
+                    for (NameLabelList option : list) {
+                        result.put(option.getName(), option.getLabel());
+                    }
+                }
+                return result;
+            default:
+                throw new ListNotFoundException();
+        }
+    }
+
+    private String getReflectionType() {
+        Class[] interfazes = (repositories.get(baseRepoName)).getClass().getInterfaces();
+        for (Class interfaze : interfazes) {
+            if (AppRepository.class.isAssignableFrom(interfaze)) {
+                Type[] genericInterfaces = interfaze.getGenericInterfaces();
+                for (Type genericInterface : genericInterfaces) {
+                    if (genericInterface instanceof ParameterizedType) {
+                        Type[] typeParameter = ((Class<?>) ((ParameterizedType) genericInterface).getRawType()).getTypeParameters();
+                        Type[] actualTypeArgument = ((ParameterizedType) genericInterface).getActualTypeArguments();
+                        for (int i = 0; i < typeParameter.length; i++) {
+                            if (typeParameter[i].getTypeName().equals("Y")) {
+                                return actualTypeArgument[i].getTypeName();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

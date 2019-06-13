@@ -45,6 +45,10 @@ public class City extends AppDomain {
             this.stateId = stateId;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
     @Override
     public String underscoreName() {
         return unique_name;
