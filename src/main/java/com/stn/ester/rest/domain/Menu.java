@@ -26,7 +26,6 @@ public class Menu extends AppDomain {
     @JoinColumn(name = "module_id", insertable = false, updatable = false)
     private Module module;
 
-    @NotNull(message = "Module is mandatory.")
     @JsonProperty("moduleId")
     @Column(name = "module_id")
     private Long moduleId;
