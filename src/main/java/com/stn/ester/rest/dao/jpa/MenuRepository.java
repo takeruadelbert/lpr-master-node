@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface MenuRepository extends AppRepository<Menu,Long, IdList> {
+public interface MenuRepository extends AppRepository<Menu, IdList> {
 
     List<Menu> findAllByParentMenuId(Long parentMenuId);
 

@@ -7,6 +7,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SystemProfileRepository extends AppRepository<SystemProfile, Long, IdList> {
+public interface SystemProfileRepository extends AppRepository<SystemProfile, IdList> {
 
 }

@@ -7,5 +7,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CityStatusRepository extends AppRepository<CityStatus, Long, IdList> {
+public interface CityStatusRepository extends AppRepository<CityStatus, IdList> {
 }

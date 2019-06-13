@@ -7,7 +7,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserGroupRepository extends AppRepository<UserGroup, Long, IdList> {
+public interface UserGroupRepository extends AppRepository<UserGroup, IdList> {
 
     UserGroup findByName(String name);
 }

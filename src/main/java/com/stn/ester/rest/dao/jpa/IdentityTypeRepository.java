@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface IdentityTypeRepository extends AppRepository<IdentityType,Long, IdList> {
+public interface IdentityTypeRepository extends AppRepository<IdentityType, IdList> {
     Optional<IdentityType> findByLabel(String label);
 }

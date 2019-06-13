@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Set;
 
 @Repository
-public interface AccessGroupRepository extends AppRepository<AccessGroup, Long, IdList> {
+public interface AccessGroupRepository extends AppRepository<AccessGroup, IdList> {
 
     Set<AccessGroup> findAllByUserGroupId(Long userGroupId);
 

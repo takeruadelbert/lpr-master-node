@@ -8,5 +8,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CountryRepository extends AppRepository<Country, Long, IdNameList> {
+public interface CountryRepository extends AppRepository<Country, IdNameList> {
 }
