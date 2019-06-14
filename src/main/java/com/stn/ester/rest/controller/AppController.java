@@ -53,4 +53,9 @@ public abstract class AppController<T extends AppService, U extends AppDomain> {
     public void delete(@PathVariable long id) {
         service.delete(id);
     }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public Object list() {
+        return service.getList();
+    }
 }

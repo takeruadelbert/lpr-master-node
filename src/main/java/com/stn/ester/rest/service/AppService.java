@@ -94,14 +94,13 @@ public abstract class AppService implements OptionBehaviour {
     }
 
     @Override
-    public Object getListById() {
+    public Object getList() {
         String projectionType = this.getReflectionType();
         if (projectionType.isEmpty())
             throw new ListNotFoundException();
         // check projection type
         HashMap<String, String> result = new HashMap<>();
         String[] temp = projectionType.split("\\.");
-        System.out.println(temp[temp.length - 1]);
         switch (temp[temp.length - 1]) {
             case "IdNameList":
                 List<IdNameList> list = repositories.get(baseRepoName).findAllProjectedBy();
@@ -119,25 +118,10 @@ public abstract class AppService implements OptionBehaviour {
                     }
                 }
                 return result;
-            default:
-                throw new ListNotFoundException();
-        }
-    }
-
-    @Override
-    public Object getListByName() {
-        String projectionType = this.getReflectionType();
-        if (projectionType.isEmpty())
-            throw new NotImplementedException();
-        // check projection type
-        HashMap<String, String> result = new HashMap<>();
-        String[] temp = projectionType.split("\\.");
-        System.out.println(temp[temp.length - 1]);
-        switch (temp[temp.length - 1]) {
             case "NameLabelList":
-                List<NameLabelList> list = repositories.get(baseRepoName).findAllProjectedBy();
-                if (list.size() > 0) {
-                    for (NameLabelList option : list) {
+                List<NameLabelList> nameLabelLists = repositories.get(baseRepoName).findAllProjectedBy();
+                if (nameLabelLists.size() > 0) {
+                    for (NameLabelList option : nameLabelLists) {
                         result.put(option.getName(), option.getLabel());
                     }
                 }
