@@ -26,7 +26,7 @@ public class UserController extends AppController<UserService, User> {
     @Autowired
     public UserController(UserService userService) {
         super(userService);
-        this.userService=userService;
+        this.userService = userService;
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -37,11 +37,19 @@ public class UserController extends AppController<UserService, User> {
 
     @RequestMapping(value = "/heartbeat")
     public Object isValid(@RequestHeader("access-token") String accessToken) {
-        LoginSession loginSession=this.userService.tokenHeartbeat(accessToken);
-        if (loginSession==null){
+        LoginSession loginSession = this.userService.tokenHeartbeat(accessToken);
+        if (loginSession == null) {
             throw new UnauthorizedException();
-        }else{
+        } else {
             return loginSession;
         }
+    }
+
+    @RequestMapping(value = "/{id}/change-password", method = RequestMethod.PUT)
+    public Object changePassword(@PathVariable Long id, @RequestBody Map<String,String> data) {
+        String old_password = data.get("old_password");
+        String new_password = data.get("new_password");
+        String retype_new_password = data.get("retype_new_password");
+        return service.changePassword(id, old_password, new_password, retype_new_password);
     }
 }
