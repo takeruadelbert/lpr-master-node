@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Data
 @Entity
@@ -52,6 +53,19 @@ public class AccessGroup extends AppDomain {
     private boolean editable;
     private boolean addable;
     private boolean deleteable;
+
+    public AccessGroup() {
+
+    }
+
+    public AccessGroup(long userGroupId, long menuId, boolean viewable, boolean editable, boolean addable, boolean deleteable) {
+        this.userGroupId = userGroupId;
+        this.menuId = menuId;
+        this.viewable = viewable;
+        this.editable = editable;
+        this.addable = addable;
+        this.deleteable = deleteable;
+    }
 
     public void setViewable(boolean viewable) {
         this.viewable = viewable;

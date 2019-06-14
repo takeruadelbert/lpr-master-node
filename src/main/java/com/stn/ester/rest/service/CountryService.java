@@ -5,7 +5,7 @@ import com.stn.ester.rest.domain.Country;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CountryService extends AppService{
+public class CountryService extends AppService {
 
     public CountryService(CountryRepository countryRepository) {
         super(Country.unique_name);
