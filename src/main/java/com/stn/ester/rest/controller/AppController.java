@@ -5,6 +5,7 @@ import com.stn.ester.rest.service.AppService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,12 +35,12 @@ public abstract class AppController<T extends AppService, U extends AppDomain> {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public Object create(@Valid @RequestBody U domain) {
+    public Object create(@Validated(AppDomain.New.class) @RequestBody U domain) {
         return service.create(domain);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public Object update(@PathVariable long id, @Valid @RequestBody U domain) {
+    public Object update(@PathVariable long id, @Validated(AppDomain.Existing.class) @RequestBody U domain) {
         return service.update(id, domain);
     }
 
