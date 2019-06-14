@@ -5,7 +5,9 @@ import com.stn.ester.rest.dao.jpa.LoginSessionRepository;
 import com.stn.ester.rest.dao.jpa.UserGroupRepository;
 import com.stn.ester.rest.dao.jpa.UserRepository;
 import com.stn.ester.rest.domain.*;
+import com.stn.ester.rest.exception.ConfirmNewPasswordException;
 import com.stn.ester.rest.exception.InvalidLoginException;
+import com.stn.ester.rest.exception.PasswordMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class UserService extends AppService{
+public class UserService extends AppService {
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;
@@ -32,14 +34,14 @@ public class UserService extends AppService{
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository){
+    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository) {
         super(User.unique_name);
-        super.repositories.put(User.unique_name,userRepository);
-        super.repositories.put(Biodata.unique_name,biodataRepository);
-        super.repositories.put(UserGroup.unique_name,userGroupRepository);
-        this.userRepository=userRepository;
-        this.loginSessionRepository=loginSessionRepository;
-        this.userGroupRepository=userGroupRepository;
+        super.repositories.put(User.unique_name, userRepository);
+        super.repositories.put(Biodata.unique_name, biodataRepository);
+        super.repositories.put(UserGroup.unique_name, userGroupRepository);
+        this.userRepository = userRepository;
+        this.loginSessionRepository = loginSessionRepository;
+        this.userGroupRepository = userGroupRepository;
     }
 
     @Override
@@ -61,38 +63,56 @@ public class UserService extends AppService{
             throw new InvalidLoginException();
         }
         UUID randomUUID = UUID.randomUUID();
-        String token=randomUUID.toString();
-        Calendar calendar=Calendar.getInstance();
-        calendar.add(Calendar.SECOND,sessionTimeout);
-        LoginSession loginSession=new LoginSession(token,calendar.getTime(),user);
-        LoginSession savedLoginSession=loginSessionRepository.save(loginSession);
-        Map o=new HashMap();
-        o.put("username",username);
-        o.put("token",token);
+        String token = randomUUID.toString();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, sessionTimeout);
+        LoginSession loginSession = new LoginSession(token, calendar.getTime(), user);
+        LoginSession savedLoginSession = loginSessionRepository.save(loginSession);
+        Map o = new HashMap();
+        o.put("username", username);
+        o.put("token", token);
 
-        Map<String,Object> loginInfoSession=new HashMap();
+        Map<String, Object> loginInfoSession = new HashMap();
 
-        loginInfoSession.put("token",token);
-        loginInfoSession.put("username",username);
-        loginInfoSession.put("loginSessionId",savedLoginSession.getId());
+        loginInfoSession.put("token", token);
+        loginInfoSession.put("username", username);
+        loginInfoSession.put("loginSessionId", savedLoginSession.getId());
 
-        session.setAttribute("login",loginInfoSession);
+        session.setAttribute("login", loginInfoSession);
         return o;
     }
 
-    public LoginSession isValidToken(String token){
+    public LoginSession isValidToken(String token) {
         return loginSessionRepository.isTokenExist(token);
     }
 
-    public LoginSession tokenHeartbeat(String token){
+    public LoginSession tokenHeartbeat(String token) {
         LoginSession loginSession = loginSessionRepository.isTokenExist(token);
-        if (loginSession==null){
+        if (loginSession == null) {
             return null;
         }
-        Calendar calendar=Calendar.getInstance();
-        calendar.add(Calendar.SECOND,sessionTimeout);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, sessionTimeout);
         loginSession.setExpire(calendar.getTime());
-        LoginSession savedLoginSession=loginSessionRepository.save(loginSession);
+        LoginSession savedLoginSession = loginSessionRepository.save(loginSession);
         return savedLoginSession;
+    }
+
+    public Object changePassword(Long userID, String oldPassword, String newPassword, String retypeNewPassword) {
+        // check if new password is same with retype one
+        if (!newPassword.equals(retypeNewPassword)) {
+            throw new ConfirmNewPasswordException();
+        }
+
+        // check if old password is same with the registered one
+        User user = this.userRepository.findById(userID).orElse(null);
+        if (user == null || !passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new PasswordMismatchException();
+        }
+
+        user.setId(userID);
+        user.setPassword(this.passwordEncoder.encode(newPassword));
+        this.userRepository.save(user);
+        return user;
     }
 }
