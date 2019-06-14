@@ -51,9 +51,15 @@ public class UserService extends AppService {
         return super.create(o);
     }
 
-    public Map login(String username, String password, HttpSession session) {
-        User user = userRepository.findByUsername(username).orElse(null);
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+    @Override
+    public Object update(Long id, AppDomain object){
+        ((User) object).setPassword(passwordEncoder.encode(((User) object).getPassword()));
+        return super.update(id,object);
+    }
+
+    public Map login(String username, String password, HttpSession session){
+        User user=userRepository.findByUsername(username).orElse(null);
+        if (user == null || !passwordEncoder.matches(password,user.getPassword())){
             throw new InvalidLoginException();
         }
         UUID randomUUID = UUID.randomUUID();
