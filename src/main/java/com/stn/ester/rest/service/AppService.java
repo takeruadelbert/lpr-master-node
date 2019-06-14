@@ -101,6 +101,7 @@ public abstract class AppService implements OptionBehaviour {
         // check projection type
         HashMap<String, String> result = new HashMap<>();
         String[] temp = projectionType.split("\\.");
+        System.out.println(temp[temp.length - 1]);
         switch (temp[temp.length - 1]) {
             case "IdNameList":
                 List<IdNameList> list = repositories.get(baseRepoName).findAllProjectedBy();
@@ -131,6 +132,7 @@ public abstract class AppService implements OptionBehaviour {
         // check projection type
         HashMap<String, String> result = new HashMap<>();
         String[] temp = projectionType.split("\\.");
+        System.out.println(temp[temp.length - 1]);
         switch (temp[temp.length - 1]) {
             case "NameLabelList":
                 List<NameLabelList> list = repositories.get(baseRepoName).findAllProjectedBy();

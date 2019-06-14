@@ -43,4 +43,9 @@ public class MenuController extends AppController<MenuService, Menu> {
     public Object create(@Valid @RequestBody Menu menu) {
         return service.create(menu);
     }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public Object getMenuList() {
+        return service.getListById();
+    }
 }
