@@ -1,9 +1,9 @@
 package com.stn.ester.rest.search.util;
 
 public enum SearchOperation {
-    EQUALITY, NEGATION, GREATER_THAN, LESS_THAN, LIKE, STARTS_WITH, ENDS_WITH, CONTAINS;
+    EQUALITY, NEGATION, GREATER_THAN, LESS_THAN, CONTAINS, LIKE, STARTS_WITH, ENDS_WITH;
 
-    public static final String[] SIMPLE_OPERATION_SET = { ":", "!", ">", "<", "~" };
+    public static final String[] SIMPLE_OPERATION_SET = {":", "!", ">", "<", "~"};
 
     public static final String OR_PREDICATE_FLAG = "'";
 
@@ -28,7 +28,7 @@ public enum SearchOperation {
             case '<':
                 return LESS_THAN;
             case '~':
-                return LIKE;
+                return CONTAINS;
             default:
                 return null;
         }
