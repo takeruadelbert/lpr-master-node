@@ -8,5 +8,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ModuleRepository extends AppRepository<Module,Long, IdNameList> {
+public interface ModuleRepository extends AppRepository<Module,IdNameList> {
 }

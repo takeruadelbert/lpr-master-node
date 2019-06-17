@@ -43,4 +43,9 @@ public class UserGroupController extends AppController<UserGroupService, UserGro
     public Object create(@Valid @RequestBody UserGroup userGroup) {
         return service.create(userGroup);
     }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public Object getMenuList() {
+        return service.getListById();
+    }
 }

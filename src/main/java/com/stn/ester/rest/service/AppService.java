@@ -1,6 +1,7 @@
 package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.base.AppRepository;
+import com.stn.ester.rest.dao.jpa.base.AppRepository;
 import com.stn.ester.rest.dao.jpa.projections.IdLabelList;
 import com.stn.ester.rest.dao.jpa.projections.IdNameList;
 import com.stn.ester.rest.dao.jpa.projections.NameLabelList;
@@ -14,6 +15,7 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -40,6 +42,10 @@ public abstract class AppService implements OptionBehaviour {
 
     public Page<Object> index(Integer page, Integer size) {
         return repositories.get(baseRepoName).findAll(PageRequest.of(page, size));
+    }
+
+    public Page<Object> index(Integer page, Integer size, Specification spec) {
+        return repositories.get(baseRepoName).findAll(spec, PageRequest.of(page, size));
     }
 
     @Transactional

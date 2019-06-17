@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface MenuRepository extends AppRepository<Menu,Long, IdLabelList> {
+public interface MenuRepository extends AppRepository<Menu,IdLabelList> {
 
     List<Menu> findAllByParentMenuId(Long parentMenuId);
 

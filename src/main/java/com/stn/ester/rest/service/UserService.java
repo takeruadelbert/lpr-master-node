@@ -53,7 +53,6 @@ public class UserService extends AppService {
 
     @Override
     public Object update(Long id, AppDomain object){
-        ((User) object).setPassword(passwordEncoder.encode(((User) object).getPassword()));
         return super.update(id,object);
     }
 
