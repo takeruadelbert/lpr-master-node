@@ -16,9 +16,4 @@ public class ModuleController extends AppController<ModuleService, Module>{
         super(moduleService);
     }
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public Object getModuleList() {
-        return service.getListById();
-    }
-
 }

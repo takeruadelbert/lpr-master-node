@@ -12,9 +12,4 @@ public class CityController extends AppController<CityService, City> {
     public CityController(CityService cityService) {
         super(cityService);
     }
-
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public Object getListCity() {
-        return service.getListById();
-    }
 }

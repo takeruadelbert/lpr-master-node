@@ -14,9 +14,4 @@ public class StateController extends AppController<StateService, State> {
     public StateController(StateService stateService) {
         super(stateService);
     }
-
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public Object getStateList() {
-        return service.getListById();
-    }
 }

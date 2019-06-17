@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value= HttpStatus.NOT_FOUND)
 public class ListNotFoundException extends RuntimeException{
     public ListNotFoundException() {
-        super();
+        super("List Not Found.");
     }
 
     public ListNotFoundException(String message, Throwable cause) {

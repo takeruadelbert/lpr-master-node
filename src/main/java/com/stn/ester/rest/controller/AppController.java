@@ -32,9 +32,9 @@ public abstract class AppController<T extends AppService, U extends AppDomain> {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Page<Object> index(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUM) Integer page, @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) Integer size,@RequestParam(value = "search", required = false) String search) {
+    public Page<Object> index(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUM) Integer page, @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) Integer size, @RequestParam(value = "search", required = false) String search) {
         Specification<U> spec = resolveSpecification(search);
-        return service.index(page, size,spec);
+        return service.index(page, size, spec);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -60,6 +60,11 @@ public abstract class AppController<T extends AppService, U extends AppDomain> {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void delete(@PathVariable long id) {
         service.delete(id);
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public Object list() {
+        return service.getList();
     }
 
     protected Specification<U> resolveSpecification(String searchParameters) {

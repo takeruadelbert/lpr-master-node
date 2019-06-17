@@ -14,9 +14,4 @@ public class CountryController extends AppController<CountryService, Country> {
     public CountryController(CountryService countryService) {
         super(countryService);
     }
-
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public Object getCountryList() {
-        return service.getListById();
-    }
 }
