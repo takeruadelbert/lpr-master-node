@@ -1,5 +1,6 @@
 package com.stn.ester.rest.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -32,6 +33,11 @@ public class User extends AppDomain {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private Biodata biodata;
+
+    @OneToOne
+    @JoinColumn(name = "employee_id")
+    @JsonBackReference
+    private Employee employee;
 
     //contoh belongsto(unidirection manytoone)
     //start

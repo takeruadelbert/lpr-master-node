@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +41,25 @@ public class Position extends AppDomain {
     public void setParentPositionId(long parentPositionId) {
         if (parentPositionId != 0)
             this.parentPositionId = parentPositionId;
+    }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_group_id", insertable = false, updatable = false)
+    private UserGroup userGroup;
+
+    @NotNull(message = "User Group is mandatory.")
+    @JsonProperty("userGroupId")
+    @Column(name = "user_group_id", nullable = false)
+    private Long userGroupId;
+
+    @JsonSetter("userGroupId")
+    public void setUserGroupId(long userGroupId) {
+        if (userGroupId != 0)
+            this.userGroupId = userGroupId;
+    }
+
+    public Long getUserGroupId() {
+        return this.userGroupId;
     }
 
     public Long getParentPositionId() {
