@@ -65,7 +65,7 @@ public class ProfilePictureController extends AppController<ProfilePictureServic
             }
             return base64Image;
         } else {
-            return "Image not uploaded";
+            throw new IllegalArgumentException("Image not uploaded");
         }
     }
 }
