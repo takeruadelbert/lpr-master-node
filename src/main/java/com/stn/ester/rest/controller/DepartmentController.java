@@ -11,6 +11,4 @@ public class DepartmentController extends AppController<DepartmentService, Depar
     public DepartmentController(DepartmentService departmentService) {
         super(departmentService);
     }
-
-
 }
