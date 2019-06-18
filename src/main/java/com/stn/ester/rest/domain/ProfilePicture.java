@@ -14,7 +14,7 @@ import javax.persistence.OneToOne;
 public class ProfilePicture extends AppDomain {
     public static final String unique_name = "profile_picture";
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "MEDIUMTEXT")
     public String avatar;
 
     @OneToOne

@@ -14,5 +14,4 @@ public class BiodataController extends AppController<BiodataService,Biodata>{
     public BiodataController(BiodataService biodataService){
         super(biodataService);
     }
-
 }

@@ -68,5 +68,4 @@ public abstract class AppDomain {
     }
 
     public abstract String underscoreName();
-
 }

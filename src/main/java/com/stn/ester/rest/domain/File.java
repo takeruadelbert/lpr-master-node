@@ -24,6 +24,10 @@ public class File extends AppDomain {
     @JsonBackReference
     private User user;
 
+    public File(String imagePath) {
+        super();
+    }
+
     @Override
     public String underscoreName() {
         return null;
