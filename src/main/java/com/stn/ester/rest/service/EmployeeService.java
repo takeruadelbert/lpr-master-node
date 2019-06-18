@@ -6,6 +6,7 @@ import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.Employee;
 import com.stn.ester.rest.domain.Position;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -14,6 +15,9 @@ import javax.transaction.Transactional;
 public class EmployeeService extends AppService {
 
     private PositionRepository positionRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    private final String defaultPassword = "password123";
 
     @Autowired
     public EmployeeService(EmployeeRepository employeeRepository, PositionRepository positionRepository) {
@@ -33,6 +37,9 @@ public class EmployeeService extends AppService {
 
         // append data Employee Work Status
         ((Employee) domain).setEmployeeWorkStatusId(1); // -> default is Active
+
+        // encode password
+        ((Employee) domain).getUser().setPassword(this.passwordEncoder.encode(this.defaultPassword));
         return super.create(domain);
     }
 }
