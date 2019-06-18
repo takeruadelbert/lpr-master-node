@@ -27,10 +27,10 @@ public class FileController extends AppController<FileService, File> {
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Object uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
 
-        final long limit = 5000000;
+        final long limitSmallFileUpload = 1000000;
 
         String path = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\" + file.getOriginalFilename(); //set path directory
-        if (file.getSize() > limit){
+        if (file.getSize() > limitSmallFileUpload){
 
             try(FileOutputStream fout = new FileOutputStream(path)) {
                 fout.write(file.getBytes());
@@ -39,7 +39,7 @@ public class FileController extends AppController<FileService, File> {
                 System.out.println("File not found" + e);
                 e.printStackTrace();
             }
-            throw new MaxUploadSizeExceededException(limit);
+            throw new MaxUploadSizeExceededException(limitSmallFileUpload);
         }
         return file;
     }
