@@ -42,6 +42,11 @@ public class User extends AppDomain {
     @JsonManagedReference
     private ProfilePicture profilePicture;
 
+    @OneToOne
+    @JoinColumn(name = "employee_id")
+    @JsonBackReference
+    private Employee employee;
+
     //contoh belongsto(unidirection manytoone)
     //start
     @ManyToOne(fetch = FetchType.EAGER)
