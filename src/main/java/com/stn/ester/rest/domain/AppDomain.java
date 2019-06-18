@@ -68,4 +68,13 @@ public abstract class AppDomain {
     }
 
     public abstract String underscoreName();
+
+    // for validation grouping purpose
+    public interface Existing {
+
+    }
+
+    public interface New {
+
+    }
 }

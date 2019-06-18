@@ -6,5 +6,5 @@ import com.stn.ester.rest.domain.City;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CityRepository extends AppRepository<City,Long, IdNameList>{
+public interface CityRepository extends AppRepository<City, IdNameList>{
 }

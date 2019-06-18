@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FileRepository extends AppRepository<File, Long, IdList> {
+public interface FileRepository extends AppRepository<File, IdList> {
     Optional<File> findByFile(String file);
 }

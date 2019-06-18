@@ -1,6 +1,7 @@
 package com.stn.ester.rest.dao.jpa;
 
 import com.stn.ester.rest.dao.jpa.base.AppRepository;
+import com.stn.ester.rest.dao.jpa.projections.IdLabelList;
 import com.stn.ester.rest.dao.jpa.projections.IdList;
 import com.stn.ester.rest.domain.Menu;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface MenuRepository extends AppRepository<Menu,Long, IdList> {
+public interface MenuRepository extends AppRepository<Menu,IdLabelList> {
 
     List<Menu> findAllByParentMenuId(Long parentMenuId);
 

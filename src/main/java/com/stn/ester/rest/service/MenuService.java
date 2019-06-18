@@ -2,12 +2,16 @@ package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.AccessGroupRepository;
 import com.stn.ester.rest.dao.jpa.MenuRepository;
+import com.stn.ester.rest.dao.jpa.UserGroupRepository;
 import com.stn.ester.rest.domain.AccessGroup;
+import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.Menu;
+import com.stn.ester.rest.domain.UserGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
@@ -16,14 +20,16 @@ public class MenuService extends AppService {
     private MenuRepository menuRepository;
     private UserGroupService userGroupService;
     private AccessGroupRepository accessGroupRepository;
+    private UserGroupRepository userGroupRepository;
 
     @Autowired
-    public MenuService(MenuRepository menuRepository, UserGroupService userGroupService, AccessGroupRepository accessGroupRepository) {
+    public MenuService(MenuRepository menuRepository, UserGroupService userGroupService, AccessGroupRepository accessGroupRepository, UserGroupRepository userGroupRepository) {
         super(Menu.unique_name);
         super.repositories.put(Menu.unique_name, menuRepository);
         this.menuRepository = menuRepository;
         this.userGroupService = userGroupService;
         this.accessGroupRepository = accessGroupRepository;
+        this.userGroupRepository = userGroupRepository;
     }
 
     @Override
@@ -93,5 +99,22 @@ public class MenuService extends AppService {
             }
         }
         return result;
+    }
+
+    @Override
+    @Transactional
+    public Object create(AppDomain o) {
+        Menu menu = (Menu) super.create(o);
+        Long lastInsertID = menu.getId();
+
+        // automatically add access group once either menu or submenu has been added
+        Iterable<UserGroup> userGroups = this.userGroupRepository.findAll();
+        List<AccessGroup> accessGroups = new ArrayList<>();
+        for(UserGroup userGroup : userGroups) {
+            AccessGroup accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, true, false, false, false);
+            accessGroups.add(accessGroup);
+        }
+        this.accessGroupRepository.saveAll(accessGroups);
+        return menu;
     }
 }

@@ -15,17 +15,18 @@ public class User extends AppDomain {
 
     public static final String unique_name = "user";
 
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Username must be Alphanumeric.")
-    @NotBlank(message = "Username is mandatory.")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Username must be Alphanumeric.", groups = {New.class, Existing.class})
+    @NotBlank(groups = New.class, message = "Username is mandatory.")
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Email(message = "Invalid Email Format.")
-    @NotBlank(message = "Email is mandatory.")
+    @Email(message = "Invalid Email Format.", groups = {New.class, Existing.class})
+    @NotBlank(groups = {New.class, Existing.class}, message = "Email is mandatory.")
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "Password is mandatory.")
+    @NotBlank(groups = New.class, message = "Password is mandatory.")
+    @Null(groups = Existing.class)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -47,7 +48,7 @@ public class User extends AppDomain {
     @JoinColumn(name = "user_group_id", insertable = false, updatable = false)
     private UserGroup userGroup;
 
-    @NotNull(message = "User Group is mandatory.")
+    @NotNull(groups = {New.class, Existing.class}, message = "User Group is mandatory.")
     @JsonProperty("userGroupId")
     @Column(name = "user_group_id")
     private Long userGroupId;

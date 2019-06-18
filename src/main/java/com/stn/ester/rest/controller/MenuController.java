@@ -6,10 +6,9 @@ import com.stn.ester.rest.exception.UnauthorizedException;
 import com.stn.ester.rest.service.MenuService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("menus")
@@ -38,5 +37,10 @@ public class MenuController extends AppController<MenuService, Menu> {
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public Object viewMenuSubMenu() {
         return this.menuService.getAllMenuSubmenu();
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public Object create(@Valid @RequestBody Menu menu) {
+        return service.create(menu);
     }
 }

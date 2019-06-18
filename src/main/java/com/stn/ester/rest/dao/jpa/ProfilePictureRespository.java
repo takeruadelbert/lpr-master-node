@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ProfilePictureRespository extends AppRepository<ProfilePicture, Long, IdList> {
+public interface ProfilePictureRespository extends AppRepository<ProfilePicture, IdList> {
     Optional<ProfilePicture> findByAvatar(String avatar);
 }
