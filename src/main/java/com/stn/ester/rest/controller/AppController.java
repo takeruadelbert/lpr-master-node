@@ -68,12 +68,12 @@ public abstract class AppController<T extends AppService, U extends AppDomain> {
     }
 
     protected Specification<U> resolveSpecification(String searchParameters) {
-
         SpecificationsBuilder builder = new SpecificationsBuilder<>();
         String operationSetExper = Joiner.on("|")
                 .join(SearchOperation.SIMPLE_OPERATION_SET);
         Pattern pattern = Pattern.compile("(\\p{Punct}?)(\\w+?)(" + operationSetExper + ")(\\p{Punct}?)(\\w+?)(\\p{Punct}?),");
         Matcher matcher = pattern.matcher(searchParameters + ",");
+        System.out.println(searchParameters);
         while (matcher.find()) {
             builder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(5), matcher.group(4), matcher.group(6));
         }
