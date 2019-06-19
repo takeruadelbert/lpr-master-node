@@ -1,5 +1,6 @@
 package com.stn.ester.rest.controller;
 
+import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.LoginSession;
 import com.stn.ester.rest.domain.User;
 import com.stn.ester.rest.exception.UnauthorizedException;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +29,16 @@ public class UserController extends AppController<UserService, User> {
     public UserController(UserService userService) {
         super(userService);
         this.userService = userService;
+    }
+
+    @Override
+    public Object create(@Validated(AppDomain.New.class) @RequestBody User user) {
+        return super.service.create(user);
+    }
+
+    @Override
+    public Object update(@PathVariable long id, @Validated(AppDomain.Existing.class) @RequestBody User user) {
+        return super.service.update(id, user);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
