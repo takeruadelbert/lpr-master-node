@@ -73,7 +73,8 @@ public class FileController extends AppController<FileService, File> {
                 base64Image = Base64.getEncoder().encodeToString(imageData);
 
                 File files = new File();
-                files.name = base64Image;
+                files.name = file.getOriginalFilename();
+                files.base64Image = base64Image;
                 fileService.save(files);
 
                 System.out.println("Image is successfully uploaded.");

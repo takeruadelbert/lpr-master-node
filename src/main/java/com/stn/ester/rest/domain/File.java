@@ -1,6 +1,7 @@
 package com.stn.ester.rest.domain;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -16,8 +17,11 @@ import org.springframework.data.annotation.ReadOnlyProperty;
 public class File extends AppDomain {
     public static final String unique_name = "file";
 
-    @Column(columnDefinition = "MEDIUMTEXT")
+    @NotBlank(message = "name is mandatory")
     public String name;
+
+    @Column(columnDefinition = "MEDIUMTEXT")
+    public String base64Image;
 
     @OneToOne
     @JoinColumn(name = "user_id")
