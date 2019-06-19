@@ -17,7 +17,7 @@ public class FileService extends AppService{
         super.repositories.put(File.unique_name, fileRepository);
     }
 
-    public File save(File files) {
-        return fileRepository.save(files);
+    public File save(File photo) {
+        return fileRepository.save(photo);
     }
 }

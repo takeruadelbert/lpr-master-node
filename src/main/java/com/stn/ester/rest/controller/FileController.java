@@ -73,14 +73,12 @@ public class FileController extends AppController<FileService, File> {
                 imageInFile.read(imageData);
                 base64Image = Base64.getEncoder().encodeToString(imageData);
 
-                File files = new File();
-                files.name = file.getOriginalFilename();
-                System.out.println("extension" + files.name);
-                files.extension = file.getContentType().substring(6);
-                System.out.println("extension" + files.extension);
-                files.base64Image = base64Image;
-                files.url = "http://localhost:8080/files/image/" + file.getOriginalFilename();
-                fileService.save(files);
+                File photo = new File();
+                photo.name = file.getOriginalFilename();
+                photo.extension = file.getContentType().substring(6);
+                photo.url = "http://localhost:8080/files/image/" + file.getOriginalFilename();
+                photo.base64Image = base64Image;
+                fileService.save(photo);
 
                 msg = msg + "Image is successfully uploaded.";
             } catch (FileNotFoundException e) {

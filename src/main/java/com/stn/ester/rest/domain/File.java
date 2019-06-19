@@ -36,6 +36,11 @@ public class File extends AppDomain {
     @JsonBackReference
     private SystemProfile systemProfile;
 
+    @OneToOne
+    @JoinColumn(name = "news_id")
+    @JsonBackReference
+    private News news;
+
     @Override
     public String underscoreName() {
         return null;
