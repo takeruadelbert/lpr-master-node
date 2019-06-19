@@ -9,8 +9,15 @@ import org.springframework.stereotype.Service;
 public class FileService extends AppService{
 
     @Autowired
+    private FileRepository fileRepository;
+
+    @Autowired
     public FileService(FileRepository fileRepository){
         super(File.unique_name);
         super.repositories.put(File.unique_name, fileRepository);
+    }
+
+    public File save(File files) {
+        return fileRepository.save(files);
     }
 }

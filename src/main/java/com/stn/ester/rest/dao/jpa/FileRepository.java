@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface FileRepository extends AppRepository<File, IdList> {
-    Optional<File> findByFile(String file);
+    Optional<File> findByName(String name);
 }

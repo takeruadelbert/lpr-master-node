@@ -16,17 +16,13 @@ import org.springframework.data.annotation.ReadOnlyProperty;
 public class File extends AppDomain {
     public static final String unique_name = "file";
 
-    @Column(columnDefinition = "TEXT")
-    public String file;
+    @Column(columnDefinition = "MEDIUMTEXT")
+    public String name;
 
     @OneToOne
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
-
-    public File(String imagePath) {
-        super();
-    }
 
     @Override
     public String underscoreName() {

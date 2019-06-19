@@ -16,8 +16,4 @@ public class ProfilePictureService extends AppService{
         super(ProfilePicture.unique_name);
         super.repositories.put(ProfilePicture.unique_name, profilePictureRespository);
     }
-
-    public ProfilePicture save(ProfilePicture profilePicture) {
-        return profilePictureRespository.save(profilePicture);
-    }
 }

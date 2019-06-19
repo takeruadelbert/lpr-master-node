@@ -21,50 +21,7 @@ import java.util.Base64;
 public class ProfilePictureController extends AppController<ProfilePictureService, ProfilePicture>{
 
     @Autowired
-    private ProfilePictureService profilePictureService;
-
-    @Autowired
     public ProfilePictureController(ProfilePictureService profilePictureService){
         super(profilePictureService);
-    }
-
-    @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Object convertImage(@RequestParam("file") MultipartFile file) throws IOException {
-
-        if (file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/gif")) {
-            //serv image to resource folder
-            String path = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\images\\" + file.getOriginalFilename(); //set path directory
-            FileOutputStream fout = new FileOutputStream(path);
-            fout.write(file.getBytes());
-            fout.close();
-            //end
-
-            String imagePath = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\images\\" + file.getOriginalFilename();
-            String base64Image = "";
-
-            try (FileInputStream imageInFile = new FileInputStream(imagePath)) {
-                // Reading a Image file from file system
-                byte[] imageData;
-                int maxByteImage = 1000000;
-
-                imageData = new byte[maxByteImage];
-                imageInFile.read(imageData);
-                base64Image = Base64.getEncoder().encodeToString(imageData);
-
-                ProfilePicture profilePicture = new ProfilePicture();
-                profilePicture.avatar = base64Image;
-                profilePictureService.save(profilePicture);
-
-            } catch (FileNotFoundException e) {
-                System.out.println("Image not found" + e);
-                e.printStackTrace();
-            } catch (IOException ioe) {
-                System.out.println("Exception while reading the image" + ioe);
-                ioe.printStackTrace();
-            }
-            return base64Image;
-        } else {
-            throw new IllegalArgumentException("Image not uploaded");
-        }
     }
 }
