@@ -7,6 +7,9 @@ import com.stn.ester.rest.domain.State;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface StateRepository extends AppRepository<State, IdNameList> {
+    List<State> findAllByCountryId(long country_id);
 }
