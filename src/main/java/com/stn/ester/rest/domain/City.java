@@ -40,6 +40,7 @@ public class City extends AppDomain {
     @Column(name = "state_id")
     private Long stateId;
 
+    @JsonSetter("stateId")
     public void setStateId(long stateId) {
         if (stateId != 0)
             this.stateId = stateId;
