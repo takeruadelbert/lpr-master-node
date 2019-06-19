@@ -38,10 +38,6 @@ public class User extends AppDomain {
     @JsonManagedReference
     private File file;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private ProfilePicture profilePicture;
-
     @OneToOne
     @JoinColumn(name = "employee_id")
     @JsonBackReference

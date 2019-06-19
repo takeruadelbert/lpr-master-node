@@ -17,11 +17,6 @@ public class ProfilePicture extends AppDomain {
     @Column(columnDefinition = "MEDIUMTEXT")
     public String avatar;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    @JsonBackReference
-    private User user;
-
     @Override
     public String underscoreName() { return null; }
 }

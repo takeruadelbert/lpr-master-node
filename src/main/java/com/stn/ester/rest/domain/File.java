@@ -24,6 +24,11 @@ public class File extends AppDomain {
     @JsonBackReference
     private User user;
 
+    @OneToOne
+    @JoinColumn(name = "system_profile_id")
+    @JsonBackReference
+    private SystemProfile systemProfile;
+
     @Override
     public String underscoreName() {
         return null;
