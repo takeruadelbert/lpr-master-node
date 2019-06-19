@@ -43,7 +43,6 @@ public class ProfilePictureController extends AppController<ProfilePictureServic
             String base64Image = "";
 
             try (FileInputStream imageInFile = new FileInputStream(imagePath)) {
-                System.out.println("imageInFile = " + imageInFile);
                 // Reading a Image file from file system
                 byte[] imageData;
                 int maxByteImage = 1000000;
