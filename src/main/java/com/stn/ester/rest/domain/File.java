@@ -17,8 +17,11 @@ import org.springframework.data.annotation.ReadOnlyProperty;
 public class File extends AppDomain {
     public static final String unique_name = "file";
 
-    @NotBlank(message = "name is mandatory")
+    public String url;
+
     public String name;
+
+    public String extension;
 
     @Column(columnDefinition = "MEDIUMTEXT")
     public String base64Image;
