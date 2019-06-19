@@ -1,7 +1,6 @@
 package com.stn.ester.rest.controller;
 
 import com.stn.ester.rest.domain.File;
-import com.stn.ester.rest.domain.ProfilePicture;
 import com.stn.ester.rest.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,7 +28,7 @@ public class FileController extends AppController<FileService, File> {
     public FileController(FileService fileService) { super(fileService);}
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Object uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
+    public Object uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
 
         String path = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\" + file.getOriginalFilename(); //set path directory
         if (file.getSize() < 1000000) {
@@ -43,7 +42,7 @@ public class FileController extends AppController<FileService, File> {
                 e.printStackTrace();
             }
         } else {
-            throw new Exception("Maximum upload size exceeded");
+            throw new IllegalArgumentException("Maximum upload size exceeded 10MB.");
         }
         return "File is successfully uploaded.";
     }
