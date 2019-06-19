@@ -35,14 +35,16 @@ public class FileController extends AppController<FileService, File> {
             try(FileOutputStream fout = new FileOutputStream(path)) {
                 fout.write(file.getBytes());
                 fout.close();
-
                 System.out.println("File is successfully uploaded.");
             } catch (FileNotFoundException e) {
                 System.out.println("File not found" + e);
                 e.printStackTrace();
+            } catch (IOException ioe) {
+                System.out.println(ioe.getMessage());
+                ioe.printStackTrace();
             }
         } else {
-            throw new IllegalArgumentException("Maximum upload size exceeded 10MB.");
+            throw new Error("Maximum upload size exceeded 10MB.");
         }
         return "File is successfully uploaded.";
     }
@@ -78,10 +80,13 @@ public class FileController extends AppController<FileService, File> {
             } catch (FileNotFoundException e) {
                 System.out.println("Image not found" + e);
                 e.printStackTrace();
+            } catch (IOException ioe) {
+                System.out.println(ioe.getMessage());
+                ioe.printStackTrace();
             }
             return base64Image;
         } else {
-            throw new IllegalArgumentException("Image not uploaded.");
+            throw new Error("Image not uploaded.");
         }
     }
 }
