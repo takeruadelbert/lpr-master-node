@@ -31,8 +31,6 @@ public class AppSpecification<T extends AppDomain> implements Specification<T> {
         try {
             switch (criteria.getOperation()) {
                 case EQUALITY:
-                    System.out.println(criteria.getKey());
-                    System.out.println(criteria.getValue());
                     return builder.equal(root.get(criteria.getKey()), criteria.getValue());
                 case NEGATION:
                     return builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
