@@ -1,5 +1,6 @@
 package com.stn.ester.rest.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
@@ -25,6 +26,10 @@ public class News extends AppDomain {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "news", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private File file;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;

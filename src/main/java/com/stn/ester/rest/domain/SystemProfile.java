@@ -1,16 +1,20 @@
 package com.stn.ester.rest.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 
 @Data
 @Entity
 public class SystemProfile extends AppDomain {
     public static final String unique_name = "system_profile";
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "systemProfile", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private File file;
 
     private String logo;
     private String address;
