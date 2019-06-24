@@ -18,18 +18,14 @@ public class File extends AppDomain {
     public static final String unique_name = "file";
 
     public String url;
-
     public String name;
-
     public String extension;
+    public int Amount;
 
-    @Column(columnDefinition = "MEDIUMTEXT")
-    public String base64Image;
-
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    @JsonBackReference
-    private User user;
+//    @OneToOne
+//    @JoinColumn(name = "user_id")
+//    @JsonBackReference
+//    private User user;
 
 //    @OneToOne
 //    @JoinColumn(name = "system_profile_id")

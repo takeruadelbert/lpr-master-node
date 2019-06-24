@@ -13,10 +13,13 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/files")
 public class FileController extends AppController<FileService, File> {
+
+    private String PATH_FOLDER = "\\assets\\uploads\\";
 
     @Autowired
     private FileService fileService;
@@ -33,71 +36,89 @@ public class FileController extends AppController<FileService, File> {
     @RequestMapping(value = "/single_file_upload", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        String setFile = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\uploads\\" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
-        HttpHeaders headers = new HttpHeaders();
+
+        String setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+        Optional<File> checkNameFileIfExist = fileRepository.findByName(globalFunctionHelper.getNameFile(file.getOriginalFilename()));
+        if (!checkNameFileIfExist.equals(Optional.empty())) {
+            setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+        }
         try(FileOutputStream fileOutputStream = new FileOutputStream(setFile)) {
             fileOutputStream.write(file.getBytes());
             fileOutputStream.close();
 
             File voData = new File();
-            voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
+            voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename());
+            voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+            if (!checkNameFileIfExist.equals(Optional.empty())) {
+                voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
+                voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+            }
             voData.extension = globalFunctionHelper.getExtension(file.getOriginalFilename());
-            voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
             fileService.Create(voData);
 
-            headers.set("Content-Type", "application/json; charset=utf-8");
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (IOException ioe) {
-            return new ResponseEntity<>(headers, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(ioe.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        return new ResponseEntity<>("File is successfully uploaded.", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/upload_photo", method = RequestMethod.POST)
     @ResponseBody
      public ResponseEntity<Object> photoUpload(
         @RequestParam("file") MultipartFile file) throws IOException {
+
         if (file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/gif") || file.getContentType().equals("image/bmp")) {
             //serv image to resource folder
-            String setFile = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\uploads\\" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
-            FileOutputStream fileOutputStream = new FileOutputStream(setFile);
-            fileOutputStream.write(file.getBytes());
-            fileOutputStream.close();
-            //end
+            String setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+            Optional<File> checkNameFileIfExist = fileRepository.findByName(globalFunctionHelper.getNameFile(file.getOriginalFilename()));
+            if (!checkNameFileIfExist.equals(Optional.empty())) {
+                setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+            }
+            try(FileOutputStream fileOutputStream = new FileOutputStream(setFile)) {
+                fileOutputStream.write(file.getBytes());
+                fileOutputStream.close();
 
-            String base64Image = "";
-            String imagePath = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\uploads\\" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
-            HttpHeaders headers = new HttpHeaders();
-            try (FileInputStream fileInputStream = new FileInputStream(imagePath)) {
+                String base64Image = "";
+                String imagePath = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                if (!checkNameFileIfExist.equals(Optional.empty())) {
+                    imagePath = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                }
+
+                FileInputStream fileInputStream = new FileInputStream(imagePath);
                 // Reading a Image file from file system
                 byte[] buffer = Files.readAllBytes(Paths.get(imagePath));
                 base64Image = Base64.getEncoder().encodeToString(buffer);
 
                 File voData = new File();
-                voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
+                voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename());
+                voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                if (!checkNameFileIfExist.equals(Optional.empty())) {
+                    voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
+                    voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                }
                 voData.extension = globalFunctionHelper.getExtension(file.getOriginalFilename());
-                voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
-                voData.base64Image = base64Image;
                 fileService.Create(voData);
 
-                headers.set("Content-Type", "application/json; charset=utf-8");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
             } catch (IOException ioe) {
                 ioe.printStackTrace();
-                return new ResponseEntity<>(headers, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity(ioe.getMessage(), HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity<>(headers, HttpStatus.OK);
+            return new ResponseEntity<>("File is successfully uploaded.", HttpStatus.OK);
         } else {
-            throw new Error("File is not a valid image. Only JPG, JPEG, PNG, GIF and BMP files are allowed.");
+            return new ResponseEntity("File is not a valid image. Only JPG, JPEG, PNG, GIF and BMP files are allowed.", HttpStatus.BAD_REQUEST);
         }
     }
 
     @RequestMapping("/get_file/{name}")
     public ResponseEntity<byte[]> getFile(@PathVariable("name") String name) throws IOException {
+
         HttpHeaders headers = new HttpHeaders();
-        String filename = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\uploads\\" + name;
+        String filename = System.getProperty("user.dir") + PATH_FOLDER + name;
         try (InputStream inputFile = new FileInputStream(filename)) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = Files.readAllBytes(Paths.get(filename));
@@ -107,10 +128,7 @@ public class FileController extends AppController<FileService, File> {
                 l = inputFile.read(buffer);
             }
 
-            //get extension image
-            String getExtension = name;
-            int index = getExtension.indexOf( '.' );
-            String extension = getExtension.substring(getExtension.indexOf( '.' ) + 1, getExtension.length());
+            String extension = globalFunctionHelper.getExtensionImage(name);
             if (extension.matches("(.*)jpg(.*)") || extension.matches("(.*)jpeg(.*)") || extension.matches("(.*)png(.*)") || extension.matches("(.*)gif(.*)") || extension.matches("(.*)bmp(.*)")) {
                 headers.set("Content-Type", "image/" + extension);
                 headers.set("Content-Disposition", "inline; filename=\"" + name + "");
