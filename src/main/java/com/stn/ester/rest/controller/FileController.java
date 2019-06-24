@@ -36,6 +36,12 @@ public class FileController extends AppController<FileService, File> {
     @ResponseBody
     public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
 
+        String getOS = System.getProperty("os.name");
+        getOS.substring(0, 6);
+        if (getOS != "Windows") {
+            PATH_FOLDER = "/assets/uploads/";
+        }
+
         String setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
         Optional<File> checkNameFileIfExist = fileRepository.findByName(globalFunctionHelper.getNameFile(file.getOriginalFilename()));
         if (!checkNameFileIfExist.equals(Optional.empty())) {
@@ -71,6 +77,13 @@ public class FileController extends AppController<FileService, File> {
 
         if (file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/gif") || file.getContentType().equals("image/bmp")) {
             //serv image to resource folder
+
+            String getOS = System.getProperty("os.name");
+            getOS.substring(0, 6);
+            if (getOS != "Windows") {
+                PATH_FOLDER = "/assets/uploads/";
+            }
+
             String setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
             Optional<File> checkNameFileIfExist = fileRepository.findByName(globalFunctionHelper.getNameFile(file.getOriginalFilename()));
             if (!checkNameFileIfExist.equals(Optional.empty())) {
@@ -116,6 +129,12 @@ public class FileController extends AppController<FileService, File> {
 
     @RequestMapping("/get_file/{name}")
     public ResponseEntity<byte[]> getFile(@PathVariable("name") String name) throws IOException {
+
+        String getOS = System.getProperty("os.name");
+        getOS.substring(0, 6);
+        if (getOS != "Windows") {
+            PATH_FOLDER = "/assets/uploads/";
+        }
 
         HttpHeaders headers = new HttpHeaders();
         String filename = System.getProperty("user.dir") + PATH_FOLDER + name;
