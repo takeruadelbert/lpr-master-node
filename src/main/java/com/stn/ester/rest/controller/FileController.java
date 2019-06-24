@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,16 +21,14 @@ import java.util.Optional;
 public class FileController extends AppController<FileService, File> {
 
     private String PATH_FOLDER = "\\assets\\uploads\\";
-
     @Autowired
     private FileService fileService;
-
     @Autowired
     private FileRepository fileRepository;
-
     @Autowired
     private GlobalFunctionHelper globalFunctionHelper;
-
+    @Autowired
+    private HttpServletRequest request;
     @Autowired
     public FileController(FileService fileService) { super(fileService);}
 
@@ -42,16 +41,17 @@ public class FileController extends AppController<FileService, File> {
         if (!checkNameFileIfExist.equals(Optional.empty())) {
             setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
         }
+
         try(FileOutputStream fileOutputStream = new FileOutputStream(setFile)) {
             fileOutputStream.write(file.getBytes());
             fileOutputStream.close();
 
             File voData = new File();
             voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename());
-            voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+            voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
             if (!checkNameFileIfExist.equals(Optional.empty())) {
                 voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
-                voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
             }
             voData.extension = globalFunctionHelper.getExtension(file.getOriginalFilename());
             fileService.Create(voData);
@@ -93,10 +93,10 @@ public class FileController extends AppController<FileService, File> {
 
                 File voData = new File();
                 voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename());
-                voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
                 if (!checkNameFileIfExist.equals(Optional.empty())) {
                     voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
-                    voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                    voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
                 }
                 voData.extension = globalFunctionHelper.getExtension(file.getOriginalFilename());
                 fileService.Create(voData);
