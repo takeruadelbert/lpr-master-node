@@ -1,18 +1,17 @@
 package com.stn.ester.rest.controller;
 
+import com.stn.ester.rest.dao.jpa.FileRepository;
 import com.stn.ester.rest.domain.File;
+import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import com.stn.ester.rest.service.FileService;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 @RestController
@@ -23,98 +22,102 @@ public class FileController extends AppController<FileService, File> {
     private FileService fileService;
 
     @Autowired
+    private FileRepository fileRepository;
+
+    @Autowired
+    private GlobalFunctionHelper globalFunctionHelper;
+
+    @Autowired
     public FileController(FileService fileService) { super(fileService);}
 
-    @RequestMapping(value = "/singleFileUpload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Object uploadSingleFile(@RequestParam("file") MultipartFile file) throws IOException {
+    @RequestMapping(value = "/single_file_upload", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+        String setFile = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\uploads\\" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+        HttpHeaders headers = new HttpHeaders();
+        try(FileOutputStream fileOutputStream = new FileOutputStream(setFile)) {
+            fileOutputStream.write(file.getBytes());
+            fileOutputStream.close();
 
-        String msg = "";
-        String path = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\" + file.getOriginalFilename(); //set path directory
-        if (file.getSize() < 1000000) {
-            try(FileOutputStream fout = new FileOutputStream(path)) {
-                fout.write(file.getBytes());
-                fout.close();
+            File voData = new File();
+            voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
+            voData.extension = globalFunctionHelper.getExtension(file.getOriginalFilename());
+            voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+            fileService.Create(voData);
 
-                msg = msg + "File is successfully uploaded.";
-            } catch (FileNotFoundException e) {
-                msg = msg + "File not found" + e;
-                e.printStackTrace();
-            } catch (IOException ioe) {
-                msg = msg + ioe.getMessage();
-                ioe.printStackTrace();
-            }
-        } else {
-            throw new Error("Maximum upload size exceeded 10MB.");
+            headers.set("Content-Type", "application/json; charset=utf-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException ioe) {
+            return new ResponseEntity<>(headers, HttpStatus.BAD_REQUEST);
         }
-        return msg;
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/image/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Object uploadPhoto(@RequestParam("file") MultipartFile file) throws IOException {
-
-        if (file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/gif")) {
+    @RequestMapping(value = "/upload_photo", method = RequestMethod.POST)
+    @ResponseBody
+     public ResponseEntity<Object> photoUpload(
+        @RequestParam("file") MultipartFile file) throws IOException {
+        if (file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/gif") || file.getContentType().equals("image/bmp")) {
             //serv image to resource folder
-            String path = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\images\\" + file.getOriginalFilename(); //set path directory
-            FileOutputStream fout = new FileOutputStream(path);
-            fout.write(file.getBytes());
-            fout.close();
+            String setFile = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\uploads\\" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+            FileOutputStream fileOutputStream = new FileOutputStream(setFile);
+            fileOutputStream.write(file.getBytes());
+            fileOutputStream.close();
             //end
 
-            String msg = "";
             String base64Image = "";
-            String imagePath = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\images\\" + file.getOriginalFilename();
-
-            try (FileInputStream imageInFile = new FileInputStream(imagePath)) {
+            String imagePath = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\uploads\\" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+            HttpHeaders headers = new HttpHeaders();
+            try (FileInputStream fileInputStream = new FileInputStream(imagePath)) {
                 // Reading a Image file from file system
-                byte[] imageData;
-                int maxByteImage = 1000000;
+                byte[] buffer = Files.readAllBytes(Paths.get(imagePath));
+                base64Image = Base64.getEncoder().encodeToString(buffer);
 
-                imageData = new byte[maxByteImage];
-                imageInFile.read(imageData);
-                base64Image = Base64.getEncoder().encodeToString(imageData);
+                File voData = new File();
+                voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
+                voData.extension = globalFunctionHelper.getExtension(file.getOriginalFilename());
+                voData.url = "http://localhost:8080/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                voData.base64Image = base64Image;
+                fileService.Create(voData);
 
-                File photo = new File();
-                photo.name = file.getOriginalFilename();
-                photo.extension = file.getContentType().substring(6);
-                photo.url = "http://localhost:8080/files/image/" + file.getOriginalFilename();
-                photo.base64Image = base64Image;
-                fileService.save(photo);
-
-                msg = msg + "Image is successfully uploaded.";
+                headers.set("Content-Type", "application/json; charset=utf-8");
             } catch (FileNotFoundException e) {
-                msg = msg + "Image not found" + e;
                 e.printStackTrace();
             } catch (IOException ioe) {
-                msg = msg + ioe.getMessage();
                 ioe.printStackTrace();
+                return new ResponseEntity<>(headers, HttpStatus.BAD_REQUEST);
             }
-            return msg;
+            return new ResponseEntity<>(headers, HttpStatus.OK);
         } else {
-            throw new Error("Image not uploaded.");
+            throw new Error("File is not a valid image. Only JPG, JPEG, PNG, GIF and BMP files are allowed.");
         }
     }
 
-    @RequestMapping("/image/{name}")
-    public ResponseEntity<byte[]> getImageFile(@PathVariable("name") String name) throws IOException {
-
-        String filename = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\images\\" + name;
+    @RequestMapping("/get_file/{name}")
+    public ResponseEntity<byte[]> getFile(@PathVariable("name") String name) throws IOException {
         HttpHeaders headers = new HttpHeaders();
-        try (InputStream inputImage = new FileInputStream(filename))  {
-
+        String filename = System.getProperty("user.dir") + "\\src\\main\\resources\\files\\uploads\\" + name;
+        try (InputStream inputFile = new FileInputStream(filename)) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            byte[] buffer = new byte[512];
-            int l = inputImage.read(buffer);
+            byte[] buffer = Files.readAllBytes(Paths.get(filename));
+            int l = inputFile.read(buffer);
             while(l >= 0) {
                 outputStream.write(buffer, 0, l);
-                l = inputImage.read(buffer);
+                l = inputFile.read(buffer);
             }
 
+            //get extension image
             String getExtension = name;
             int index = getExtension.indexOf( '.' );
-            String extension = getExtension.substring(getExtension.indexOf( '.' )+1, getExtension.length());
-
-            headers.set("Content-Type", "image/" + extension);
-            headers.set("Content-Disposition", "inline; filename=\"" + name + "");
+            String extension = getExtension.substring(getExtension.indexOf( '.' ) + 1, getExtension.length());
+            if (extension.matches("(.*)jpg(.*)") || extension.matches("(.*)jpeg(.*)") || extension.matches("(.*)png(.*)") || extension.matches("(.*)gif(.*)") || extension.matches("(.*)bmp(.*)")) {
+                headers.set("Content-Type", "image/" + extension);
+                headers.set("Content-Disposition", "inline; filename=\"" + name + "");
+            } else {
+                headers.set("Content-Type", "application/x-javascript; charset=utf-8");
+                headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
+            }
             return new ResponseEntity<byte[]>(outputStream.toByteArray(), headers, HttpStatus.OK);
         } catch (IOException e) {
             e.printStackTrace();
