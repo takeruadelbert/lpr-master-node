@@ -27,9 +27,9 @@ public class News extends AppDomain {
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "news", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private File file;
+//    @OneToOne(fetch = FetchType.LAZY, mappedBy = "news", cascade = CascadeType.ALL)
+//    @JsonManagedReference
+//    private File file;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
