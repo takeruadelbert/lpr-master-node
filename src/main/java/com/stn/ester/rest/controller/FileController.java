@@ -20,8 +20,11 @@ import java.util.Optional;
 @RequestMapping("/files")
 public class FileController extends AppController<FileService, File> {
 
-    private static String PATH_FOLDER = "\\assets\\uploads\\";
-    private static String PATH_FOLDER_LINUX = "/assets/uploads/";
+    private static String path_folder = "\\assets\\uploads\\";
+    private static String path_folder_linux = "/assets/uploads/";
+    private static String url_file = "/files/get_file/";
+    private static String protocol = "http://";
+
     @Autowired
     private FileService fileService;
     @Autowired
@@ -37,12 +40,12 @@ public class FileController extends AppController<FileService, File> {
     @ResponseBody
     public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile[] files) throws IOException {
         //get OS
-        if (globalFunctionHelper.getOS().equals("Linux")) {PATH_FOLDER = PATH_FOLDER_LINUX;}
+        if (globalFunctionHelper.getOS().equals("Linux")) {path_folder = path_folder_linux;}
         for(MultipartFile file : files) {
-            String setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+            String setFile = System.getProperty("user.dir") + path_folder + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
             Optional<File> checkNameFileIfExist = fileRepository.findByName(globalFunctionHelper.getNameFile(file.getOriginalFilename()));
             if (!checkNameFileIfExist.equals(Optional.empty())) {
-                setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+                setFile = System.getProperty("user.dir") + path_folder + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getTimeNow() + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
             }
             try (FileOutputStream fileOutputStream = new FileOutputStream(setFile)) {
                 fileOutputStream.write(file.getBytes());
@@ -50,10 +53,10 @@ public class FileController extends AppController<FileService, File> {
 
                 File voData = new File();
                 voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename());
-                voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+                voData.url = protocol + request.getServerName() + ":" + request.getServerPort() + url_file + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
                 if (!checkNameFileIfExist.equals(Optional.empty())) {
-                    voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
-                    voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+                    voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getTimeNow();
+                    voData.url = protocol + request.getServerName() + ":" + request.getServerPort() + url_file + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getTimeNow() + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
                 }
                 voData.extension = globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
                 fileService.Create(voData);
@@ -72,13 +75,13 @@ public class FileController extends AppController<FileService, File> {
     public ResponseEntity<Object> photoUpload(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/gif") || file.getContentType().equals("image/bmp")) {
             //get OS
-            if (globalFunctionHelper.getOS().equals("Linux")) {PATH_FOLDER = PATH_FOLDER_LINUX;}
+            if (globalFunctionHelper.getOS().equals("Linux")) {path_folder = path_folder_linux;}
             //serv image to assets folder
-            String setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+            String setFile = System.getProperty("user.dir") + path_folder + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
             Optional<File> checkNameFileIfExist = fileRepository.findByName(globalFunctionHelper.getNameFile(file.getOriginalFilename()));
             //if name is exist can't override file
             if (!checkNameFileIfExist.equals(Optional.empty())) {
-                setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+                setFile = System.getProperty("user.dir") + path_folder + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getTimeNow() + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
             }
             try(FileOutputStream fileOutputStream = new FileOutputStream(setFile)) {
                 fileOutputStream.write(file.getBytes());
@@ -86,10 +89,10 @@ public class FileController extends AppController<FileService, File> {
 
                 File voData = new File();
                 voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename());
-                voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+                voData.url = protocol + request.getServerName() + ":" + request.getServerPort() + url_file + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
                 if (!checkNameFileIfExist.equals(Optional.empty())) {
-                    voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
-                    voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+                    voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getTimeNow();
+                    voData.url = protocol + request.getServerName() + ":" + request.getServerPort() + url_file + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getTimeNow() + globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
                 }
                 voData.extension = globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
                 fileService.Create(voData);
@@ -111,9 +114,9 @@ public class FileController extends AppController<FileService, File> {
     @ResponseBody
     public ResponseEntity<Object> uploadPhotoBase64(@RequestParam(value = "encodeBase64") String encodeBase64) throws IOException {
         //get OS
-        if (globalFunctionHelper.getOS().equals("Linux")) {PATH_FOLDER = PATH_FOLDER_LINUX;}
+        if (globalFunctionHelper.getOS().equals("Linux")) {path_folder = path_folder_linux;}
         //decode base64 string
-        String imagePath = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getDate() + globalFunctionHelper.getExtensionFromBase64(encodeBase64);
+        String imagePath = System.getProperty("user.dir") + path_folder + globalFunctionHelper.getTimeNow() + globalFunctionHelper.getExtensionFromBase64(encodeBase64);
         try (FileOutputStream imageOutFile = new FileOutputStream(imagePath)) {
             byte[] imageByteArray = Base64.getDecoder().decode(globalFunctionHelper.removeDataFromBase64Two(encodeBase64));
             imageOutFile.write(imageByteArray);
@@ -130,9 +133,9 @@ public class FileController extends AppController<FileService, File> {
     @RequestMapping("/get_file/{name}")
     public ResponseEntity<byte[]> getFile(@PathVariable("name") String name) throws IOException {
         //get OS
-        if (globalFunctionHelper.getOS().equals("Linux")) {PATH_FOLDER = PATH_FOLDER_LINUX;}
+        if (globalFunctionHelper.getOS().equals("Linux")) {path_folder = path_folder_linux;}
         HttpHeaders headers = new HttpHeaders();
-        String filename = System.getProperty("user.dir") + PATH_FOLDER + name;
+        String filename = System.getProperty("user.dir") + path_folder + name;
         try (InputStream inputFile = new FileInputStream(filename)) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = Files.readAllBytes(Paths.get(filename));

@@ -18,7 +18,7 @@ public class GlobalFunctionHelper {
     }
 
     // get Time now
-    public static String getDate() {
+    public static String getTimeNow() {
         String timeStamp = new SimpleDateFormat(tmeNow).format(new Date());
         return timeStamp;
     }
@@ -34,7 +34,7 @@ public class GlobalFunctionHelper {
     // get extension file
     public static String getExtensionFile(String vData) {
         int index = vData.indexOf( '.' );
-        String extension = vData.substring(vData.indexOf( '.' ) + 1, vData.length());
+        String extension = "." + vData.substring(vData.indexOf( '.' ) + 1, vData.length());
         return extension;
     }
 
