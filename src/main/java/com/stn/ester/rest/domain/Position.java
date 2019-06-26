@@ -31,7 +31,7 @@ public class Position extends AppDomain {
     @JoinColumn(name = "parent_position_id", insertable = false, updatable = false)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private Department parentPosition;
+    private Position parentPosition;
 
     @JsonProperty("parentPositionId")
     @Column(name = "parent_position_id")
