@@ -21,6 +21,7 @@ public class File extends AppDomain {
     public String name;
     public String extension;
     public int Amount;
+    public int is_private;
 
 //    @OneToOne
 //    @JoinColumn(name = "user_id")
