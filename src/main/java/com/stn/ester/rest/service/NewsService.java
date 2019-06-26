@@ -47,22 +47,26 @@ public class NewsService extends AppService {
         List<News> validNews = new ArrayList<>();
         Iterable<News> allNews = this.newsRepository.findAll();
 
+        long department_id = SessionHelper.getDepartmentID();
+
         // get current date
         Date today = DateTimeHelper.getCurrentDate();
 
-        for(News news : allNews) {
+        for (News news : allNews) {
             // check if period date of news exists
-            if(news.getStartDate() != null && news.getExpiredDate() != null) {
+            if (news.getStartDate() != null && news.getExpiredDate() != null) {
                 // check if news still valid within period of date
                 Date startDate = news.getStartDate();
                 Date expiredDate = news.getExpiredDate();
-                if(!startDate.after(today) && !expiredDate.before(today)) {
-                    validNews.add(news);
+                if (!startDate.after(today) && !expiredDate.before(today)) {
+                    if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
+                        validNews.add(news);
                 }
             } else {
                 // otherwise just get all news status id 1 -> showing
-                if(news.getNewsStatusId() == 1) {
-                    validNews.add(news);
+                if (news.getNewsStatusId() == 1) {
+                    if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
+                        validNews.add(news);
                 }
             }
         }
