@@ -20,7 +20,8 @@ import java.util.Optional;
 @RequestMapping("/files")
 public class FileController extends AppController<FileService, File> {
 
-    private String PATH_FOLDER = "\\assets\\uploads\\";
+    private static String PATH_FOLDER = "\\assets\\uploads\\";
+    private static String PATH_FOLDER_LINUX = "/assets/uploads/";
     @Autowired
     private FileService fileService;
     @Autowired
@@ -32,77 +33,56 @@ public class FileController extends AppController<FileService, File> {
     @Autowired
     public FileController(FileService fileService) { super(fileService);}
 
-    @RequestMapping(value = "/single_file_upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/upload_file", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-
-        String getOS = System.getProperty("os.name");
-        getOS.substring(0, 6);
-        if (getOS != "Windows") {
-            PATH_FOLDER = "/assets/uploads/";
-        }
-
-        String setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
-        Optional<File> checkNameFileIfExist = fileRepository.findByName(globalFunctionHelper.getNameFile(file.getOriginalFilename()));
-        if (!checkNameFileIfExist.equals(Optional.empty())) {
-            setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
-        }
-
-        try(FileOutputStream fileOutputStream = new FileOutputStream(setFile)) {
-            fileOutputStream.write(file.getBytes());
-            fileOutputStream.close();
-
-            File voData = new File();
-            voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename());
-            voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+    public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile[] files) throws IOException {
+        //get OS
+        if (globalFunctionHelper.getOS().equals("Linux")) {PATH_FOLDER = PATH_FOLDER_LINUX;}
+        for(MultipartFile file : files) {
+            String setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+            Optional<File> checkNameFileIfExist = fileRepository.findByName(globalFunctionHelper.getNameFile(file.getOriginalFilename()));
             if (!checkNameFileIfExist.equals(Optional.empty())) {
-                voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
-                voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
             }
-            voData.extension = globalFunctionHelper.getExtension(file.getOriginalFilename());
-            fileService.Create(voData);
+            try (FileOutputStream fileOutputStream = new FileOutputStream(setFile)) {
+                fileOutputStream.write(file.getBytes());
+                fileOutputStream.close();
 
-        } catch (FileNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (IOException ioe) {
-            return new ResponseEntity<>(ioe.getMessage(), HttpStatus.BAD_REQUEST);
+                File voData = new File();
+                voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename());
+                voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                if (!checkNameFileIfExist.equals(Optional.empty())) {
+                    voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate();
+                    voData.url = "http://" + request.getServerName() + ":" + request.getServerPort() + "/files/get_file/" + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
+                }
+                voData.extension = globalFunctionHelper.getExtension(file.getOriginalFilename());
+                fileService.Create(voData);
+
+            } catch (FileNotFoundException e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            } catch (IOException ioe) {
+                return new ResponseEntity<>(ioe.getMessage(), HttpStatus.BAD_REQUEST);
+            }
         }
         return new ResponseEntity<>("File is successfully uploaded.", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/upload_photo", method = RequestMethod.POST)
     @ResponseBody
-     public ResponseEntity<Object> photoUpload(
-        @RequestParam("file") MultipartFile file) throws IOException {
-
+    public ResponseEntity<Object> photoUpload(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/gif") || file.getContentType().equals("image/bmp")) {
-            //serv image to resource folder
-
-            String getOS = System.getProperty("os.name");
-            getOS.substring(0, 6);
-            if (getOS != "Windows") {
-                PATH_FOLDER = "/assets/uploads/";
-            }
-
+            //get OS
+            if (globalFunctionHelper.getOS().equals("Linux")) {PATH_FOLDER = PATH_FOLDER_LINUX;}
+            //serv image to assets folder
             String setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
             Optional<File> checkNameFileIfExist = fileRepository.findByName(globalFunctionHelper.getNameFile(file.getOriginalFilename()));
+            //if name is exist can't override file
             if (!checkNameFileIfExist.equals(Optional.empty())) {
                 setFile = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
             }
             try(FileOutputStream fileOutputStream = new FileOutputStream(setFile)) {
                 fileOutputStream.write(file.getBytes());
                 fileOutputStream.close();
-
-                String base64Image = "";
-                String imagePath = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
-                if (!checkNameFileIfExist.equals(Optional.empty())) {
-                    imagePath = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getNameFile(file.getOriginalFilename()) + "-" + globalFunctionHelper.getDate() + "." + globalFunctionHelper.getExtension(file.getOriginalFilename());
-                }
-
-                FileInputStream fileInputStream = new FileInputStream(imagePath);
-                // Reading a Image file from file system
-                byte[] buffer = Files.readAllBytes(Paths.get(imagePath));
-                base64Image = Base64.getEncoder().encodeToString(buffer);
 
                 File voData = new File();
                 voData.name = globalFunctionHelper.getNameFile(file.getOriginalFilename());
@@ -127,15 +107,31 @@ public class FileController extends AppController<FileService, File> {
         }
     }
 
+    @RequestMapping(value = "/upload_photo_base64", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<Object> uploadPhotoBase64(@RequestParam(value = "encodeBase64") String encodeBase64) throws IOException {
+        //get OS
+        if (globalFunctionHelper.getOS().equals("Linux")) {PATH_FOLDER = PATH_FOLDER_LINUX;}
+        //decode
+        String imagePath = System.getProperty("user.dir") + PATH_FOLDER + globalFunctionHelper.getDate() + globalFunctionHelper.getExtensionFromBase64(encodeBase64);
+        try (FileOutputStream imageOutFile = new FileOutputStream(imagePath)) {
+            byte[] imageByteArray = Base64.getDecoder().decode(globalFunctionHelper.removeDataFromBase64Two(encodeBase64));
+            imageOutFile.write(imageByteArray);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            return new ResponseEntity(ioe.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("File is successfully uploaded.", HttpStatus.OK);
+    }
+
     @RequestMapping("/get_file/{name}")
     public ResponseEntity<byte[]> getFile(@PathVariable("name") String name) throws IOException {
-
-        String getOS = System.getProperty("os.name");
-        getOS.substring(0, 6);
-        if (getOS != "Windows") {
-            PATH_FOLDER = "/assets/uploads/";
-        }
-
+        //get OS
+        if (globalFunctionHelper.getOS().equals("Linux")) {PATH_FOLDER = PATH_FOLDER_LINUX;}
+        //set headers application
         HttpHeaders headers = new HttpHeaders();
         String filename = System.getProperty("user.dir") + PATH_FOLDER + name;
         try (InputStream inputFile = new FileInputStream(filename)) {
@@ -146,7 +142,6 @@ public class FileController extends AppController<FileService, File> {
                 outputStream.write(buffer, 0, l);
                 l = inputFile.read(buffer);
             }
-
             String extension = globalFunctionHelper.getExtensionImage(name);
             if (extension.matches("(.*)jpg(.*)") || extension.matches("(.*)jpeg(.*)") || extension.matches("(.*)png(.*)") || extension.matches("(.*)gif(.*)") || extension.matches("(.*)bmp(.*)")) {
                 headers.set("Content-Type", "image/" + extension);
