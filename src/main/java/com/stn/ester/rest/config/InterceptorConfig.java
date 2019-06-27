@@ -1,6 +1,7 @@
 package com.stn.ester.rest.config;
 
 import com.stn.ester.rest.interceptor.AuthInterceptor;
+import com.stn.ester.rest.interceptor.DisabledPageInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -12,8 +13,12 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Autowired
     private AuthInterceptor authInterceptor;
 
+    @Autowired
+    private DisabledPageInterceptor disabledPageInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor);
+        registry.addInterceptor(disabledPageInterceptor);
     }
 }
