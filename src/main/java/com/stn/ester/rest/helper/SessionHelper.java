@@ -11,4 +11,8 @@ public class SessionHelper {
     public static long getUserID() {
         return 1;
     }
+
+    public static long getDepartmentID() {
+        return 1;
+    }
 }

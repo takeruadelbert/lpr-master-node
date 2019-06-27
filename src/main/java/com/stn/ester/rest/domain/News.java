@@ -1,8 +1,10 @@
 package com.stn.ester.rest.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -37,11 +39,11 @@ public class News extends AppDomain {
             this.authorId = authorId;
     }
 
-    @Column(columnDefinition = "Date")
+    @Column(columnDefinition = "DateTime")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
 
-    @Column(columnDefinition = "Date")
+    @Column(columnDefinition = "DateTime")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date expiredDate;
 
@@ -66,8 +68,26 @@ public class News extends AppDomain {
         return this.expiredDate;
     }
 
-    public long getNewsStatusId() {
+    public Long getNewsStatusId() {
         return this.newsStatusId;
+    }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "department_id", insertable = false, updatable = false)
+    private Department department;
+
+    @Column(name = "department_id")
+    @JsonProperty("departmentId")
+    private Long departmentId;
+
+    @JsonSetter("departmentId")
+    public void setDepartmentId(Long departmentId) {
+        if (departmentId != 0)
+            this.departmentId = departmentId;
+    }
+
+    public Long getDepartmentId() {
+        return this.departmentId;
     }
 
     public String underscoreName() {
