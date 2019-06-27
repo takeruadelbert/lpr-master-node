@@ -34,9 +34,9 @@ public class User extends AppDomain {
     @JsonManagedReference
     private Biodata biodata;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private File file;
+//    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+//    @JsonManagedReference
+//    private File file;
 
     @OneToOne
     @JoinColumn(name = "employee_id")

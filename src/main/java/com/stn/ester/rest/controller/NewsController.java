@@ -4,10 +4,7 @@ import com.stn.ester.rest.domain.News;
 import com.stn.ester.rest.service.NewsService;
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -27,5 +24,10 @@ public class NewsController extends AppController<NewsService, News> {
     @Override
     public Object update(@PathVariable long id, @Valid @RequestBody News news) {
         return service.update(id, news);
+    }
+
+    @RequestMapping(value = "/show", method = RequestMethod.GET)
+    public Object getAllValidNews() throws Exception {
+        return service.getAllValidNews();
     }
 }
