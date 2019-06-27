@@ -10,7 +10,7 @@ import java.util.Date;
 @ControllerAdvice
 public class GlobalFunctionHelper {
 
-    private static final String timeNow = "HHmmss";
+    private static final String timeNow = "yyyy-MM-dd HH:mm:ss";
     @Autowired
     private static FileRepository fileRepository;
     @Autowired
@@ -62,7 +62,7 @@ public class GlobalFunctionHelper {
 
     // remove Data: base64 image
     public static String removeDataFromBase64Two(String base64image) {
-        // String unwantedText = "data:image/png;base64,";
+        String unwantedText = "data:image/png;base64,";
         int index = base64image.indexOf( ',' );
         String vData = base64image.substring(index + 1, base64image.length());
         return vData;
