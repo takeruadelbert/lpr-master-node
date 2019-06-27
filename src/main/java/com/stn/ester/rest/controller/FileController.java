@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.file.Files;
@@ -31,7 +30,6 @@ public class FileController extends AppController<FileService, File> {
     private static String url_profile_picture = "/files/get/profile_picture/";
     private static String url_base64 = "/files/get/base64/";
     private static String protocol = "http://";
-
     @Autowired
     private FileService fileService;
     @Autowired
@@ -67,7 +65,6 @@ public class FileController extends AppController<FileService, File> {
                 }
                 voData.extension = globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
                 fileService.Create(voData);
-
             } catch (FileNotFoundException e) {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
             } catch (IOException ioe) {
@@ -103,7 +100,6 @@ public class FileController extends AppController<FileService, File> {
                 }
                 voData.extension = globalFunctionHelper.getExtensionFile(file.getOriginalFilename());
                 fileService.Create(voData);
-
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -134,7 +130,6 @@ public class FileController extends AppController<FileService, File> {
             voData.url = protocol + request.getServerName() + ":" + request.getServerPort() + url_base64 + globalFunctionHelper.getDateTimeNow() + globalFunctionHelper.getExtensionFromBase64(base64);
             voData.extension = globalFunctionHelper.getExtensionFromBase64(base64);
             fileService.Create(voData);
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
