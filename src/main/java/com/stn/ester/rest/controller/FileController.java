@@ -78,7 +78,7 @@ public class FileController extends AppController<FileService, File> {
 
     @RequestMapping(value = "/upload_photo", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Object> photoUpload(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<Object> uploadPhoto(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/gif") || file.getContentType().equals("image/bmp")) {
             //get operation system
             if (globalFunctionHelper.getOS().equals("Linux")) {directory_upload_profile_picture = directory_upload_profile_picture_linux;}
