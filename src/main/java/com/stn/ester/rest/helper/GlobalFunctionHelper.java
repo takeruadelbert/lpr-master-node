@@ -1,6 +1,6 @@
 package com.stn.ester.rest.helper;
 
-import com.stn.ester.rest.dao.jpa.FileRepository;
+import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
@@ -12,58 +12,50 @@ public class GlobalFunctionHelper {
 
     private static final String timeNow = "yyyy-MM-dd HH:mm:ss";
     @Autowired
-    private static FileRepository fileRepository;
+    private static AssetFileRepository assetFileRepository;
+
     @Autowired
     public GlobalFunctionHelper() {
     }
 
     // get Time now
-    public static String getTimeNow() {
+    public static String getCurrentTimestamp() {
         String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
         return timeStamp;
     }
 
     // get name file
     public static String getNameFile(String vData) {
-        //int getLastCharOfDot = vData.lastIndexOf('.');
-        int index = vData.indexOf( '.' );
+        if (vData == null) return null;
+        int index = vData.lastIndexOf('.');
+        if (index == -1) return vData;
         String name = vData.substring(0, index);
         return name;
     }
 
     // get extension file
     public static String getExtensionFile(String vData) {
-        int index = vData.indexOf( '.' );
-        String extension = "." + vData.substring(vData.indexOf( '.' ) + 1, vData.length());
-        return extension;
-    }
-
-    // get extension image
-    public static String getExtensionImage(String name) {
-        String getExtension = name;
-        int index = getExtension.indexOf( '.' );
-        String extension = getExtension.substring(getExtension.indexOf( '.' ) + 1, getExtension.length());
+        String extension = "." + vData.substring(vData.lastIndexOf(".") + 1);
         return extension;
     }
 
     // remove data: from base64 image
     public static String removeDataFromBase64(String base64Image) {
-        int getlenght = base64Image.length();
-        String getDataImage = base64Image.substring(0,base64Image.indexOf( ',' ) + 1);
+        String getDataImage = base64Image.substring(0, base64Image.indexOf(',') + 1);
         return getDataImage;
     }
 
     // get extension from base64 image
     public static String getExtensionFromBase64(String base64image) {
-        int getIndexOfColonTwoPoint = base64image.indexOf( ';' );
-        String getExtension = base64image.substring(base64image.indexOf( '/' ) + 1, getIndexOfColonTwoPoint);
+        int getIndexOfColonTwoPoint = base64image.indexOf(';');
+        String getExtension = base64image.substring(base64image.indexOf('/') + 1, getIndexOfColonTwoPoint);
         return "." + getExtension;
     }
 
     // remove Data: base64 image
     public static String removeDataFromBase64Two(String base64image) {
         String unwantedText = "data:image/png;base64,";
-        int index = base64image.indexOf( ',' );
+        int index = base64image.indexOf(',');
         String vData = base64image.substring(index + 1, base64image.length());
         return vData;
     }
