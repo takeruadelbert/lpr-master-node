@@ -2,6 +2,8 @@ package com.stn.ester.rest.helper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -25,5 +27,9 @@ public class DateTimeHelper {
 
     public static Date getCurrentDate(String dateValue) throws Exception {
         return new SimpleDateFormat(datePattern).parse(dateValue);
+    }
+
+    public static String getCurrentTimeStamp() {
+        return Long.toString(System.currentTimeMillis());
     }
 }
