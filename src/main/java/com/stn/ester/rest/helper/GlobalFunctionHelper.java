@@ -10,7 +10,7 @@ import java.util.Date;
 @ControllerAdvice
 public class GlobalFunctionHelper {
 
-    private static final String tmeNow = "HHmmss";
+    private static final String timeNow = "HHmmss";
     @Autowired
     private static FileRepository fileRepository;
     @Autowired
@@ -19,7 +19,7 @@ public class GlobalFunctionHelper {
 
     // get Time now
     public static String getTimeNow() {
-        String timeStamp = new SimpleDateFormat(tmeNow).format(new Date());
+        String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
         return timeStamp;
     }
 
