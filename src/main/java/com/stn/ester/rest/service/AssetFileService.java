@@ -7,15 +7,16 @@ import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -57,11 +58,11 @@ public class AssetFileService extends AppService {
 
                 // store file into asset using FileOutputStream
                 try {
-                    String pathFile = DS + environment.getProperty("ester.parent-directory");
+                    String pathFile = DS + environment.getProperty("ester.parent-directory") + DS + filename + "." + ext;
 
                     this.autoCreateAssetDir();
 
-                    FileOutputStream fileOutputStream = new FileOutputStream(System.getProperty("user.dir") + DS + pathFile + DS + filename + "." + ext);
+                    FileOutputStream fileOutputStream = new FileOutputStream(System.getProperty("user.dir") + DS + pathFile);
                     fileOutputStream.write(file.getBytes());
                     fileOutputStream.close();
 
@@ -91,7 +92,6 @@ public class AssetFileService extends AppService {
 
                 String name = GlobalFunctionHelper.getNameFile(filename);
                 String ext = GlobalFunctionHelper.getExtensionFile(filename);
-                String path = DS + this.environment.getProperty("ester.parent-directory") + DS + filename;
 
                 // check if uploaded file is already exists
                 Optional<AssetFile> file = this.assetFileRepository.findByNameAndExtension(name, ext);
@@ -101,9 +101,9 @@ public class AssetFileService extends AppService {
                  If so, added suffix timestamp (milliseconds) from uploaded file.
                  */
                 if (!file.equals(Optional.empty())) {
-                    filename += DateTimeHelper.getCurrentTimeStamp();
+                    filename = name + DateTimeHelper.getCurrentTimeStamp() + "." + ext;
                 }
-
+                String path = DS + this.environment.getProperty("ester.parent-directory") + DS + filename;
                 String pathfile = System.getProperty("user.dir") + DS + this.environment.getProperty("ester.parent-directory") + DS + filename;
                 FileOutputStream fileOutputStream = new FileOutputStream(pathfile);
                 byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
@@ -136,6 +136,37 @@ public class AssetFileService extends AppService {
         File assetDir = new File(System.getProperty("user.dir") + DS + this.environment.getProperty("ester.parent-directory"));
         if (!assetDir.exists()) {
             assetDir.mkdir();
+        }
+    }
+
+    public Object getFile(String path) {
+        path = DS + path;
+        Map<String,Object> result = new HashMap<>();
+        HttpHeaders headers = new HttpHeaders();
+        String filename = System.getProperty("user.dir") + path;
+        try (InputStream inputFile = new FileInputStream(filename)) {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] buffer = Files.readAllBytes(Paths.get(filename));
+            int l = inputFile.read(buffer);
+            while (l >= 0) {
+                outputStream.write(buffer, 0, l);
+                l = inputFile.read(buffer);
+            }
+            String[] temp = path.split("/");
+            String name = temp[temp.length - 1];
+            String extension = GlobalFunctionHelper.getExtensionFile(name);
+            if (extension.matches("(.*)jpg(.*)") || extension.matches("(.*)jpeg(.*)") || extension.matches("(.*)png(.*)") || extension.matches("(.*)gif(.*)") || extension.matches("(.*)bmp(.*)")) {
+                headers.set("Content-Type", "image/" + extension);
+                headers.set("Content-Disposition", "inline; filename=\"" + name + "");
+            } else {
+                headers.set("Content-Type", "application/x-javascript; charset=utf-8");
+                headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
+            }
+            return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
+        } catch (Exception e) {
+            result.put("status", HttpStatus.NOT_FOUND.value());
+            result.put("message", e.getMessage());
+            return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
         }
     }
 }
