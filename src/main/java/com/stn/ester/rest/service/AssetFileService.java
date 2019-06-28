@@ -99,6 +99,7 @@ public class AssetFileService extends AppService {
                  If so, added suffix timestamp (milliseconds) from uploaded file.
                  */
                 if (!file.equals(Optional.empty())) {
+                    name += DateTimeHelper.getCurrentTimeStamp();
                     filename = name + DateTimeHelper.getCurrentTimeStamp() + "." + ext;
                 }
                 String path = DS + this.environment.getProperty("ester.parent-directory") + DS + filename;
