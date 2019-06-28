@@ -139,7 +139,7 @@ public class AssetFileService extends AppService {
         }
     }
 
-    public Object getFile(String path) {
+    public Object getFile(String path, boolean is_download) {
         path = DS + path;
         Map<String,Object> result = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
@@ -155,12 +155,17 @@ public class AssetFileService extends AppService {
             String[] temp = path.split("/");
             String name = temp[temp.length - 1];
             String extension = GlobalFunctionHelper.getExtensionFile(name);
-            if (extension.matches("(.*)jpg(.*)") || extension.matches("(.*)jpeg(.*)") || extension.matches("(.*)png(.*)") || extension.matches("(.*)gif(.*)") || extension.matches("(.*)bmp(.*)")) {
-                headers.set("Content-Type", "image/" + extension);
-                headers.set("Content-Disposition", "inline; filename=\"" + name + "");
-            } else {
+            if(is_download) {
                 headers.set("Content-Type", "application/x-javascript; charset=utf-8");
                 headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
+            } else {
+                if (extension.matches("(.*)jpg(.*)") || extension.matches("(.*)jpeg(.*)") || extension.matches("(.*)png(.*)") || extension.matches("(.*)gif(.*)") || extension.matches("(.*)bmp(.*)")) {
+                    headers.set("Content-Type", "image/" + extension);
+                    headers.set("Content-Disposition", "inline; filename=\"" + name + "");
+                } else {
+                    headers.set("Content-Type", "application/x-javascript; charset=utf-8");
+                    headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
+                }
             }
             return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
         } catch (Exception e) {

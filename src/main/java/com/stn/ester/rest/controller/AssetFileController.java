@@ -34,9 +34,13 @@ public class AssetFileController extends AppController<AssetFileService, AssetFi
 
     @RequestMapping(value = "/**", method = RequestMethod.GET)
     @NotNull
-    public Object getFile(HttpServletRequest request) {
+    public Object getFile(HttpServletRequest request, @RequestParam(value = "dl", required = false) Integer flag_dl) {
         String path = extractFilePath(request);
-        return service.getFile(path);
+        boolean is_dl = false;
+        if (flag_dl != null) {
+            is_dl = flag_dl == 1 ? true : false;
+        }
+        return service.getFile(path, is_dl);
     }
 
     private static String extractFilePath(HttpServletRequest request) {
