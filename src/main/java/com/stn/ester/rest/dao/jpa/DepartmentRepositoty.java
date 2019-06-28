@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface DepartmentRepositoty extends AppRepository<Department, IdLabelList> {
     List<Department> findAllByParentDepartmentId(Long parentDepartmentId);
+
+    List<Department> findAllByParentDepartmentIdIsNull();
 }
