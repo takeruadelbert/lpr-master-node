@@ -16,12 +16,7 @@ public class GlobalFunctionHelper {
 
     @Autowired
     public GlobalFunctionHelper() {
-    }
 
-    // get Time now
-    public static String getCurrentTimestamp() {
-        String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
-        return timeStamp;
     }
 
     // get name file
@@ -35,34 +30,26 @@ public class GlobalFunctionHelper {
 
     // get extension file
     public static String getExtensionFile(String vData) {
-        String extension = "." + vData.substring(vData.lastIndexOf(".") + 1);
+        String extension = vData.substring(vData.lastIndexOf(".") + 1);
         return extension;
     }
 
+    private static String[] splitDataEncodedBase64(String encodedBase64) {
+        return encodedBase64.split(",");
+    }
+
     // remove data: from base64 image
-    public static String removeDataFromBase64(String base64Image) {
-        String getDataImage = base64Image.substring(0, base64Image.indexOf(',') + 1);
-        return getDataImage;
+    public static String getRawDataFromEncodedBase64(String encodedBase64) {
+        String[] temp = splitDataEncodedBase64(encodedBase64);
+        return temp[1];
     }
 
-    // get extension from base64 image
-    public static String getExtensionFromBase64(String base64image) {
-        int getIndexOfColonTwoPoint = base64image.indexOf(';');
-        String getExtension = base64image.substring(base64image.indexOf('/') + 1, getIndexOfColonTwoPoint);
-        return "." + getExtension;
-    }
-
-    // remove Data: base64 image
-    public static String removeDataFromBase64Two(String base64image) {
-        String unwantedText = "data:image/png;base64,";
-        int index = base64image.indexOf(',');
-        String vData = base64image.substring(index + 1, base64image.length());
-        return vData;
-    }
-
-    // get operation system
-    public static String getOS() {
-        String getOS = System.getProperty("os.name");
-        return getOS;
+    public static String getExtFromEncodedBase64(String encodedBase64) {
+        String[] temp = splitDataEncodedBase64(encodedBase64);
+        String data = temp[0];
+        String[] temp2 = data.split("data:image/");
+        String data2 = temp2[0];
+        String[] temp3 = data2.split(";");
+        return temp3[0];
     }
 }
