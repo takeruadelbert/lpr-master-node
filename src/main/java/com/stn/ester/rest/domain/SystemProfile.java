@@ -14,7 +14,7 @@ public class SystemProfile extends AppDomain {
 
 //    @OneToOne(fetch = FetchType.LAZY, mappedBy = "systemProfile", cascade = CascadeType.ALL)
 //    @JsonManagedReference
-//    private File file;
+//    private AssetFile file;
 
     private String logo;
     private String address;

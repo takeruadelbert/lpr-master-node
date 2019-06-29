@@ -36,7 +36,7 @@ public class User extends AppDomain {
 
 //    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
 //    @JsonManagedReference
-//    private File file;
+//    private AssetFile file;
 
     @OneToOne
     @JoinColumn(name = "employee_id")

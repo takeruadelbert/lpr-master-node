@@ -1,9 +1,8 @@
 package com.stn.ester.rest.helper;
 
-import com.stn.ester.rest.dao.jpa.FileRepository;
+import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
@@ -11,13 +10,15 @@ import java.util.Scanner;
 @ControllerAdvice
 public class GlobalFunctionHelper {
 
-    private static final String timeNow = "yyyyMMddHHmmss";
+    private static final String timeNow = "yyyy-MM-dd HH:mm:ss";
     @Autowired
-    private static FileRepository fileRepository;
+    private static AssetFileRepository assetFileRepository;
+
     @Autowired
     public GlobalFunctionHelper() {
-    }
 
+	}
+	
     // get Time now
     public static String getDateTimeNow() {
         String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
@@ -26,50 +27,35 @@ public class GlobalFunctionHelper {
 
     // get name file
     public static String getNameFile(String vData) {
-        //int getLastCharOfDot = vData.lastIndexOf('.');
-        int index = vData.indexOf( '.' );
+        if (vData == null) return null;
+        int index = vData.lastIndexOf('.');
+        if (index == -1) return vData;
         String name = vData.substring(0, index);
         return name;
     }
 
     // get extension file
     public static String getExtensionFile(String vData) {
-        int index = vData.indexOf( '.' );
-        String extension = "." + vData.substring(vData.indexOf( '.' ) + 1, vData.length());
+        String extension = vData.substring(vData.lastIndexOf(".") + 1);
         return extension;
     }
 
-    // get extension image
-    public static String getExtensionImage(String name) {
-        String getExtension = name;
-        int index = getExtension.indexOf( '.' );
-        String extension = getExtension.substring(getExtension.indexOf( '.' ) + 1, getExtension.length());
-        return extension;
+    private static String[] splitDataEncodedBase64(String encodedBase64) {
+        return encodedBase64.split(",");
     }
 
-    // get extension from base64 image
-    public static String getExtensionFromBase64(String base64) {
-        int getIndexOfColonTwoPoint = base64.indexOf( ';' );
-        String getExtension = base64.substring(base64.indexOf( '/' ) + 1, getIndexOfColonTwoPoint);
-        return "." + getExtension;
+    // remove data: from base64 image
+    public static String getRawDataFromEncodedBase64(String encodedBase64) {
+        String[] temp = splitDataEncodedBase64(encodedBase64);
+        return temp[1];
     }
 
-    // remove Data: base64 image
-    public static String removeDataFromBase64(String base64) {
-        int index = base64.indexOf( ',' );
-        String getBase64WithoutData = base64.substring(index + 1, base64.length());
-        return getBase64WithoutData;
-    }
-
-    // remove all spaces in base64 string
-    public static String perfectionBase64(String newBase64) {
-        String getNewBase64 = newBase64.replaceAll(" ","+");
-        return getNewBase64;
-    }
-
-    // get operation system
-    public static String getOS() {
-        String getOS = System.getProperty("os.name");
-        return getOS;
-    }
+    public static String getExtFromEncodedBase64(String encodedBase64) {
+        String[] temp = splitDataEncodedBase64(encodedBase64);
+        String data = temp[0];
+        String[] temp2 = data.split("data:image/");
+        String data2 = temp2[0];
+        String[] temp3 = data2.split(";");
+        return temp3[0];
+	}
 }
