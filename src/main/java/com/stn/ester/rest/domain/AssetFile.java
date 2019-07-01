@@ -12,6 +12,7 @@ public class AssetFile extends AppDomain {
     private String path;
     private String name;
     private String extension;
+    private String token;
 
     public AssetFile() {
 
@@ -21,6 +22,22 @@ public class AssetFile extends AppDomain {
         this.path = path;
         this.name = name;
         this.extension = extension;
+    }
+
+    public String getPath() {
+        return this.path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getToken() {
+        return this.token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @Override
