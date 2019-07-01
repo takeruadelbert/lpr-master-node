@@ -22,6 +22,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.io.File;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -31,6 +32,8 @@ public abstract class AppService implements OptionBehaviour {
 
     protected HashMap<String, AppRepository> repositories;
     protected String baseRepoName;
+    protected String currentDirectory = System.getProperty("user.dir");
+    protected static final String DS = File.separator;
 
     @PersistenceContext
     protected EntityManager entityManager;

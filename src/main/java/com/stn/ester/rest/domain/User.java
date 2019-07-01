@@ -92,6 +92,10 @@ public class User extends AppDomain {
         return userGroupId;
     }
 
+    public String getToken() {
+        return this.token;
+    }
+
     @Override
     public String underscoreName() {
         return User.unique_name;

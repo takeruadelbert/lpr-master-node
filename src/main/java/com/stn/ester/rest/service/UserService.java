@@ -51,6 +51,9 @@ public class UserService extends AppService implements AssetFileBehaviour {
     @Override
     @Transactional
     public Object create(AppDomain o) {
+        if(((User) o).getToken().isEmpty()) {
+            ((User) o).setAssetFileId(1L);
+        }
         ((User) o).setPassword(passwordEncoder.encode(((User) o).getPassword()));
         return super.create(o);
     }

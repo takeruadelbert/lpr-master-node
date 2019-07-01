@@ -6,7 +6,6 @@ import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,6 @@ public class AssetFileService extends AppService {
 
     @Autowired
     private AssetFileRepository assetFileRepository;
-    private final String DS = File.separator;
 
     @Value("${ester.asset.root}")
     private String assetRootPath;
@@ -32,7 +30,7 @@ public class AssetFileService extends AppService {
     @Value("${ester.asset.temp}")
     private String assetTempPath;
 
-    private String currentUserDirectory = new File(System.getProperty("user.dir")).getParent();
+    private String parentDirectory = new File(System.getProperty("user.dir")).getParent();
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
@@ -66,7 +64,7 @@ public class AssetFileService extends AppService {
 
                     this.autoCreateAssetDir(this.assetTempPath);
 
-                    FileOutputStream fileOutputStream = new FileOutputStream(this.currentUserDirectory + DS + pathFile);
+                    FileOutputStream fileOutputStream = new FileOutputStream(this.parentDirectory + DS + pathFile);
                     fileOutputStream.write(file.getBytes());
                     fileOutputStream.close();
 
@@ -110,7 +108,7 @@ public class AssetFileService extends AppService {
                     filename = name + DateTimeHelper.getCurrentTimeStamp() + "." + ext;
                 }
                 String path = DS + this.assetTempPath + DS + filename;
-                String pathfile = this.currentUserDirectory + DS + this.assetTempPath + DS + filename;
+                String pathfile = this.parentDirectory + DS + this.assetTempPath + DS + filename;
                 FileOutputStream fileOutputStream = new FileOutputStream(pathfile);
                 byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
                 fileOutputStream.write(fileByteArray);
@@ -141,7 +139,7 @@ public class AssetFileService extends AppService {
     */
     private void autoCreateAssetDir(String assetPath) {
         try {
-            File assetDir = new File(this.currentUserDirectory + DS + assetPath);
+            File assetDir = new File(this.parentDirectory + DS + assetPath);
             if (!assetDir.exists()) {
                 assetDir.mkdirs();
             }
@@ -154,7 +152,8 @@ public class AssetFileService extends AppService {
         path = DS + path;
         Map<String, Object> result = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
-        String filename = this.currentUserDirectory + path;
+        String filename = this.parentDirectory + path;
+        System.out.println("filename = " + filename);
         try (InputStream inputFile = new FileInputStream(filename)) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = Files.readAllBytes(Paths.get(filename));
@@ -197,7 +196,7 @@ public class AssetFileService extends AppService {
                 // create if the path doesn't exists
                 this.autoCreateAssetDir(path);
 
-                String from = this.currentUserDirectory + file.get().getPath();
+                String from = this.currentDirectory + file.get().getPath();
                 String to = from.replace("temp", this.assetRootPath + DS + assetDir);
 
                 // move file from folder "temp"
@@ -207,7 +206,7 @@ public class AssetFileService extends AppService {
 
                 // update path data of asset file
                 file.get().setId(asset_file_id);
-                file.get().setPath(to.replace(this.currentUserDirectory, ""));
+                file.get().setPath(to.replace(this.parentDirectory, ""));
                 this.assetFileRepository.save(file.get());
                 return asset_file_id;
             } else {
