@@ -207,7 +207,7 @@ public class AssetFileService extends AppService {
 
                 // update path data of asset file
                 file.get().setId(asset_file_id);
-                file.get().setPath(to);
+                file.get().setPath(to.replace(this.currentUserDirectory, ""));
                 this.assetFileRepository.save(file.get());
                 return asset_file_id;
             } else {
