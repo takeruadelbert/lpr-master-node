@@ -3,6 +3,9 @@ package com.stn.ester.rest.helper;
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Scanner;
 
 @ControllerAdvice
 public class GlobalFunctionHelper {
@@ -14,6 +17,12 @@ public class GlobalFunctionHelper {
     @Autowired
     public GlobalFunctionHelper() {
 
+	}
+	
+    // get Time now
+    public static String getDateTimeNow() {
+        String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
+        return timeStamp;
     }
 
     // get name file
