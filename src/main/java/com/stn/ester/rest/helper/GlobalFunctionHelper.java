@@ -57,5 +57,5 @@ public class GlobalFunctionHelper {
         String data2 = temp2[0];
         String[] temp3 = data2.split(";");
         return temp3[0];
-	}
+    }
 }
