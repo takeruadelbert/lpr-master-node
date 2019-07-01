@@ -66,7 +66,7 @@ public class AssetFileService extends AppService {
 
                     this.autoCreateAssetDir(this.assetTempPath);
 
-                    FileOutputStream fileOutputStream = new FileOutputStream(System.getProperty("user.dir") + DS + pathFile);
+                    FileOutputStream fileOutputStream = new FileOutputStream(this.currentUserDirectory + DS + pathFile);
                     fileOutputStream.write(file.getBytes());
                     fileOutputStream.close();
 
@@ -110,7 +110,7 @@ public class AssetFileService extends AppService {
                     filename = name + DateTimeHelper.getCurrentTimeStamp() + "." + ext;
                 }
                 String path = DS + this.assetTempPath + DS + filename;
-                String pathfile = System.getProperty("user.dir") + DS + this.assetTempPath + DS + filename;
+                String pathfile = this.currentUserDirectory + DS + this.assetTempPath + DS + filename;
                 FileOutputStream fileOutputStream = new FileOutputStream(pathfile);
                 byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
                 fileOutputStream.write(fileByteArray);
@@ -141,11 +141,9 @@ public class AssetFileService extends AppService {
     */
     private void autoCreateAssetDir(String assetPath) {
         try {
-            System.out.println("target dir = " + this.currentUserDirectory + DS + assetPath);
             File assetDir = new File(this.currentUserDirectory + DS + assetPath);
             if (!assetDir.exists()) {
                 assetDir.mkdirs();
-                System.out.println("New Dir has been created");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -156,7 +154,7 @@ public class AssetFileService extends AppService {
         path = DS + path;
         Map<String, Object> result = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
-        String filename = System.getProperty("user.dir") + path;
+        String filename = this.currentUserDirectory + path;
         try (InputStream inputFile = new FileInputStream(filename)) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = Files.readAllBytes(Paths.get(filename));
@@ -215,7 +213,6 @@ public class AssetFileService extends AppService {
                 return result;
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
             ex.printStackTrace();
             return result;
         }
