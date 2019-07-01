@@ -198,7 +198,7 @@ public class AssetFileService extends AppService {
                 this.autoCreateAssetDir(path);
 
                 String from = this.currentUserDirectory + file.get().getPath();
-                String to = from.replace("temp",this.assetRootPath + DS + assetDir);
+                String to = from.replace("temp", this.assetRootPath + DS + assetDir);
 
                 // move file from folder "temp"
                 Files.copy(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
