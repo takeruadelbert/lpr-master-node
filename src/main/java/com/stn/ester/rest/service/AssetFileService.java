@@ -196,7 +196,7 @@ public class AssetFileService extends AppService {
                 // create if the path doesn't exists
                 this.autoCreateAssetDir(path);
 
-                String from = this.currentDirectory + file.get().getPath();
+                String from = this.parentDirectory + file.get().getPath();
                 String to = from.replace("temp", this.assetRootPath + DS + assetDir);
 
                 // move file from folder "temp"

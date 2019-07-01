@@ -5,6 +5,7 @@ import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.News;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.SessionHelper;
+import com.stn.ester.rest.service.base.AssetFileBehaviour;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +18,17 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class NewsService extends AppService {
+public class NewsService extends AppService implements AssetFileBehaviour {
     private NewsRepository newsRepository;
+    private AssetFileService assetFileService;
+    private String asset_path = "news";
 
     @Autowired
-    public NewsService(NewsRepository newsRepository) {
+    public NewsService(NewsRepository newsRepository, AssetFileService assetFileService) {
         super(News.unique_name);
         super.repositories.put(News.unique_name, newsRepository);
         this.newsRepository = newsRepository;
+        this.assetFileService = assetFileService;
     }
 
     @Transactional
@@ -33,6 +37,10 @@ public class NewsService extends AppService {
         long author_id = SessionHelper.getUserID();
         ((News) o).setAuthorId(author_id);
         ((News) o).setNewsStatusId(1); // default option is showed.
+        String token = ((News) o).getToken();
+        if(token != null) {
+            ((News) o).setAssetFileId(this.claimFile(token));
+        }
         return super.create(o);
     }
 
@@ -40,6 +48,10 @@ public class NewsService extends AppService {
     public Object update(Long id, AppDomain o) {
         long author_id = SessionHelper.getUserID();
         ((News) o).setAuthorId(author_id);
+        String token = ((News) o).getToken();
+        if(!token.isEmpty()) {
+            ((News) o).setAssetFileId(this.claimFile(token));
+        }
         return super.update(id, o);
     }
 
@@ -71,5 +83,15 @@ public class NewsService extends AppService {
             }
         }
         return validNews;
+    }
+
+    @Override
+    public String getAssetPath() {
+        return this.asset_path;
+    }
+
+    @Override
+    public Long claimFile(String token) {
+        return this.assetFileService.moveTempDirToPermanentDir(token, this.getAssetPath());
     }
 }

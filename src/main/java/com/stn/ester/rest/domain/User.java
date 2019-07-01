@@ -69,7 +69,6 @@ public class User extends AppDomain {
     //end
 
     @Transient
-    @JsonIgnore
     private String token;
 
     public String getUsername() {
