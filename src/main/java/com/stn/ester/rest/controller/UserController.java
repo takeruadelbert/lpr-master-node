@@ -54,10 +54,15 @@ public class UserController extends AppController<UserService, User> {
     }
 
     @RequestMapping(value = "/{id}/change-password", method = RequestMethod.PUT)
-    public Object changePassword(@PathVariable Long id, @RequestBody Map<String,String> data) {
+    public Object changePassword(@PathVariable Long id, @RequestBody Map<String, String> data) {
         String old_password = data.get("old_password");
         String new_password = data.get("new_password");
         String retype_new_password = data.get("retype_new_password");
         return service.changePassword(id, old_password, new_password, retype_new_password);
+    }
+
+    @RequestMapping(value = "/change-profile-picture", method = RequestMethod.POST)
+    public Object changeProfilePicture(@RequestBody Map<String, String> data) {
+        return service.changeProfilePicture(data.get("token"));
     }
 }

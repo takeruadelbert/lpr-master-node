@@ -32,7 +32,7 @@ public class AssetFileService extends AppService {
     @Value("${ester.asset.temp}")
     private String assetTempPath;
 
-    private String currentUserDirectory = System.getProperty("user.dir");
+    private String currentUserDirectory = new File(System.getProperty("user.dir")).getParent();
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
@@ -190,8 +190,8 @@ public class AssetFileService extends AppService {
         Long result = null;
         try {
             Optional<AssetFile> file = this.assetFileRepository.findByToken(token);
-            long asset_file_id = file.get().getId();
             if (!file.equals(Optional.empty())) {
+                long asset_file_id = file.get().getId();
                 String path = this.assetRootPath + DS + assetDir;
 
                 // create if the path doesn't exists
@@ -203,6 +203,7 @@ public class AssetFileService extends AppService {
                 // move file from folder "temp"
                 Files.copy(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
                 Files.delete(Paths.get(from));
+//                Files.move(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
 
                 // update path data of asset file
                 file.get().setId(asset_file_id);

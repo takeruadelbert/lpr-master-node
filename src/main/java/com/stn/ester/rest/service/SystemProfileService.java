@@ -29,7 +29,6 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
 
         // insert asset file ID if there's any file uploaded.
         String token = ((SystemProfile) object).getToken();
-        System.out.println("token = " + token);
         if (!token.isEmpty()) {
             ((SystemProfile) object).setAssetFileId(this.claimFile(token));
         }
@@ -48,6 +47,6 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
 
     @Override
     public Long claimFile(String fileToken) {
-        return this.assetFileService.moveTempDirToPermanentDir(fileToken, this.asset_path);
+        return this.assetFileService.moveTempDirToPermanentDir(fileToken, this.getAssetPath());
     }
 }
