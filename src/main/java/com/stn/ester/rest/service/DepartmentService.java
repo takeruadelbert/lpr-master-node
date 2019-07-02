@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -55,5 +56,16 @@ public class DepartmentService extends AppService {
             }
         }
         return subDepartments;
+    }
+
+    public Object getDepartmentAndSubDepartmentGroupList() {
+        List<Department> departments = departmentRepositoty.findAllByParentDepartmentIdIsNull();
+        List<Object> result = new ArrayList();
+        if (!departments.isEmpty()) {
+            for (Department department : departments) {
+                result.add(this.get(department.getId()));
+            }
+        }
+        return result;
     }
 }
