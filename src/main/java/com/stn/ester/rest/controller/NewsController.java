@@ -4,6 +4,9 @@ import com.stn.ester.rest.domain.News;
 import com.stn.ester.rest.service.NewsService;
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,8 +29,8 @@ public class NewsController extends AppController<NewsService, News> {
         return service.update(id, news);
     }
 
-    @RequestMapping(value = "/show", method = RequestMethod.GET)
-    public Object getAllValidNews() throws Exception {
-        return service.getAllValidNews();
+    @RequestMapping(value = "/dashboard", method = RequestMethod.GET)
+    public Page<News> dashboard(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUM) Integer page, @RequestParam(name = "size", defaultValue = "2") Integer size) throws Exception {
+        return service.dashboard(page, size, PageRequest.of(page, size));
     }
 }

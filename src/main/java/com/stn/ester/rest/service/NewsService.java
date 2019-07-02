@@ -7,6 +7,10 @@ import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -38,7 +42,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         ((News) o).setAuthorId(author_id);
         ((News) o).setNewsStatusId(1); // default option is showed.
         String token = ((News) o).getToken();
-        if(token != null) {
+        if (token != null) {
             ((News) o).setAssetFileId(this.claimFile(token));
         }
         return super.create(o);
@@ -49,13 +53,13 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         long author_id = SessionHelper.getUserID();
         ((News) o).setAuthorId(author_id);
         String token = ((News) o).getToken();
-        if(!token.isEmpty()) {
+        if (!token.isEmpty()) {
             ((News) o).setAssetFileId(this.claimFile(token));
         }
         return super.update(id, o);
     }
 
-    public Object getAllValidNews() throws Exception {
+    public Page<News> dashboard(Integer page, Integer size, Pageable pageable) throws Exception {
         List<News> validNews = new ArrayList<>();
         Iterable<News> allNews = this.newsRepository.findAll();
 
@@ -64,25 +68,31 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         // get current date
         Date today = DateTimeHelper.getCurrentDate();
 
-        for (News news : allNews) {
-            // check if period date of news exists
-            if (news.getStartDate() != null && news.getExpiredDate() != null) {
-                // check if news still valid within period of date
-                Date startDate = news.getStartDate();
-                Date expiredDate = news.getExpiredDate();
-                if (!startDate.after(today) && !expiredDate.before(today)) {
-                    if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
-                        validNews.add(news);
-                }
-            } else {
-                // otherwise just get all news status id 1 -> showing
-                if (news.getNewsStatusId() == 1) {
-                    if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
-                        validNews.add(news);
+        if (allNews != null) {
+            for (News news : allNews) {
+                // check if period date of news exists
+                if (news.getStartDate() != null && news.getExpiredDate() != null) {
+                    // check if news still valid within period of date
+                    Date startDate = news.getStartDate();
+                    Date expiredDate = news.getExpiredDate();
+                    if (!startDate.after(today) && !expiredDate.before(today)) {
+                        if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
+                            validNews.add(news);
+                    }
+                } else {
+                    // otherwise just get all news status id 1 -> showing
+                    if (news.getNewsStatusId() == 1) {
+                        if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
+                            validNews.add(news);
+                    }
                 }
             }
         }
-        return validNews;
+        int start = (int) pageable.getOffset();
+        int end = (start + pageable.getPageSize()) > validNews.size() ? validNews.size() : (start + pageable.getPageSize());
+        List<News> temp = start <= end ? validNews.subList(start, end) : new ArrayList<>();
+        Page<News> newsDashboard = new PageImpl<>(temp, PageRequest.of(page, size), validNews.size());
+        return newsDashboard;
     }
 
     @Override
