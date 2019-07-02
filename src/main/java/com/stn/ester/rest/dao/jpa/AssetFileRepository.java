@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface AssetFileRepository extends AppRepository<AssetFile, IdList> {
     Optional<AssetFile> findByNameAndExtension(String name, String ext);
+
+    Optional<AssetFile> findByToken(String token);
 }

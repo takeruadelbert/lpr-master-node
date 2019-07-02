@@ -8,24 +8,27 @@ import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.exception.ConfirmNewPasswordException;
 import com.stn.ester.rest.exception.InvalidLoginException;
 import com.stn.ester.rest.exception.PasswordMismatchException;
+import com.stn.ester.rest.helper.SessionHelper;
+import com.stn.ester.rest.service.base.AssetFileBehaviour;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-public class UserService extends AppService {
+public class UserService extends AppService implements AssetFileBehaviour {
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;
     private UserGroupRepository userGroupRepository;
+    private AssetFileService assetFileService;
+    private String asset_path = "profile_picture";
 
     @Value("${ester.session.login.timeout}")
     private int sessionTimeout;
@@ -34,7 +37,7 @@ public class UserService extends AppService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository) {
+    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService) {
         super(User.unique_name);
         super.repositories.put(User.unique_name, userRepository);
         super.repositories.put(Biodata.unique_name, biodataRepository);
@@ -42,11 +45,15 @@ public class UserService extends AppService {
         this.userRepository = userRepository;
         this.loginSessionRepository = loginSessionRepository;
         this.userGroupRepository = userGroupRepository;
+        this.assetFileService = assetFileService;
     }
 
     @Override
     @Transactional
     public Object create(AppDomain o) {
+        if(((User) o).getToken() != null) {
+            ((User) o).setAssetFileId(1L);
+        }
         ((User) o).setPassword(passwordEncoder.encode(((User) o).getPassword()));
         return super.create(o);
     }
@@ -113,5 +120,30 @@ public class UserService extends AppService {
         user.setPassword(this.passwordEncoder.encode(newPassword));
         this.userRepository.save(user);
         return user;
+    }
+
+    @Override
+    public String getAssetPath() {
+        return this.asset_path;
+    }
+
+    @Override
+    public Long claimFile(String token) {
+        return this.assetFileService.moveTempDirToPermanentDir(token, this.getAssetPath());
+    }
+
+    public Object changeProfilePicture(String token) {
+        if(!token.isEmpty()) {
+            Long user_id = SessionHelper.getUserID();
+            Long asset_file_id = this.claimFile(token);
+            User user = this.userRepository.findById(user_id).get();
+            user.setId(user_id);
+            user.setAssetFileId(asset_file_id);
+            return super.update(user_id, user);
+        }
+        Map<String,Object> result = new HashMap<>();
+        result.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
+        result.put("message", "Failed to change profile picture : Invalid Token.");
+        return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

@@ -1,6 +1,7 @@
 package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -12,11 +13,21 @@ import javax.validation.constraints.Email;
 public class SystemProfile extends AppDomain {
     public static final String unique_name = "system_profile";
 
-//    @OneToOne(fetch = FetchType.LAZY, mappedBy = "systemProfile", cascade = CascadeType.ALL)
-//    @JsonManagedReference
-//    private AssetFile file;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "asset_file_id", insertable = false, updatable = false)
+    private AssetFile assetFile;
 
-    private String logo;
+    @JsonProperty("assetFileId")
+    @Column(name = "asset_file_id")
+    private Long assetFileId;
+
+    public void setAssetFileId(Long assetFileId) {
+        if (assetFileId != null)
+            this.assetFileId = assetFileId;
+    }
+
+    @Transient
+    private String token;
     private String address;
     private String telephone;
     private String name;
@@ -27,6 +38,10 @@ public class SystemProfile extends AppDomain {
     private String email;
     @URL(regexp = "^(http|https).*", message = "Invalid URL Website")
     private String website;
+
+    public String getToken() {
+        return this.token;
+    }
 
     @Override
     public String underscoreName() {
