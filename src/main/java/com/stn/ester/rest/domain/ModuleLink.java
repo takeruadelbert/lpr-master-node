@@ -23,7 +23,7 @@ public class ModuleLink extends AppDomain {
     @Enumerated(EnumType.STRING)
     private RequestMethod requestMethod;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
     @JsonBackReference
     @EqualsAndHashCode.Exclude
