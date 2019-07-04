@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.lang.reflect.Field;
 import java.util.Date;
 
 @MappedSuperclass
@@ -68,6 +69,16 @@ public abstract class AppDomain {
     }
 
     public abstract String underscoreName();
+
+    public void setAttribute(String attributeName,Object value){
+        try {
+            Field attribute = getClass().getDeclaredField(attributeName);
+            attribute.setAccessible(true);
+            attribute.set(this,value);
+        }catch(Exception ex){
+            System.out.println(ex);
+        }
+    }
 
     // for validation grouping purpose
     public interface Existing {
