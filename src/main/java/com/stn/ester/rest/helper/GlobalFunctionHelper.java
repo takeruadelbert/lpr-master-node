@@ -3,7 +3,10 @@ package com.stn.ester.rest.helper;
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -13,6 +16,9 @@ public class GlobalFunctionHelper {
     private static final String timeNow = "yyyy-MM-dd HH:mm:ss";
     @Autowired
     private static AssetFileRepository assetFileRepository;
+
+    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
     @Autowired
     public GlobalFunctionHelper() {
@@ -57,5 +63,11 @@ public class GlobalFunctionHelper {
         String data2 = temp2[0];
         String[] temp3 = data2.split(";");
         return temp3[0];
+	}
+
+    public static String generateToken() {
+        byte[] randomBytes = new byte[24];
+        secureRandom.nextBytes(randomBytes);
+        return base64Encoder.encodeToString(randomBytes);
     }
 }

@@ -5,7 +5,7 @@ import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Service
@@ -23,10 +24,13 @@ public class AssetFileService extends AppService {
     @Autowired
     private AssetFileRepository assetFileRepository;
 
-    @Autowired
-    private Environment environment;
+    @Value("${ester.asset.root}")
+    private String assetRootPath;
 
-    private final String DS = File.separator;
+    @Value("${ester.asset.temp}")
+    private String assetTempPath;
+
+    private String parentDirectory = new File(System.getProperty("user.dir")).getParent();
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
@@ -56,15 +60,16 @@ public class AssetFileService extends AppService {
 
                 // store file into asset using FileOutputStream
                 try {
-                    String pathFile = DS + environment.getProperty("ester.parent-directory") + DS + filename + "." + ext;
+                    String pathFile = DS + this.assetTempPath + DS + filename + "." + ext;
 
-                    this.autoCreateAssetDir();
+                    this.autoCreateAssetDir(this.assetTempPath);
 
-                    FileOutputStream fileOutputStream = new FileOutputStream(System.getProperty("user.dir") + DS + pathFile);
+                    FileOutputStream fileOutputStream = new FileOutputStream(this.parentDirectory + DS + pathFile);
                     fileOutputStream.write(file.getBytes());
                     fileOutputStream.close();
 
                     AssetFile assetFile = new AssetFile(pathFile, filename, ext);
+                    assetFile.setToken(GlobalFunctionHelper.generateToken());
                     data.add(this.assetFileRepository.save(assetFile));
                 } catch (Exception ex) {
                     result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -86,7 +91,7 @@ public class AssetFileService extends AppService {
         if (!encoded_file.isEmpty()) {
             List<MultipartFile> decoded_files = new ArrayList<>();
             try {
-                this.autoCreateAssetDir();
+                this.autoCreateAssetDir(this.assetTempPath);
 
                 String name = GlobalFunctionHelper.getNameFile(filename);
                 String ext = GlobalFunctionHelper.getExtensionFile(filename);
@@ -102,14 +107,15 @@ public class AssetFileService extends AppService {
                     name += DateTimeHelper.getCurrentTimeStamp();
                     filename = name + DateTimeHelper.getCurrentTimeStamp() + "." + ext;
                 }
-                String path = DS + this.environment.getProperty("ester.parent-directory") + DS + filename;
-                String pathfile = System.getProperty("user.dir") + DS + this.environment.getProperty("ester.parent-directory") + DS + filename;
+                String path = DS + this.assetTempPath + DS + filename;
+                String pathfile = this.parentDirectory + DS + this.assetTempPath + DS + filename;
                 FileOutputStream fileOutputStream = new FileOutputStream(pathfile);
                 byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
                 fileOutputStream.write(fileByteArray);
 
                 // save decoded file to database
                 AssetFile assetFile = new AssetFile(path, name, ext);
+                assetFile.setToken(GlobalFunctionHelper.generateToken());
                 this.assetFileRepository.save(assetFile);
 
                 result.put("data", assetFile);
@@ -131,18 +137,23 @@ public class AssetFileService extends AppService {
       check if required directory is exist.
       If it doesn't exists, then program creates the directory automatically
     */
-    private void autoCreateAssetDir() {
-        File assetDir = new File(System.getProperty("user.dir") + DS + this.environment.getProperty("ester.parent-directory"));
-        if (!assetDir.exists()) {
-            assetDir.mkdir();
+    private void autoCreateAssetDir(String assetPath) {
+        try {
+            File assetDir = new File(this.parentDirectory + DS + assetPath);
+            if (!assetDir.exists()) {
+                assetDir.mkdirs();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
     public Object getFile(String path, boolean is_download) {
         path = DS + path;
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
-        String filename = System.getProperty("user.dir") + path;
+        String filename = this.parentDirectory + path;
+        System.out.println("filename = " + filename);
         try (InputStream inputFile = new FileInputStream(filename)) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = Files.readAllBytes(Paths.get(filename));
@@ -154,7 +165,7 @@ public class AssetFileService extends AppService {
             String[] temp = path.split("/");
             String name = temp[temp.length - 1];
             String extension = GlobalFunctionHelper.getExtensionFile(name);
-            if(is_download) {
+            if (is_download) {
                 headers.set("Content-Type", "application/x-javascript; charset=utf-8");
                 headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
             } else {
@@ -171,6 +182,39 @@ public class AssetFileService extends AppService {
             result.put("status", HttpStatus.NOT_FOUND.value());
             result.put("message", e.getMessage());
             return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    public Long moveTempDirToPermanentDir(String token, String assetDir) {
+        Long result = null;
+        try {
+            Optional<AssetFile> file = this.assetFileRepository.findByToken(token);
+            if (!file.equals(Optional.empty())) {
+                long asset_file_id = file.get().getId();
+                String path = this.assetRootPath + DS + assetDir;
+
+                // create if the path doesn't exists
+                this.autoCreateAssetDir(path);
+
+                String from = this.parentDirectory + file.get().getPath();
+                String to = from.replace("temp", this.assetRootPath + DS + assetDir);
+
+                // move file from folder "temp"
+                Files.copy(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
+                Files.delete(Paths.get(from));
+//                Files.move(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
+
+                // update path data of asset file
+                file.get().setId(asset_file_id);
+                file.get().setPath(to.replace(this.parentDirectory, ""));
+                this.assetFileRepository.save(file.get());
+                return asset_file_id;
+            } else {
+                return result;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return result;
         }
     }
 }

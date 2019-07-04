@@ -1,9 +1,6 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -34,9 +31,19 @@ public class User extends AppDomain {
     @JsonManagedReference
     private Biodata biodata;
 
-//    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-//    @JsonManagedReference
-//    private AssetFile file;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "asset_file_id", insertable = false, updatable = false)
+    private AssetFile assetFile;
+
+    @JsonProperty("assetFileId")
+    @Column(name = "asset_file_id")
+    private Long assetFileId;
+
+    @JsonSetter("assetFileId")
+    public void setAssetFileId(Long assetFileId) {
+        if (assetFileId != null)
+            this.assetFileId = assetFileId;
+    }
 
     @OneToOne
     @JoinColumn(name = "employee_id")
@@ -61,6 +68,9 @@ public class User extends AppDomain {
     }
     //end
 
+    @Transient
+    private String token;
+
     public String getUsername() {
         return username;
     }
@@ -79,6 +89,10 @@ public class User extends AppDomain {
 
     public Long getUserGroupId() {
         return userGroupId;
+    }
+
+    public String getToken() {
+        return this.token;
     }
 
     @Override

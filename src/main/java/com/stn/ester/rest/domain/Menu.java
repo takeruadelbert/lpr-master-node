@@ -3,6 +3,9 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.base.OnDeleteSetParentNull;
+import com.stn.ester.rest.base.TableFieldPair;
+import com.stn.ester.rest.service.MenuService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,9 +18,12 @@ import java.util.Set;
 
 @Data
 @Entity
+@OnDeleteSetParentNull({
+        @TableFieldPair(service = MenuService.class, tableName = "menu", fieldName = "parent_menu_id")
+})
 public class Menu extends AppDomain {
 
-    public static final String unique_name="menu";
+    public static final String unique_name = "menu";
 
     private String label;
     private int orderingNumber;
@@ -38,29 +44,29 @@ public class Menu extends AppDomain {
 
     @Transient
     @EqualsAndHashCode.Exclude
-    private Set<Menu> subMenu=new HashSet<Menu>();
+    private Set<Menu> subMenu = new HashSet<Menu>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="parent_menu_id", insertable = false, updatable = false)
+    @JoinColumn(name = "parent_menu_id", insertable = false, updatable = false)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Menu parentMenu;
 
     @JsonProperty("parentMenuId")
-    @Column(name="parent_menu_id")
+    @Column(name = "parent_menu_id")
     private Long parentMenuId;
 
     @JsonSetter("parentMenuId")
-    public void setParentMenuId(long parentMenuId){
-        if (parentMenuId!=0)
-            this.parentMenuId=parentMenuId;
+    public void setParentMenuId(long parentMenuId) {
+        if (parentMenuId != 0)
+            this.parentMenuId = parentMenuId;
     }
 
     public Long getParentMenuId() {
         return parentMenuId;
     }
 
-    public void mergeSubMenu(List<Menu> subMenu){
+    public void mergeSubMenu(List<Menu> subMenu) {
         this.subMenu.addAll(subMenu);
     }
 

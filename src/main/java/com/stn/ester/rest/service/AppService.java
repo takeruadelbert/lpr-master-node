@@ -1,6 +1,8 @@
 package com.stn.ester.rest.service;
 
-import com.stn.ester.rest.dao.jpa.base.AppRepository;
+import com.google.common.base.CaseFormat;
+import com.stn.ester.rest.base.OnDeleteSetParentNull;
+import com.stn.ester.rest.base.TableFieldPair;
 import com.stn.ester.rest.dao.jpa.base.AppRepository;
 import com.stn.ester.rest.dao.jpa.projections.IdLabelList;
 import com.stn.ester.rest.dao.jpa.projections.IdNameList;
@@ -9,10 +11,15 @@ import com.stn.ester.rest.dao.jpa.projections.OptionList;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.exception.ListNotFoundException;
 import com.stn.ester.rest.helper.UpdaterHelper;
+import com.stn.ester.rest.search.AppSpecification;
+import com.stn.ester.rest.search.util.SearchOperation;
+import com.stn.ester.rest.search.util.SpecSearchCriteria;
 import com.stn.ester.rest.service.base.OptionBehaviour;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,6 +29,8 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.io.File;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -31,9 +40,14 @@ public abstract class AppService implements OptionBehaviour {
 
     protected HashMap<String, AppRepository> repositories;
     protected String baseRepoName;
+    protected String currentDirectory = System.getProperty("user.dir");
+    protected static final String DS = File.separator;
 
     @PersistenceContext
     protected EntityManager entityManager;
+
+    @Autowired
+    private ApplicationContext context;
 
     public AppService(String baseRepoName) {
         repositories = new HashMap();
@@ -74,6 +88,7 @@ public abstract class AppService implements OptionBehaviour {
     }
 
     public void delete(Long id) {
+        this.onDeleteSetParentNull(id);
         repositories.get(baseRepoName).deleteById(id);
     }
 
@@ -156,5 +171,48 @@ public abstract class AppService implements OptionBehaviour {
             }
         }
         return null;
+    }
+
+    private void onDeleteSetParentNull(Long parentId) {
+        Class[] interfazes = this.repositories.get(this.baseRepoName).getClass().getInterfaces();
+        for (Class interfaze : interfazes) {
+            if (AppRepository.class.isAssignableFrom(interfaze)) {
+                Type[] genericInterfaces = interfaze.getGenericInterfaces();
+                for (Type genericInterface : genericInterfaces) {
+                    if (genericInterface instanceof ParameterizedType) {
+                        Type[] actualTypeArguments = ((ParameterizedType) genericInterface).getActualTypeArguments();
+                        for (Type actualTypeArgument : actualTypeArguments) {
+                            if (actualTypeArgument instanceof Class) {
+                                Class<?> clazz = (Class<?>) actualTypeArgument;
+                                if (AppDomain.class.isAssignableFrom(clazz)) {
+                                    Annotation onDeleteSetParentNullAnnotation = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class);
+                                    if (onDeleteSetParentNullAnnotation != null) {
+                                        TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class).value();
+                                        for (TableFieldPair tableFieldPair : tableFieldPairs) {
+                                            if (AppService.class.isAssignableFrom(tableFieldPair.service())) {
+                                                String serviceName=tableFieldPair.service().getSimpleName();
+                                                serviceName=CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL,serviceName);
+                                                context.getBean(serviceName,tableFieldPair.service()).setParentNull(parentId,tableFieldPair.tableName(),tableFieldPair.fieldName());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected void setParentNull(Long parentId, String tableName, String fieldName) {
+        String lowerCamelCase=CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,fieldName);
+        SpecSearchCriteria searchByParentId=new SpecSearchCriteria(null,lowerCamelCase, SearchOperation.EQUALITY,parentId);
+        AppSpecification spec=new AppSpecification(searchByParentId);
+        Iterable<AppDomain> entities=repositories.get(baseRepoName).findAll(spec);
+        for(AppDomain entity:entities){
+            entity.setAttribute(lowerCamelCase,null);
+            repositories.get(baseRepoName).save(entity);
+        }
     }
 }

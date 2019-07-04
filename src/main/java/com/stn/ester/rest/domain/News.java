@@ -60,18 +60,6 @@ public class News extends AppDomain {
             this.newsStatusId = newsStatusId;
     }
 
-    public Date getStartDate() {
-        return this.startDate;
-    }
-
-    public Date getExpiredDate() {
-        return this.expiredDate;
-    }
-
-    public Long getNewsStatusId() {
-        return this.newsStatusId;
-    }
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id", insertable = false, updatable = false)
     private Department department;
@@ -84,6 +72,39 @@ public class News extends AppDomain {
     public void setDepartmentId(Long departmentId) {
         if (departmentId != 0)
             this.departmentId = departmentId;
+    }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "asset_file_id", insertable = false, updatable = false)
+    private AssetFile assetFile;
+
+    @Column(name = "asset_file_id")
+    @JsonProperty("assetFileId")
+    private Long assetFileId;
+
+    @JsonSetter("assetFileId")
+    public void setAssetFileId(Long assetFileId) {
+        if (assetFileId != null)
+            this.assetFileId = assetFileId;
+    }
+
+    @Transient
+    private String token;
+
+    public String getToken() {
+        return this.token;
+    }
+
+    public Date getStartDate() {
+        return this.startDate;
+    }
+
+    public Date getExpiredDate() {
+        return this.expiredDate;
+    }
+
+    public Long getNewsStatusId() {
+        return this.newsStatusId;
     }
 
     public Long getDepartmentId() {
