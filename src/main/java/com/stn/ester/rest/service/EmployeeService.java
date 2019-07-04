@@ -3,12 +3,19 @@ package com.stn.ester.rest.service;
 import com.stn.ester.rest.dao.jpa.EmployeeRepository;
 import com.stn.ester.rest.dao.jpa.PositionRepository;
 import com.stn.ester.rest.dao.jpa.UserRepository;
-import com.stn.ester.rest.domain.*;
+import com.stn.ester.rest.domain.AppDomain;
+import com.stn.ester.rest.domain.Employee;
+import com.stn.ester.rest.domain.Position;
+import com.stn.ester.rest.domain.User;
+import com.stn.ester.rest.domain.enumerate.EmployeeWorkStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmployeeService extends AppService {
@@ -39,11 +46,20 @@ public class EmployeeService extends AppService {
             ((Employee) domain).getUser().setAssetFileId(1L); // set default profile picture
         }
 
-        // append data Employee Work Status
-        ((Employee) domain).setEmployeeWorkStatusId(1); // -> default is Active
+        // append data Employee Work NewsStatus
+        ((Employee) domain).setEmployeeWorkStatus(EmployeeWorkStatus.ACTIVE); // -> default is Active
 
         // encode password
         ((Employee) domain).getUser().setPassword(this.passwordEncoder.encode(this.defaultPassword));
         return super.create(domain);
+    }
+
+    public Map<EmployeeWorkStatus, String> getEmployeeWorkStatusList() {
+        Map<EmployeeWorkStatus, String> result = new HashMap<>();
+        List<EmployeeWorkStatus> employeeWorkStatuses = EmployeeWorkStatus.toList();
+        for (EmployeeWorkStatus employeeWorkStatus : employeeWorkStatuses) {
+            result.put(employeeWorkStatus, employeeWorkStatus.getLabel());
+        }
+        return result;
     }
 }
