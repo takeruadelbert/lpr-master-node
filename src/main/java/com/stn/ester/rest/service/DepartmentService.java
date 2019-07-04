@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class DepartmentService extends AppService {
@@ -66,6 +63,7 @@ public class DepartmentService extends AppService {
                 result.add(this.get(department.getId()));
             }
         }
-        return result;
+        String newResult = result.toString();
+        return newResult;
     }
 }

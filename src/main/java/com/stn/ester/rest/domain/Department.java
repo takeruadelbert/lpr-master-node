@@ -1,8 +1,6 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,14 +15,12 @@ import java.util.Set;
 public class Department extends AppDomain {
     public static String unique_name = "department";
 
+    private long id;
+
     @NotBlank(message = "Name is mandatory.")
     @Column(nullable = false, unique = true)
     private String name;
     private String label;
-
-    @Transient
-    @EqualsAndHashCode.Exclude
-    private Set<Department> subDepartment = new HashSet<Department>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_department_id", insertable = false, updatable = false)
@@ -42,16 +38,21 @@ public class Department extends AppDomain {
             this.parentDepartmentId = parentDepartmentId;
     }
 
-    public Long getParentDepartmentId() {
-        return parentDepartmentId;
-    }
+    @Transient
+    @EqualsAndHashCode.Exclude
+    private Set<Department> subDepartment = new HashSet<Department>();
 
-    public void mergeSubDepartment(List<Department> subDepartment) {
-        this.subDepartment.addAll(subDepartment);
+    public void mergeSubDepartment(List<Department> body) {
+        this.subDepartment.addAll(body);
     }
 
     @Override
     public String underscoreName() {
         return unique_name;
+    }
+
+    @Override
+    public String toString() {
+        return "{\"id\":" + id + ",\"" + name + "\":" + subDepartment + "}";
     }
 }
