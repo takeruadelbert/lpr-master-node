@@ -19,8 +19,8 @@ public class DepartmentController extends AppController<DepartmentService, Depar
         this.departmentService = departmentService;
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/crud", method = RequestMethod.GET, produces = "application/json")
     public Object viewDepartmentGroupList() {
-        return this.departmentService.getDepartmentAndSubDepartmentGroupList();
+        return this.departmentService.getDepartmentGroupList();
     }
 }

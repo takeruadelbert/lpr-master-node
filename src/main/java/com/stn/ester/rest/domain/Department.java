@@ -1,6 +1,7 @@
 package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.*;
+import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -53,6 +54,6 @@ public class Department extends AppDomain {
 
     @Override
     public String toString() {
-        return "{\"id\":" + id + ",\"" + name + "\":" + subDepartment + "}";
+        return GlobalFunctionHelper.getDataJsonDepartmentGroupList(id, name, parentDepartmentId, subDepartment);
     }
 }
