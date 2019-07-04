@@ -3,6 +3,7 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.enumerate.EmployeeWorkStatus;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -27,19 +28,8 @@ public class Employee extends AppDomain {
     @JsonManagedReference
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "employee_work_status_id", insertable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
     private EmployeeWorkStatus employeeWorkStatus;
-
-    @JsonProperty("employeeWorkStatusId")
-    @Column(name = "employee_work_status_id")
-    private Long employeeWorkStatusId;
-
-    @JsonSetter("employeeWorkStatusId")
-    public void setEmployeeWorkStatusId(long employeeWorkStatusId) {
-        if (employeeWorkStatusId != 0)
-            this.employeeWorkStatusId = employeeWorkStatusId;
-    }
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id", insertable = false, updatable = false)
@@ -76,6 +66,10 @@ public class Employee extends AppDomain {
 
     public User getUser() {
         return this.user;
+    }
+
+    public void setEmployeeWorkStatus(EmployeeWorkStatus employeeWorkStatus) {
+        this.employeeWorkStatus = employeeWorkStatus;
     }
 
     public String underscoreName() {
