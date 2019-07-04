@@ -2,6 +2,7 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.enumerate.CityStatus;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -18,19 +19,8 @@ public class City extends AppDomain {
 
     private int postal_code;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "city_status_id", insertable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
     private CityStatus cityStatus;
-
-    @JsonProperty("cityStatusId")
-    @Column(name = "city_status_id")
-    private Long cityStatusId;
-
-    @JsonSetter("cityStatusId")
-    public void setCityStatusId(long cityStatusId) {
-        if (cityStatusId != 0)
-            this.cityStatusId = cityStatusId;
-    }
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "state_id", insertable = false, updatable = false)
