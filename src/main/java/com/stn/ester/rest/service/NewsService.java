@@ -3,6 +3,7 @@ package com.stn.ester.rest.service;
 import com.stn.ester.rest.dao.jpa.NewsRepository;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.News;
+import com.stn.ester.rest.domain.enumerate.NewsStatus;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
@@ -14,12 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class NewsService extends AppService implements AssetFileBehaviour {
@@ -40,7 +36,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
     public Object create(AppDomain o) {
         long author_id = SessionHelper.getUserID();
         ((News) o).setAuthorId(author_id);
-        ((News) o).setNewsStatusId(1); // default option is showed.
+        ((News) o).setNewsStatus(NewsStatus.SHOWED); // default option is showed.
         String token = ((News) o).getToken();
         if (token != null) {
             ((News) o).setAssetFileId(this.claimFile(token));
@@ -53,7 +49,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         long author_id = SessionHelper.getUserID();
         ((News) o).setAuthorId(author_id);
         String token = ((News) o).getToken();
-        if (!token.isEmpty()) {
+        if (token != null) {
             ((News) o).setAssetFileId(this.claimFile(token));
         }
         return super.update(id, o);
@@ -81,7 +77,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
                     }
                 } else {
                     // otherwise just get all news status id 1 -> showing
-                    if (news.getNewsStatusId() == 1) {
+                    if (news.getNewsStatus() == NewsStatus.SHOWED) {
                         if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
                             validNews.add(news);
                     }
@@ -103,5 +99,14 @@ public class NewsService extends AppService implements AssetFileBehaviour {
     @Override
     public Long claimFile(String token) {
         return this.assetFileService.moveTempDirToPermanentDir(token, this.getAssetPath());
+    }
+
+    public Map<NewsStatus, String> getStatusList() {
+        Map<NewsStatus, String> result = new HashMap<>();
+        List<NewsStatus> newsStatuses = NewsStatus.toList();
+        for (NewsStatus newsStatus : newsStatuses) {
+            result.put(newsStatus, newsStatus.getLabel());
+        }
+        return result;
     }
 }

@@ -39,7 +39,7 @@ public class EmployeeService extends AppService {
             ((Employee) domain).getUser().setAssetFileId(1L); // set default profile picture
         }
 
-        // append data Employee Work Status
+        // append data Employee Work NewsStatus
         ((Employee) domain).setEmployeeWorkStatusId(1); // -> default is Active
 
         // encode password
