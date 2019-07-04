@@ -2,9 +2,8 @@ package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.EmployeeRepository;
 import com.stn.ester.rest.dao.jpa.PositionRepository;
-import com.stn.ester.rest.domain.AppDomain;
-import com.stn.ester.rest.domain.Employee;
-import com.stn.ester.rest.domain.Position;
+import com.stn.ester.rest.dao.jpa.UserRepository;
+import com.stn.ester.rest.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,9 +19,10 @@ public class EmployeeService extends AppService {
     private final String defaultPassword = "password123";
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository, PositionRepository positionRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, PositionRepository positionRepository, UserRepository userRepository) {
         super(Employee.unique_name);
         super.repositories.put(Employee.unique_name, employeeRepository);
+        super.repositories.put(User.unique_name, userRepository);
         this.positionRepository = positionRepository;
     }
 

@@ -53,7 +53,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         long author_id = SessionHelper.getUserID();
         ((News) o).setAuthorId(author_id);
         String token = ((News) o).getToken();
-        if (!token.isEmpty()) {
+        if (token != null) {
             ((News) o).setAssetFileId(this.claimFile(token));
         }
         return super.update(id, o);
