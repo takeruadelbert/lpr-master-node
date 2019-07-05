@@ -39,7 +39,7 @@ public class EmployeeService extends AppService {
         long user_group_id = position.getUserGroupId();
         ((Employee) domain).getUser().setUserGroupId(user_group_id);
 
-        if(((Employee) domain).getUser().getToken() != null) {
+        if(((Employee) domain).getUser().getToken() == null) {
             ((Employee) domain).getUser().setAssetFileId(1L); // set default profile picture
         }
 
