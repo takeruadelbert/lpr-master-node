@@ -63,4 +63,14 @@ public class SpecificationsBuilder<T extends AppDomain> {
         params.add(criteria);
         return this;
     }
+
+    @Override
+    public String toString(){
+        String result="";
+        for(SpecSearchCriteria param:params){
+            result+=param.toString();
+        }
+        return result;
+    }
+
 }

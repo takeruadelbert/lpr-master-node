@@ -1,7 +1,9 @@
 package com.stn.ester.rest.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.stn.ester.rest.domain.AppDomain;
+import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import com.stn.ester.rest.search.AppSpecification;
 import com.stn.ester.rest.search.SpecificationsBuilder;
 import com.stn.ester.rest.search.util.SearchOperation;
@@ -14,6 +16,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,14 +74,23 @@ public abstract class AppController<T extends AppService, U extends AppDomain> {
 
     protected Specification<U> resolveSpecification(String searchParameters) {
         SpecificationsBuilder builder = new SpecificationsBuilder<>();
-        String operationSetExper = Joiner.on("|")
-                .join(SearchOperation.SIMPLE_OPERATION_SET);
-        Pattern pattern = Pattern.compile("(\\p{Punct}?)(\\w+?)(" + operationSetExper + ")(\\p{Punct}?)(\\w+?)(\\p{Punct}?),");
-        Matcher matcher = pattern.matcher(searchParameters + ",");
-        System.out.println(searchParameters);
-        while (matcher.find()) {
-            builder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(5), matcher.group(4), matcher.group(6));
+        try {
+            this.loopSpecToSpecBuilder(builder, GlobalFunctionHelper.jsonStringToMap(searchParameters));
+        }catch(IOException ex){
+            System.out.println(ex);
         }
         return builder.build();
+    }
+
+    private void loopSpecToSpecBuilder(SpecificationsBuilder specificationsBuilder, Map<String, Object> jsonMap) {
+        for (Map.Entry<String, Object> entry : jsonMap.entrySet()) {
+            if (Map.class.isAssignableFrom(entry.getValue().getClass())) {
+                this.loopSpecToSpecBuilder(specificationsBuilder, (Map<String, Object>) entry.getValue());
+            } else {
+                String operation = entry.getKey().substring(0, 1);
+                String key = entry.getKey().substring(1);
+                specificationsBuilder.with(key, operation, entry.getValue().toString(), null, null);
+            }
+        }
     }
 }
