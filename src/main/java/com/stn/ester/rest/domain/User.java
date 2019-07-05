@@ -32,11 +32,11 @@ public class User extends AppDomain {
     private Biodata biodata;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "asset_file_id", insertable = false, updatable = false)
+    @JoinColumn(name = "profile_picture_id", insertable = false, updatable = false)
     private AssetFile assetFile;
 
     @JsonProperty("assetFileId")
-    @Column(name = "asset_file_id")
+    @Column(name = "profile_picture_id")
     private Long assetFileId;
 
     @JsonSetter("assetFileId")

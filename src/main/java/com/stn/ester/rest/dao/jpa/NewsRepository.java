@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface NewsRepository extends AppRepository<News, IdList> {
-    List<News> findAllByNewsStatusId(long newsStatusId);
+
 }
