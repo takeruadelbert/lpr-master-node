@@ -9,7 +9,6 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Scanner;
 import java.util.Set;
 
 @ControllerAdvice
@@ -27,13 +26,13 @@ public class GlobalFunctionHelper {
 
 	}
 	
-    // get Time now
+    /* get time now */
     public static String getDateTimeNow() {
         String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
         return timeStamp;
     }
 
-    // get name file
+    /* get name file */
     public static String getNameFile(String vData) {
         if (vData == null) return null;
         int index = vData.lastIndexOf('.');
@@ -42,7 +41,7 @@ public class GlobalFunctionHelper {
         return name;
     }
 
-    // get extension file
+    /* get extension file */
     public static String getExtensionFile(String vData) {
         String extension = vData.substring(vData.lastIndexOf(".") + 1);
         return extension;
@@ -52,7 +51,7 @@ public class GlobalFunctionHelper {
         return encodedBase64.split(",");
     }
 
-    // remove data: from base64 image
+    /* remove data: from base64 image */
     public static String getRawDataFromEncodedBase64(String encodedBase64) {
         String[] temp = splitDataEncodedBase64(encodedBase64);
         return temp[1];
@@ -74,9 +73,8 @@ public class GlobalFunctionHelper {
     }
 
     public static String getDataJsonDepartmentGroupList(Long id, String name, Long parentDepartmentId, Set<Department> subDepartment) {
-        String parentDeptGroupList = "";
         if (parentDepartmentId == null) {
-            parentDeptGroupList += String.valueOf(subDepartment);
+            String parentDeptGroupList = String.valueOf(subDepartment);
             return "{\"" + name + "\":" + parentDeptGroupList + "}";
         } else {
             String subDepartmentGroupList = name.replaceAll("\\[", "");
