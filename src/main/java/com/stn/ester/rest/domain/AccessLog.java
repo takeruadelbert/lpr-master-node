@@ -22,7 +22,7 @@ public class AccessLog extends AppDomain {
     @Column(nullable = false)
     private RequestMethod requestMethod;
 
-    @Column(name = "request_body")
+    @Column(name = "request_body", length = 9999)
     private String requestBody;
 
     @ManyToOne(fetch = FetchType.EAGER)
