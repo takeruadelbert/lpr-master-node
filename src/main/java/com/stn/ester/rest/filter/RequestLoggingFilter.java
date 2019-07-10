@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.google.gson.Gson;
-import com.stn.ester.rest.dao.jpa.AccessLogRepository;
 import com.stn.ester.rest.domain.AccessLog;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.filter.wrapper.RequestWrapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;

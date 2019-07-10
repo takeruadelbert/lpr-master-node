@@ -11,7 +11,7 @@ import java.io.*;
 public class RequestWrapper extends HttpServletRequestWrapper {
     private byte[] body;
 
-    public RequestWrapper(HttpServletRequest request) throws IOException {
+    public RequestWrapper(HttpServletRequest request) {
         super(request);
 
         try {
