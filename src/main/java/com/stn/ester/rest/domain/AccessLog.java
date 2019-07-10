@@ -22,6 +22,9 @@ public class AccessLog extends AppDomain {
     @Column(nullable = false)
     private RequestMethod requestMethod;
 
+    @Column(name = "request_body")
+    private String requestBody;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     private User user;
@@ -39,11 +42,12 @@ public class AccessLog extends AppDomain {
 
     }
 
-    public AccessLog(String IPAddress, String URI, RequestMethod requestMethod, Long userId) {
+    public AccessLog(String IPAddress, String URI, RequestMethod requestMethod, Long userId, String requestBody) {
         this.IPAddress = IPAddress;
         this.URI = URI;
         this.requestMethod = requestMethod;
         this.userId = userId;
+        this.requestBody = requestBody;
     }
 
     public String underscoreName() {
