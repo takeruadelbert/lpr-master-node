@@ -1,10 +1,9 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.enumerate.NewsStatus;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -47,18 +46,8 @@ public class News extends AppDomain {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date expiredDate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "news_status_id", insertable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
     private NewsStatus newsStatus;
-
-    @Column(name = "news_status_id", nullable = false)
-    private Long newsStatusId;
-
-    @JsonSetter("newsStatusId")
-    public void setNewsStatusId(long newsStatusId) {
-        if (newsStatusId != 0)
-            this.newsStatusId = newsStatusId;
-    }
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id", insertable = false, updatable = false)
@@ -75,10 +64,10 @@ public class News extends AppDomain {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "asset_file_id", insertable = false, updatable = false)
+    @JoinColumn(name = "thumbnail_id", insertable = false, updatable = false)
     private AssetFile assetFile;
 
-    @Column(name = "asset_file_id")
+    @Column(name = "thumbnail_id")
     @JsonProperty("assetFileId")
     private Long assetFileId;
 
@@ -103,15 +92,19 @@ public class News extends AppDomain {
         return this.expiredDate;
     }
 
-    public Long getNewsStatusId() {
-        return this.newsStatusId;
-    }
-
     public Long getDepartmentId() {
         return this.departmentId;
     }
 
     public String underscoreName() {
         return unique_name;
+    }
+
+    public void setNewsStatus(NewsStatus newsStatus) {
+        this.newsStatus = newsStatus;
+    }
+
+    public NewsStatus getNewsStatus() {
+        return this.newsStatus;
     }
 }

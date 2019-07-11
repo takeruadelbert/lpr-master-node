@@ -2,13 +2,9 @@ package com.stn.ester.rest.dao.jpa;
 
 import com.stn.ester.rest.dao.jpa.base.AppRepository;
 import com.stn.ester.rest.dao.jpa.projections.IdList;
-import com.stn.ester.rest.domain.News;
-import org.springframework.data.domain.Page;
+import com.stn.ester.rest.domain.AccessLog;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface NewsRepository extends AppRepository<News, IdList> {
-
+public interface AccessLogRepository extends AppRepository<AccessLog, IdList> {
 }
