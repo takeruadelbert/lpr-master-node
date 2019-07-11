@@ -54,16 +54,4 @@ public class DepartmentService extends AppService {
         }
         return subDepartments;
     }
-
-    public Object getDepartmentGroupList() {
-        List<Department> departments = departmentRepositoty.findAllByParentDepartmentIdIsNull();
-        List<Object> result = new ArrayList();
-        if (!departments.isEmpty()) {
-            for (Department department : departments) {
-                result.add(this.get(department.getId()));
-            }
-        }
-        String newResult = result.toString();
-        return newResult;
-    }
 }

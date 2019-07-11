@@ -16,8 +16,6 @@ import java.util.Set;
 public class Department extends AppDomain {
     public static String unique_name = "department";
 
-    private long id;
-
     @NotBlank(message = "Name is mandatory.")
     @Column(nullable = false, unique = true)
     private String name;
@@ -43,17 +41,12 @@ public class Department extends AppDomain {
     @EqualsAndHashCode.Exclude
     private Set<Department> subDepartment = new HashSet<Department>();
 
-    public void mergeSubDepartment(List<Department> body) {
-        this.subDepartment.addAll(body);
+    public void mergeSubDepartment(List<Department> subDepartment) {
+        this.subDepartment.addAll(subDepartment);
     }
 
     @Override
     public String underscoreName() {
         return unique_name;
-    }
-
-    @Override
-    public String toString() {
-        return GlobalFunctionHelper.getDataJsonDepartmentGroupList(id, name, parentDepartmentId, subDepartment);
     }
 }

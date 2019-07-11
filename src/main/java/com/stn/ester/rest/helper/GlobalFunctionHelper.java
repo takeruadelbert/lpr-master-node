@@ -1,15 +1,12 @@
 package com.stn.ester.rest.helper;
 
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
-import com.stn.ester.rest.domain.Department;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 @ControllerAdvice
 public class GlobalFunctionHelper {
@@ -70,17 +67,5 @@ public class GlobalFunctionHelper {
         byte[] randomBytes = new byte[24];
         secureRandom.nextBytes(randomBytes);
         return base64Encoder.encodeToString(randomBytes);
-    }
-
-    public static String getDataJsonDepartmentGroupList(Long id, String name, Long parentDepartmentId, Set<Department> subDepartment) {
-        if (parentDepartmentId == null) {
-            String parentDeptGroupList = String.valueOf(subDepartment);
-            return "{\"" + name + "\":" + parentDeptGroupList + "}";
-        } else {
-            String subDepartmentGroupList = name.replaceAll("\\[", "");
-            String subDepartmentGroupList2 = subDepartmentGroupList.replaceAll("\\]", "");
-            String subDepartmentGroupList3 = subDepartmentGroupList2.replaceAll("\\:", "");
-            return "{\"" + id + "\":\"" + subDepartmentGroupList3 + "\"}";
-        }
     }
 }
