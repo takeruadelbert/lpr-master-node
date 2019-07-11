@@ -1,9 +1,11 @@
 package com.stn.ester.rest.helper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
+import java.io.IOException;
 import java.io.File;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
@@ -18,7 +20,6 @@ public class GlobalFunctionHelper {
 
     @Autowired
     public GlobalFunctionHelper() {
-
 	}
 	
     /* get time now */
@@ -59,7 +60,7 @@ public class GlobalFunctionHelper {
         String data2 = temp2[0];
         String[] temp3 = data2.split(";");
         return temp3[0];
-	}
+    }
 
     public static String generateToken() {
         byte[] randomBytes = new byte[24];
@@ -80,5 +81,14 @@ public class GlobalFunctionHelper {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public static Map<String, Object> jsonStringToMap(String jsonString) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> jsonMap = new HashMap();
+        if (jsonString == null || jsonString.isEmpty())
+            return jsonMap;
+        jsonMap = mapper.readValue(jsonString, Map.class);
+        return jsonMap;
     }
 }

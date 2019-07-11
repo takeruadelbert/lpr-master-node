@@ -45,6 +45,16 @@ public class Department extends AppDomain {
         this.subDepartment.addAll(subDepartment);
     }
 
+    public String getName() {
+        return this.name;
+    }
+
+    public Department getParentDepartment() {
+        return this.parentDepartment;
+    }
+
+    public Long getParentDepartmentId() {return this.parentDepartmentId;}
+
     @Override
     public String underscoreName() {
         return unique_name;

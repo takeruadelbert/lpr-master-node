@@ -79,4 +79,9 @@ public class SpecSearchCriteria {
         this.orPredicate = orPredicate;
     }
 
+    @Override
+    public String toString(){
+        return key+operation+value;
+    }
+
 }

@@ -3,7 +3,9 @@ package com.stn.ester.rest.controller;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.LoginSession;
 import com.stn.ester.rest.domain.User;
+import com.stn.ester.rest.domain.enumerate.Gender;
 import com.stn.ester.rest.exception.UnauthorizedException;
+import com.stn.ester.rest.service.BiodataService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -17,11 +19,13 @@ import java.util.Map;
 public class UserController extends AppController<UserService, User> {
 
     private UserService userService;
+    private BiodataService biodataService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, BiodataService biodataService) {
         super(userService);
         this.userService = userService;
+        this.biodataService = biodataService;
     }
 
     @Override
@@ -61,6 +65,11 @@ public class UserController extends AppController<UserService, User> {
     @RequestMapping(value = "/change-profile-picture", method = RequestMethod.POST)
     public Object changeProfilePicture(@RequestBody Map<String, String> data) {
         return service.changeProfilePicture(data.get("token"));
+    }
+
+    @RequestMapping(value = "/gender/list", method = RequestMethod.GET)
+    public Map<Gender, String> getGenderList() {
+        return this.biodataService.getGenderList();
     }
 
     @RequestMapping(value = "/reset-password", method = RequestMethod.POST)
