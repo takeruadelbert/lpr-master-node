@@ -3,7 +3,6 @@ package com.stn.ester.rest;
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
-import org.omg.CORBA.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +12,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.nio.file.Path;
+import java.util.Optional;
 import java.util.TimeZone;
 
 @SpringBootApplication
@@ -30,6 +29,8 @@ public class RestApplication extends SpringBootServletInitializer {
 
     @Autowired
     private AssetFileRepository assetFileRepository;
+
+    public static Long defaultProfilePictureID;
 
     public static void main(String[] args) {
         SpringApplication.run(RestApplication.class, args);
@@ -48,16 +49,22 @@ public class RestApplication extends SpringBootServletInitializer {
 
     private void addDefaultProfilePicture() {
         try {
-            String assetDefaultDir = this.parentDirectory + DS + this.assetPath + DS + this.assetDefault;
+            Optional<AssetFile> existingDefaultPP = this.assetFileRepository.findByNameAndExtension("default-pp", "png");
+            if(existingDefaultPP.equals(Optional.empty())) {
+                String assetDefaultDir = this.parentDirectory + DS + this.assetPath + DS + this.assetDefault;
 
-            // create asset default dir if it doesn't exist
-            GlobalFunctionHelper.autoCreateDir(assetDefaultDir);
+                // create asset default dir if it doesn't exist
+                GlobalFunctionHelper.autoCreateDir(assetDefaultDir);
 
-            // add default profile picture to Asset File table
-            String filename = "default-pp.png";
-            String defaultProfilePictPath = DS + this.assetPath + DS + this.assetDefault + DS + filename;
-            AssetFile defaultPP = new AssetFile(defaultProfilePictPath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
-            this.assetFileRepository.save(defaultPP);
+                // add default profile picture to Asset File table
+                String filename = "default-pp.png";
+                String defaultProfilePictPath = DS + this.assetPath + DS + this.assetDefault + DS + filename;
+                AssetFile defaultPP = new AssetFile(defaultProfilePictPath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
+                this.assetFileRepository.save(defaultPP);
+                defaultProfilePictureID = defaultPP.getId();
+            } else {
+                defaultProfilePictureID = existingDefaultPP.get().getId();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }

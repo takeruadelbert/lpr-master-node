@@ -1,5 +1,6 @@
 package com.stn.ester.rest.service;
 
+import com.stn.ester.rest.RestApplication;
 import com.stn.ester.rest.dao.jpa.EmployeeRepository;
 import com.stn.ester.rest.dao.jpa.PositionRepository;
 import com.stn.ester.rest.domain.enumerate.EmployeeWorkStatus;
@@ -40,7 +41,7 @@ public class EmployeeService extends AppService {
         ((Employee) domain).getUser().setUserGroupId(user_group_id);
 
         if(((Employee) domain).getUser().getToken() == null) {
-            ((Employee) domain).getUser().setAssetFileId(1L); // set default profile picture
+            ((Employee) domain).getUser().setAssetFileId(RestApplication.defaultProfilePictureID); // set default profile picture
         }
 
         // append data Employee Work NewsStatus
