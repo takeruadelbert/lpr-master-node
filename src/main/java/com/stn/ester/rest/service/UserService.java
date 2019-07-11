@@ -1,5 +1,6 @@
 package com.stn.ester.rest.service;
 
+import com.stn.ester.rest.RestApplication;
 import com.stn.ester.rest.dao.jpa.BiodataRepository;
 import com.stn.ester.rest.dao.jpa.LoginSessionRepository;
 import com.stn.ester.rest.dao.jpa.UserGroupRepository;
@@ -53,7 +54,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     public Object create(AppDomain o) {
         // set default profile picture
         if(((User) o).getToken() == null) {
-            ((User) o).setAssetFileId(1L);
+            ((User) o).setAssetFileId(RestApplication.defaultProfilePictureID);
         }
         ((User) o).setPassword(passwordEncoder.encode(((User) o).getPassword()));
         return super.create(o);
