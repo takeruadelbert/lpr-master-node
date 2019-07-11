@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends AppRepository<User, IdList> {
     Optional<User> findByUsername(String username);
+
+    Optional<User> findByEmail(String email);
 }

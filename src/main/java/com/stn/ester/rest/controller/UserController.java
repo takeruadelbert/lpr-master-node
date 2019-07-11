@@ -6,12 +6,9 @@ import com.stn.ester.rest.domain.User;
 import com.stn.ester.rest.exception.UnauthorizedException;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
@@ -64,5 +61,10 @@ public class UserController extends AppController<UserService, User> {
     @RequestMapping(value = "/change-profile-picture", method = RequestMethod.POST)
     public Object changeProfilePicture(@RequestBody Map<String, String> data) {
         return service.changeProfilePicture(data.get("token"));
+    }
+
+    @RequestMapping(value = "/reset-password", method = RequestMethod.POST)
+    public Object resetPassword(@RequestBody Map<String, String> payload) {
+        return service.resetPassword(payload.get("email"));
     }
 }
