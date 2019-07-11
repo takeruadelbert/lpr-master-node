@@ -64,10 +64,10 @@ public class News extends AppDomain {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "asset_file_id", insertable = false, updatable = false)
+    @JoinColumn(name = "thumbnail_id", insertable = false, updatable = false)
     private AssetFile assetFile;
 
-    @Column(name = "asset_file_id")
+    @Column(name = "thumbnail_id")
     @JsonProperty("assetFileId")
     private Long assetFileId;
 

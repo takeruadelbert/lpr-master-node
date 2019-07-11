@@ -62,7 +62,7 @@ public class AssetFileService extends AppService {
                 try {
                     String pathFile = DS + this.assetTempPath + DS + filename + "." + ext;
 
-                    this.autoCreateAssetDir(this.assetTempPath);
+                    GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
 
                     FileOutputStream fileOutputStream = new FileOutputStream(this.parentDirectory + DS + pathFile);
                     fileOutputStream.write(file.getBytes());
@@ -91,7 +91,7 @@ public class AssetFileService extends AppService {
         if (!encoded_file.isEmpty()) {
             List<MultipartFile> decoded_files = new ArrayList<>();
             try {
-                this.autoCreateAssetDir(this.assetTempPath);
+                GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
 
                 String name = GlobalFunctionHelper.getNameFile(filename);
                 String ext = GlobalFunctionHelper.getExtensionFile(filename);
@@ -133,27 +133,12 @@ public class AssetFileService extends AppService {
         return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
     }
 
-    /*
-      check if required directory is exist.
-      If it doesn't exists, then program creates the directory automatically
-    */
-    private void autoCreateAssetDir(String assetPath) {
-        try {
-            File assetDir = new File(this.parentDirectory + DS + assetPath);
-            if (!assetDir.exists()) {
-                assetDir.mkdirs();
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
     public Object getFile(String path, boolean is_download) {
         path = DS + path;
         Map<String, Object> result = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
         String filename = this.parentDirectory + path;
-        System.out.println("filename = " + filename);
+
         try (InputStream inputFile = new FileInputStream(filename)) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = Files.readAllBytes(Paths.get(filename));
@@ -194,7 +179,7 @@ public class AssetFileService extends AppService {
                 String path = this.assetRootPath + DS + assetDir;
 
                 // create if the path doesn't exists
-                this.autoCreateAssetDir(path);
+                GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + path);
 
                 String from = this.parentDirectory + file.get().getPath();
                 String to = from.replace("temp", this.assetRootPath + DS + assetDir);

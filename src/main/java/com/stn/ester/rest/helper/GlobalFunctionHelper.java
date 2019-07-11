@@ -4,6 +4,7 @@ import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
+import java.io.File;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -12,9 +13,6 @@ import java.util.*;
 public class GlobalFunctionHelper {
 
     private static final String timeNow = "yyyy-MM-dd HH:mm:ss";
-    @Autowired
-    private static AssetFileRepository assetFileRepository;
-
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
@@ -67,5 +65,20 @@ public class GlobalFunctionHelper {
         byte[] randomBytes = new byte[24];
         secureRandom.nextBytes(randomBytes);
         return base64Encoder.encodeToString(randomBytes);
+    }
+
+    /*
+      check if required directory is exist.
+      If it doesn't exists, then program creates the directory automatically
+    */
+    public static void autoCreateDir(String path) {
+        try {
+            File assetDir = new File(path);
+            if (!assetDir.exists()) {
+                assetDir.mkdirs();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

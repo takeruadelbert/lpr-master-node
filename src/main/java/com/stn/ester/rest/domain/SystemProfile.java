@@ -14,11 +14,11 @@ public class SystemProfile extends AppDomain {
     public static final String unique_name = "system_profile";
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "asset_file_id", insertable = false, updatable = false)
+    @JoinColumn(name = "logo_id", insertable = false, updatable = false)
     private AssetFile assetFile;
 
     @JsonProperty("assetFileId")
-    @Column(name = "asset_file_id")
+    @Column(name = "logo_id")
     private Long assetFileId;
 
     public void setAssetFileId(Long assetFileId) {
