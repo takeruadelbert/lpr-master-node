@@ -37,7 +37,8 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         ServletRequest copiedRequest = requestWrapper;
 
         String IPAdress_client = request.getHeader("X-FORWARDED-FOR");
-        String URI = request.getRequestURI();
+        String queryParam = request.getQueryString();
+        String URI = queryParam == null ? request.getRequestURI() : request.getRequestURI() + "?" + queryParam;
         String request_method = request.getMethod();
         Long user_id = SessionHelper.getUserID();
         if (IPAdress_client == null || "".equals(IPAdress_client)) {
