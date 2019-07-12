@@ -53,7 +53,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     @Transactional
     public Object create(AppDomain o) {
         // set default profile picture
-        if(((User) o).getToken() == null) {
+        if (((User) o).getToken() == null) {
             ((User) o).setAssetFileId(RestApplication.defaultProfilePictureID);
         }
         ((User) o).setPassword(passwordEncoder.encode(((User) o).getPassword()));
@@ -61,13 +61,13 @@ public class UserService extends AppService implements AssetFileBehaviour {
     }
 
     @Override
-    public Object update(Long id, AppDomain object){
-        return super.update(id,object);
+    public Object update(Long id, AppDomain object) {
+        return super.update(id, object);
     }
 
-    public Map login(String username, String password, HttpSession session){
-        User user=userRepository.findByUsername(username).orElse(null);
-        if (user == null || !passwordEncoder.matches(password,user.getPassword())){
+    public Map login(String username, String password, HttpSession session) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new InvalidLoginException();
         }
         UUID randomUUID = UUID.randomUUID();
@@ -135,7 +135,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     }
 
     public Object changeProfilePicture(String token) {
-        if(!token.isEmpty()) {
+        if (!token.isEmpty()) {
             Long user_id = SessionHelper.getUserID();
             Long asset_file_id = this.claimFile(token);
             User user = this.userRepository.findById(user_id).get();
@@ -143,14 +143,32 @@ public class UserService extends AppService implements AssetFileBehaviour {
             user.setAssetFileId(asset_file_id);
             return super.update(user_id, user);
         }
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
         result.put("message", "Failed to change profile picture : Invalid Token.");
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     public Object resetPassword(String email) {
-        Optional<User> user = this.userRepository.findByEmail(email);
-        return user;
+        Map<String, Object> result = new HashMap<>();
+        if (!email.isEmpty()) {
+            try {
+                Optional<User> user = this.userRepository.findByEmail(email);
+                if (!user.equals(Optional.empty())) {
+                    result.put("success", "success");
+                    result.put("status", HttpStatus.OK.value());
+                    result.put("message", "Email is registered");
+                } else {
+                    result.put("error", "error");
+                    result.put("status", HttpStatus.BAD_REQUEST.value());
+                    result.put("message", "Email isn't registered");
+                }
+            } catch (Exception ex) {
+                result.put("status", HttpStatus.BAD_REQUEST);
+                result.put("message", ex.getMessage());
+                return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+        }
+        return result;
     }
 }
