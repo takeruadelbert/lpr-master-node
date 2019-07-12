@@ -50,6 +50,10 @@ public class User extends AppDomain {
     @JsonBackReference
     private Employee employee;
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private PasswordReset passwordReset;
+
     //contoh belongsto(unidirection manytoone)
     //start
     @ManyToOne(fetch = FetchType.EAGER)

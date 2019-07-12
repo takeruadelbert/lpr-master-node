@@ -155,13 +155,12 @@ public class UserService extends AppService implements AssetFileBehaviour {
             try {
                 Optional<User> user = this.userRepository.findByEmail(email);
                 if (!user.equals(Optional.empty())) {
-                    result.put("success", "success");
                     result.put("status", HttpStatus.OK.value());
-                    result.put("message", "Email is registered");
+                    result.put("message", "Email found.");
                 } else {
-                    result.put("error", "error");
                     result.put("status", HttpStatus.BAD_REQUEST.value());
-                    result.put("message", "Email isn't registered");
+                    result.put("message", "Email not found.");
+                    return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
                 }
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST);
