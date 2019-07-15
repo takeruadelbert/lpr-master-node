@@ -23,6 +23,12 @@ public class PasswordReset extends AppDomain {
     @JsonBackReference
     private User user;
 
+    public PasswordReset(String token, int is_used, Date expire) {
+        this.token = token;
+        this.is_used = is_used;
+        this.expire = expire;
+    }
+
     @Override
     public String underscoreName() {return PasswordReset.unique_name;}
 }

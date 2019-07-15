@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.File;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @ControllerAdvice
@@ -26,6 +28,13 @@ public class GlobalFunctionHelper {
     public static String getDateTimeNow() {
         String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
         return timeStamp;
+    }
+
+    public static Date getDateTomeNowPlusOneDay() {
+        LocalDateTime today =  LocalDateTime.now(); //Today
+        LocalDateTime tomorrow = today.plusDays(1); //Plus 1 day
+        Date currentDatePlusOneDay = Date.from(tomorrow.atZone(ZoneId.systemDefault()).toInstant());
+        return currentDatePlusOneDay;
     }
 
     /* get name file */

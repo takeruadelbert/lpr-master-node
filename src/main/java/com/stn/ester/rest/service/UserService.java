@@ -1,14 +1,12 @@
 package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.RestApplication;
-import com.stn.ester.rest.dao.jpa.BiodataRepository;
-import com.stn.ester.rest.dao.jpa.LoginSessionRepository;
-import com.stn.ester.rest.dao.jpa.UserGroupRepository;
-import com.stn.ester.rest.dao.jpa.UserRepository;
+import com.stn.ester.rest.dao.jpa.*;
 import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.exception.ConfirmNewPasswordException;
 import com.stn.ester.rest.exception.InvalidLoginException;
 import com.stn.ester.rest.exception.PasswordMismatchException;
+import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +27,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     private LoginSessionRepository loginSessionRepository;
     private UserGroupRepository userGroupRepository;
     private AssetFileService assetFileService;
+    private PasswordResetRepository passwordResetRepository;
     private String asset_path = "profile_picture";
 
     @Value("${ester.session.login.timeout}")
@@ -38,7 +37,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService) {
+    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository) {
         super(User.unique_name);
         super.repositories.put(User.unique_name, userRepository);
         super.repositories.put(Biodata.unique_name, biodataRepository);
@@ -46,6 +45,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
         this.userRepository = userRepository;
         this.loginSessionRepository = loginSessionRepository;
         this.userGroupRepository = userGroupRepository;
+        this.passwordResetRepository = passwordResetRepository;
         this.assetFileService = assetFileService;
     }
 
@@ -155,6 +155,12 @@ public class UserService extends AppService implements AssetFileBehaviour {
             try {
                 Optional<User> user = this.userRepository.findByEmail(email);
                 if (!user.equals(Optional.empty())) {
+                    String token = GlobalFunctionHelper.generateToken();
+                    int is_used = 1;
+                    Date expire = GlobalFunctionHelper.getDateTomeNowPlusOneDay();
+                    PasswordReset passwordReset = new PasswordReset(token, is_used, expire);
+                    this.passwordResetRepository.save(passwordReset);
+
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Email found.");
                 } else {
