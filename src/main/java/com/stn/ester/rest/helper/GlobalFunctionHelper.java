@@ -93,11 +93,4 @@ public class GlobalFunctionHelper {
         jsonMap = mapper.readValue(jsonString, Map.class);
         return jsonMap;
     }
-
-    public static Date getDateTimeNowPlusSeveralDay(int day) {
-        LocalDateTime today =  LocalDateTime.now(); //Today
-        LocalDateTime tomorrow = today.plusDays(day); //Plus 1 day
-        Date currentDatePlusOneDay = Date.from(tomorrow.atZone(ZoneId.systemDefault()).toInstant());
-        return currentDatePlusOneDay;
-    }
 }

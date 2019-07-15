@@ -6,6 +6,7 @@ import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.exception.ConfirmNewPasswordException;
 import com.stn.ester.rest.exception.InvalidLoginException;
 import com.stn.ester.rest.exception.PasswordMismatchException;
+import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
@@ -35,6 +37,9 @@ public class UserService extends AppService implements AssetFileBehaviour {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    HttpServletRequest httpServletRequest;
 
     @Autowired
     public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository) {
@@ -156,7 +161,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 Optional<User> user = this.userRepository.findByEmail(email);
                 if (!user.equals(Optional.empty())) {
                     String token = GlobalFunctionHelper.generateToken();
-                    Date expire = GlobalFunctionHelper.getDateTimeNowPlusSeveralDay(1);
+                    Date expire = DateTimeHelper.getDateTimeNowPlusSeveralDays(1);
                     PasswordReset passwordReset = new PasswordReset(token, expire);
                     this.passwordResetRepository.save(passwordReset);
 

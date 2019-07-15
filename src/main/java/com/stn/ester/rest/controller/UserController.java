@@ -72,7 +72,7 @@ public class UserController extends AppController<UserService, User> {
         return this.biodataService.getGenderList();
     }
 
-    @RequestMapping(value = "/reset-password", method = RequestMethod.POST)
+    @RequestMapping(value = "/reset-password/", method = RequestMethod.POST)
     public Object resetPassword(@RequestBody Map<String, String> payload) {
         return service.resetPassword(payload.get("email"));
     }

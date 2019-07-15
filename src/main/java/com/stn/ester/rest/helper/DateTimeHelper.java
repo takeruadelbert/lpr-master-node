@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class DateTimeHelper {
@@ -31,5 +33,12 @@ public class DateTimeHelper {
 
     public static String getCurrentTimeStamp() {
         return Long.toString(System.currentTimeMillis());
+    }
+
+    public static Date getDateTimeNowPlusSeveralDays(int day) {
+        LocalDateTime today =  LocalDateTime.now(); //Today
+        LocalDateTime maxDay = today.plusDays(day); //Plus several days
+        Date currentDatePlusSeveralDays = Date.from(maxDay.atZone(ZoneId.systemDefault()).toInstant());
+        return currentDatePlusSeveralDays;
     }
 }
