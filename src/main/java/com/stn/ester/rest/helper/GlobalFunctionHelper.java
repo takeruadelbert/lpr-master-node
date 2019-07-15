@@ -30,13 +30,6 @@ public class GlobalFunctionHelper {
         return timeStamp;
     }
 
-    public static Date getDateTomeNowPlusOneDay() {
-        LocalDateTime today =  LocalDateTime.now(); //Today
-        LocalDateTime tomorrow = today.plusDays(1); //Plus 1 day
-        Date currentDatePlusOneDay = Date.from(tomorrow.atZone(ZoneId.systemDefault()).toInstant());
-        return currentDatePlusOneDay;
-    }
-
     /* get name file */
     public static String getNameFile(String vData) {
         if (vData == null) return null;
@@ -99,5 +92,12 @@ public class GlobalFunctionHelper {
             return jsonMap;
         jsonMap = mapper.readValue(jsonString, Map.class);
         return jsonMap;
+    }
+
+    public static Date getDateTimeNowPlusSeveralDay(int day) {
+        LocalDateTime today =  LocalDateTime.now(); //Today
+        LocalDateTime tomorrow = today.plusDays(day); //Plus 1 day
+        Date currentDatePlusOneDay = Date.from(tomorrow.atZone(ZoneId.systemDefault()).toInstant());
+        return currentDatePlusOneDay;
     }
 }

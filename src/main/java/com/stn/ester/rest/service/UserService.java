@@ -156,9 +156,8 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 Optional<User> user = this.userRepository.findByEmail(email);
                 if (!user.equals(Optional.empty())) {
                     String token = GlobalFunctionHelper.generateToken();
-                    int is_used = 1;
-                    Date expire = GlobalFunctionHelper.getDateTomeNowPlusOneDay();
-                    PasswordReset passwordReset = new PasswordReset(token, is_used, expire);
+                    Date expire = GlobalFunctionHelper.getDateTimeNowPlusSeveralDay(1);
+                    PasswordReset passwordReset = new PasswordReset(token, expire);
                     this.passwordResetRepository.save(passwordReset);
 
                     result.put("status", HttpStatus.OK.value());
