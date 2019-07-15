@@ -75,6 +75,10 @@ public class User extends AppDomain {
     @Transient
     private String token;
 
+    public long getId() {return id;}
+
+    public void setId() {this.id = id;}
+
     public String getUsername() {
         return username;
     }

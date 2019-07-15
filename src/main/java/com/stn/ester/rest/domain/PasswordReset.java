@@ -1,6 +1,7 @@
 package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -18,13 +19,18 @@ public class PasswordReset extends AppDomain {
     private Date expire;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     @JsonBackReference
     private User user;
 
-    public PasswordReset(String token, Date expire) {
+    @JsonProperty("userId")
+    @Column(name = "user_id")
+    private Long userId;
+
+    public PasswordReset(String token, Date expire, long userId) {
         this.token = token;
         this.expire = expire;
+        this.userId = userId;
     }
 
     @Override

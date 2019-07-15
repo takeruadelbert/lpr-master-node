@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.function.Function;
 
 @Service
 public class UserService extends AppService implements AssetFileBehaviour {
@@ -162,7 +163,11 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 if (!user.equals(Optional.empty())) {
                     String token = GlobalFunctionHelper.generateToken();
                     Date expire = DateTimeHelper.getDateTimeNowPlusSeveralDays(1);
-                    PasswordReset passwordReset = new PasswordReset(token, expire);
+                    final Optional<Object> o = user.flatMap((Function<User, Optional<Object>>) user1 -> Optional.of(user1.getId()));
+                    long user_id = (long) o.get();
+
+                    //save all to database
+                    PasswordReset passwordReset = new PasswordReset(token, expire, user_id);
                     this.passwordResetRepository.save(passwordReset);
 
                     result.put("status", HttpStatus.OK.value());
