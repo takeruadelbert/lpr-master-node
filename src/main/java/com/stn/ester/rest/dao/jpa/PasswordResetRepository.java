@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface PasswordResetRepository extends AppRepository<PasswordReset, IdList> {
     Optional<PasswordReset> findByToken(String token);
+
+    PasswordReset findByUserId(Long id);
 }

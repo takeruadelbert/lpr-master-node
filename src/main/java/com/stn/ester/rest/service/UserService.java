@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.function.Function;
 
 @Service
 public class UserService extends AppService implements AssetFileBehaviour {
@@ -155,19 +154,18 @@ public class UserService extends AppService implements AssetFileBehaviour {
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    public Object resetPassword(String email) {
+    public Object identifyEmail(String email) {
         Map<String, Object> result = new HashMap<>();
         if (!email.isEmpty()) {
             try {
                 Optional<User> user = this.userRepository.findByEmail(email);
                 if (!user.equals(Optional.empty())) {
-                    String token = GlobalFunctionHelper.generateToken();
-                    Date expire = DateTimeHelper.getDateTimeNowPlusSeveralDays(1);
-                    final Optional<Object> o = user.flatMap((Function<User, Optional<Object>>) user1 -> Optional.of(user1.getId()));
-                    long user_id = (long) o.get();
+                    PasswordReset passwordReset = new PasswordReset();
+                    passwordReset.setToken(GlobalFunctionHelper.generateToken());
+                    passwordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
+                    passwordReset.setUserId(user.get().getId());
 
                     //save all to database
-                    PasswordReset passwordReset = new PasswordReset(token, expire, user_id);
                     this.passwordResetRepository.save(passwordReset);
 
                     result.put("status", HttpStatus.OK.value());

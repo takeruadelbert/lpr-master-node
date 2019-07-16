@@ -2,6 +2,7 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -27,10 +28,22 @@ public class PasswordReset extends AppDomain {
     @Column(name = "user_id")
     private Long userId;
 
-    public PasswordReset(String token, Date expire, long userId) {
+    public PasswordReset() {
+
+    }
+
+    @JsonSetter("userId")
+    public void setUserId(long userId) {
+        if (userId != 0)
+            this.userId = userId;
+    }
+
+    public void setToken(String token) {
         this.token = token;
+    }
+
+    public void setExpire(Date expire) {
         this.expire = expire;
-        this.userId = userId;
     }
 
     @Override
