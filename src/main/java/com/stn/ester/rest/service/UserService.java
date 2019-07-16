@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +26,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-public class UserService extends AppService implements AssetFileBehaviour {
+public class UserService extends AppService implements AssetFileBehaviour, UserDetailsService {
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;
@@ -147,5 +150,15 @@ public class UserService extends AppService implements AssetFileBehaviour {
         result.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
         result.put("message", "Failed to change profile picture : Invalid Token.");
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> usersOptional = userRepository.findByUsername(username);
+
+        usersOptional
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
+        return usersOptional
+                .get();
     }
 }

@@ -2,7 +2,12 @@ package com.stn.ester.rest;
 
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import com.stn.ester.rest.domain.AssetFile;
+import com.stn.ester.rest.domain.Biodata;
+import com.stn.ester.rest.domain.User;
+import com.stn.ester.rest.domain.UserGroup;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
+import com.stn.ester.rest.service.UserGroupService;
+import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -30,6 +35,12 @@ public class RestApplication extends SpringBootServletInitializer {
     @Autowired
     private AssetFileRepository assetFileRepository;
 
+    @Autowired
+    private UserGroupService userGroupService;
+
+    @Autowired
+    private UserService userService;
+
     public static Long defaultProfilePictureID;
 
     public static void main(String[] args) {
@@ -40,6 +51,7 @@ public class RestApplication extends SpringBootServletInitializer {
     public void init() {
         TimeZone.setDefault(TimeZone.getTimeZone(timezone));
         this.addDefaultProfilePicture();
+        this.addSuperAdmin();
     }
 
     @Override
@@ -50,7 +62,7 @@ public class RestApplication extends SpringBootServletInitializer {
     private void addDefaultProfilePicture() {
         try {
             Optional<AssetFile> existingDefaultPP = this.assetFileRepository.findByNameAndExtension("default-pp", "png");
-            if(existingDefaultPP.equals(Optional.empty())) {
+            if (existingDefaultPP.equals(Optional.empty())) {
                 String assetDefaultDir = this.parentDirectory + DS + this.assetPath + DS + this.assetDefault;
 
                 // create asset default dir if it doesn't exist
@@ -68,5 +80,22 @@ public class RestApplication extends SpringBootServletInitializer {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void addSuperAdmin() {
+        UserGroup userGroup = new UserGroup();
+        userGroup.setName("SUPERADMIN");
+        userGroup.setLabel("Super Admin");
+        userGroup = (UserGroup) userGroupService.create(userGroup);
+        User user = new User();
+        user.setUsername("admin");
+        user.setPassword("adminstn");
+        user.setEmail("info@suryateknologi.co.id");
+        user.setUserGroupId(userGroup.getId());
+        Biodata biodata = new Biodata();
+        biodata.setFirstName("STN");
+        biodata.setLastName("Ester");
+        user.setBiodata(biodata);
+        userService.create(user);
     }
 }
