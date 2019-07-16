@@ -38,12 +38,34 @@ public class PasswordReset extends AppDomain {
             this.userId = userId;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
     public void setToken(String token) {
         this.token = token;
     }
 
+    public Date getExpire() {
+        return expire;
+    }
+
     public void setExpire(Date expire) {
         this.expire = expire;
+    }
+
+    public int getIs_used() {
+        return is_used;
+    }
+
+    public void setIs_used(int is_used) {
+        if (is_used == 0) {
+            this.is_used = 1;
+        }
     }
 
     @Override

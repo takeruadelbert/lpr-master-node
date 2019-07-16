@@ -41,4 +41,11 @@ public class DateTimeHelper {
         Date currentDatePlusSeveralDays = Date.from(maxDay.atZone(ZoneId.systemDefault()).toInstant());
         return currentDatePlusSeveralDays;
     }
+
+    public static Date getDateTimeNow() {
+        LocalDateTime today =  LocalDateTime.now();
+        Date dateTimeNow = Date.from(today.atZone(ZoneId.systemDefault()).toInstant());
+        return dateTimeNow;
+
+    }
 }

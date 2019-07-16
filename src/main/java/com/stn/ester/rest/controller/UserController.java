@@ -76,4 +76,9 @@ public class UserController extends AppController<UserService, User> {
     public Object identifyEmail(@RequestBody Map<String, String> payload) {
         return service.identifyEmail(payload.get("email"));
     }
+
+    @RequestMapping(value = "/reset-password/{token}", method = RequestMethod.GET)
+    public Object resetPassword(@PathVariable String token) {
+        return service.resetPassword(token);
+    }
 }

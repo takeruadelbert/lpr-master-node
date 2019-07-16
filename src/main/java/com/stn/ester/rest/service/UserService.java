@@ -164,8 +164,6 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     passwordReset.setToken(GlobalFunctionHelper.generateToken());
                     passwordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
                     passwordReset.setUserId(user.get().getId());
-
-                    //save all to database
                     this.passwordResetRepository.save(passwordReset);
 
                     result.put("status", HttpStatus.OK.value());
@@ -174,6 +172,36 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     result.put("status", HttpStatus.BAD_REQUEST.value());
                     result.put("message", "Email not found.");
                     return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+                }
+            } catch (Exception ex) {
+                result.put("status", HttpStatus.BAD_REQUEST);
+                result.put("message", ex.getMessage());
+                return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+        }
+        return result;
+    }
+
+    public Object resetPassword(String token) {
+        Map<String, Object> result = new HashMap<>();
+        if (!token.isEmpty()) {
+            try {
+                PasswordReset passwordReset = this.passwordResetRepository.findByToken(token);
+                if (!passwordReset.equals(Optional.empty())) {
+                    Date getExpire = passwordReset.getExpire();
+                    if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
+                        passwordReset.setId(passwordReset.getId());
+                        passwordReset.setIs_used(passwordReset.getIs_used());
+                        //update data into db
+                        this.passwordResetRepository.save(passwordReset);
+
+                        result.put("status", HttpStatus.OK.value());
+                        result.put("message", "Token found.");
+                    } else {
+                        result.put("status", HttpStatus.BAD_REQUEST.value());
+                        result.put("message", "Token is expired.");
+                        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+                    }
                 }
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST);
