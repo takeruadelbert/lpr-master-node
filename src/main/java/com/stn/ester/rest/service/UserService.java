@@ -187,21 +187,19 @@ public class UserService extends AppService implements AssetFileBehaviour {
         if (!token.isEmpty()) {
             try {
                 PasswordReset passwordReset = this.passwordResetRepository.findByToken(token);
-                if (!passwordReset.equals(Optional.empty())) {
-                    Date getExpire = passwordReset.getExpire();
-                    if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
-                        passwordReset.setId(passwordReset.getId());
-                        passwordReset.setIs_used(passwordReset.getIs_used());
-                        //update data into db
-                        this.passwordResetRepository.save(passwordReset);
+                Date getExpire = passwordReset.getExpire();
+                if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
+                    passwordReset.setId(passwordReset.getId());
+                    passwordReset.setIs_used(passwordReset.getIs_used());
+                    //update data into db
+                    this.passwordResetRepository.save(passwordReset);
 
-                        result.put("status", HttpStatus.OK.value());
-                        result.put("message", "Token found.");
-                    } else {
-                        result.put("status", HttpStatus.BAD_REQUEST.value());
-                        result.put("message", "Token is expired.");
-                        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
-                    }
+                    result.put("status", HttpStatus.OK.value());
+                    result.put("message", "Token found.");
+                } else {
+                    result.put("status", HttpStatus.BAD_REQUEST.value());
+                    result.put("message", "Token not found or token is expired.");
+                    return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
                 }
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST);

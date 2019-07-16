@@ -46,6 +46,5 @@ public class DateTimeHelper {
         LocalDateTime today =  LocalDateTime.now();
         Date dateTimeNow = Date.from(today.atZone(ZoneId.systemDefault()).toInstant());
         return dateTimeNow;
-
     }
 }
