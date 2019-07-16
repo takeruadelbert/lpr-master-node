@@ -16,7 +16,8 @@ public class AccessLogInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        this.accessLogRepository.save(RequestLoggingFilter.accessLog);
-        return super.preHandle(request,response, handler);
+        if (RequestLoggingFilter.accessLog != null)
+            this.accessLogRepository.save(RequestLoggingFilter.accessLog);
+        return super.preHandle(request, response, handler);
     }
 }

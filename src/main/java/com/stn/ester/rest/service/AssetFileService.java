@@ -30,7 +30,7 @@ public class AssetFileService extends AppService {
     @Value("${ester.asset.temp}")
     private String assetTempPath;
 
-    private String parentDirectory = new File(System.getProperty("user.dir")).getParent();
+    private String parentDirectory = new File(System.getProperty("user.dir")).getParent() != null ? new File(System.getProperty("user.dir")).getParent() : new File(System.getProperty("user.dir")).toString();
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {

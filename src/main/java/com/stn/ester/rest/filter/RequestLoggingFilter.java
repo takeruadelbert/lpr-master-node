@@ -8,6 +8,7 @@ import com.stn.ester.rest.domain.AccessLog;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.filter.wrapper.RequestWrapper;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -16,12 +17,18 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class RequestLoggingFilter extends OncePerRequestFilter {
     private Gson gson = new Gson();
     private ObjectMapper mapper = new ObjectMapper();
     public static AccessLog accessLog;
+
+    private static final List<String> EXCLUDE_URL = Arrays.asList(
+        "/users/login"
+    );
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -30,7 +37,8 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         ServletRequest copiedRequest = requestWrapper;
 
         String IPAdress_client = request.getHeader("X-FORWARDED-FOR");
-        String URI = request.getRequestURI();
+        String queryParam = request.getQueryString();
+        String URI = queryParam == null ? request.getRequestURI() : request.getRequestURI() + "?" + queryParam;
         String request_method = request.getMethod();
         Long user_id = SessionHelper.getUserID();
         if (IPAdress_client == null || "".equals(IPAdress_client)) {
@@ -51,5 +59,10 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         accessLog = new AccessLog(IPAdress_client, URI, requestMethod, user_id, requestBody);
 
         chain.doFilter(copiedRequest, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return EXCLUDE_URL.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(request.getServletPath()));
     }
 }
