@@ -27,16 +27,16 @@ public class EmailHelper {
         return emailTo;
     }
 
-    public static String subjectEmail() {
-        String subjectEmail = "Your reset password is ready!";
-        return subjectEmail;
+    public static String emailSubject() {
+        String emailSubject = "Your reset password is ready!";
+        return emailSubject;
     }
 
-    public static String templateEmail() {
-        String templateEmail = "" +
-                "Dear user," +
-                "\n\n Please click link below to reset your password!" +
-                "\n\n http://localhost:8080/users/reset-password/CyJKAHSD7";
-        return templateEmail;
+    public static String emailTemplate() {
+        String emailTemplate = "" +
+                "Dear user, \n\n" +
+                "Please click link below to reset your password! \n\n" +
+                "http://localhost:8080/users/reset-password/CyJKAHSD7";
+        return emailTemplate;
     }
 }

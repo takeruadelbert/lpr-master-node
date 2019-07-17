@@ -167,10 +167,10 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     this.passwordResetRepository.save(passwordReset);
 
                     // If email found send link reset password to user.
-                    sendMail(user);
+                    sendLinkResetPassword(user);
 
                     result.put("status", HttpStatus.OK.value());
-                    result.put("message", "Url to reset password has been sent to your mail.");
+                    result.put("message", "Link reset password has been sent to your e-mail.");
                 } else {
                     result.put("status", HttpStatus.BAD_REQUEST.value());
                     result.put("message", "Email not found.");
@@ -185,11 +185,11 @@ public class UserService extends AppService implements AssetFileBehaviour {
         return result;
     }
 
-    public Object sendMail(Optional<User> user) {
+    public Object sendLinkResetPassword(Optional<User> user) {
         Map<String, Object> result = new HashMap<>();
         if (!user.equals(null)) {
 
-            // Setting properties email.
+            // Setting email properties.
             Properties prop = new Properties();
             prop.put("mail.smtp.host", "smtp.gmail.com");
             prop.put("mail.smtp.socketFactory.port", "465");
@@ -202,8 +202,8 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 Message message = new MimeMessage(session);
                 message.setFrom(new InternetAddress(EmailHelper.emailFrom()));
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(EmailHelper.emailTo()));
-                message.setSubject(EmailHelper.subjectEmail());
-                message.setText(EmailHelper.templateEmail());
+                message.setSubject(EmailHelper.emailSubject());
+                message.setText(EmailHelper.emailTemplate());
                 Transport.send(message);
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST);
