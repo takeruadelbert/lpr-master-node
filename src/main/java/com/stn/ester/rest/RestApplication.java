@@ -20,7 +20,7 @@ public class RestApplication extends SpringBootServletInitializer {
 
     @Value("${ester.server.timezone}")
     private String timezone;
-    private String parentDirectory = new File(System.getProperty("user.dir")).getParent();
+    private String parentDirectory = new File(System.getProperty("user.dir")).getParent() != null ? new File(System.getProperty("user.dir")).getParent() : new File(System.getProperty("user.dir")).toString();
     @Value("${ester.asset.root}")
     private String assetPath;
     @Value("${ester.asset.default}")
