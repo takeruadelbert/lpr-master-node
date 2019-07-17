@@ -44,6 +44,7 @@ public class EmailHelper {
     public static String emailTemplate(Optional<User> user, String scheme, String serverName, String serverPort, String token) {
         String username = user.get().getUsername();
         String requestURI = "users/reset-password";
+        String linkResetPassword = scheme + "://" + serverName + pointTwo + serverPort + slash + requestURI + slash + token;
 
         // Set template email
         String emailTemplate = "" +
@@ -51,7 +52,7 @@ public class EmailHelper {
                 "We've received a request to reset your password. If you didn't make the request," + breakLine +
                 "just ignore this email. Otherwise, you can reset your password using this link, " + breakLine +
                 "click link below to reset your password." + breakLines +
-                scheme + "://" + serverName + pointTwo + serverPort + slash + requestURI + slash + token + breakLines +
+                linkResetPassword + breakLines +
                 "Thanks," + breakLine +
                 "The Ester Team";
         return emailTemplate;
