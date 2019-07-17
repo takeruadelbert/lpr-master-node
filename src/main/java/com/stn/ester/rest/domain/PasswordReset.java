@@ -16,7 +16,7 @@ public class PasswordReset extends AppDomain {
     private String token;
 
     @Column(columnDefinition = "tinyint default 0")
-    private int is_used;
+    private int isUsed;
     private Date expire;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -58,13 +58,13 @@ public class PasswordReset extends AppDomain {
         this.expire = expire;
     }
 
-    public int getIs_used() {
-        return is_used;
+    public int getIsUsed() {
+        return isUsed;
     }
 
-    public void setIs_used(int is_used) {
-        if (is_used == 0) {
-            this.is_used = 1;
+    public void setIsUsed(int isUsed) {
+        if (isUsed == 0) {
+            this.isUsed = 1;
         }
     }
 

@@ -39,9 +39,6 @@ public class UserService extends AppService implements AssetFileBehaviour {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    HttpServletRequest httpServletRequest;
-
-    @Autowired
     public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository) {
         super(User.unique_name);
         super.repositories.put(User.unique_name, userRepository);
@@ -190,7 +187,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 Date getExpire = passwordReset.getExpire();
                 if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
                     passwordReset.setId(passwordReset.getId());
-                    passwordReset.setIs_used(passwordReset.getIs_used());
+                    passwordReset.setIsUsed(passwordReset.getIsUsed());
                     //update data into db
                     this.passwordResetRepository.save(passwordReset);
 
