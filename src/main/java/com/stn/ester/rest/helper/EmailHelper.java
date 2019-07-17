@@ -49,11 +49,11 @@ public class EmailHelper {
         // Set template email
         String emailTemplate = "" +
                 "Hi " + username + ", " + breakLines +
-                "We've received a request to reset your password. If you didn't make the request," + breakLine +
-                "just ignore this email. Otherwise, you can reset your password using this link, " + breakLine +
-                "click link below to reset your password." + breakLines +
+                "Kami telah menerima request untuk mereset password anda. Jika anda tidak membuat request," + breakLine +
+                "cukup abaikan email ini. Sebaliknya, anda dapat mereset password menggunakan link ini, " + breakLine +
+                "klik link di bawah ini untuk mereset password anda." + breakLines +
                 linkResetPassword + breakLines +
-                "Thanks," + breakLine +
+                "Terima kasih," + breakLine +
                 "The Ester Team";
         return emailTemplate;
     }
