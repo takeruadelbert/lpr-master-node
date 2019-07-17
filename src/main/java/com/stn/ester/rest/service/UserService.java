@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
@@ -40,6 +41,9 @@ public class UserService extends AppService implements AssetFileBehaviour {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    HttpServletRequest httpServletRequest;
 
     @Autowired
     public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository) {
@@ -161,13 +165,14 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 Optional<User> user = this.userRepository.findByEmail(email);
                 if (!user.equals(Optional.empty())) {
                     PasswordReset passwordReset = new PasswordReset();
-                    passwordReset.setToken(GlobalFunctionHelper.generateToken());
+                    String token = GlobalFunctionHelper.generateToken();
+                    passwordReset.setToken(token);
                     passwordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
                     passwordReset.setUserId(user.get().getId());
                     this.passwordResetRepository.save(passwordReset);
 
                     // If email found send link reset password to user.
-                    sendLinkResetPassword(user);
+                    sendLinkResetPassword(user, token);
 
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Link reset password has been sent to your e-mail.");
@@ -185,7 +190,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
         return result;
     }
 
-    public Object sendLinkResetPassword(Optional<User> user) {
+    public Object sendLinkResetPassword(Optional<User> user, String token) {
         Map<String, Object> result = new HashMap<>();
         if (!user.equals(null)) {
 
@@ -196,6 +201,12 @@ public class UserService extends AppService implements AssetFileBehaviour {
             prop.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
             prop.put("mail.smtp.auth", "true");
 
+            // Getting hostname, port and others from http servlet request
+            String Scheme = String.valueOf(httpServletRequest.getScheme());
+            String ServerName = httpServletRequest.getServerName();
+            String RequestURI = httpServletRequest.getRequestURI();
+            String ServerPort = String.valueOf(httpServletRequest.getServerPort());
+
             // Check username and password smptn from server.
             Session session = EmailHelper.passwordAuthentication(prop);
             try {
@@ -203,7 +214,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 message.setFrom(new InternetAddress(EmailHelper.emailFrom()));
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(EmailHelper.emailTo()));
                 message.setSubject(EmailHelper.emailSubject());
-                message.setText(EmailHelper.emailTemplate());
+                message.setText(EmailHelper.emailTemplate(user, Scheme, ServerName, ServerPort, token));
                 Transport.send(message);
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST);

@@ -1,12 +1,21 @@
 package com.stn.ester.rest.helper;
 
+import com.stn.ester.rest.domain.User;
+
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import java.util.Optional;
 import java.util.Properties;
 
 public class EmailHelper {
+
     private static final String SMTP_USERNAME = "info@suryateknologi.co.id";
     private static final String SMTP_PASSWORD = "emkF1qRD";
+
+    private static final String slash = "/";
+    private static final String pointTwo = ":";
+    private static final String breakLine = "\n";
+    private static final String breakLines = "\n\n";
 
     public static Session passwordAuthentication(Properties prop) {
         Session session = Session.getInstance(prop, new javax.mail.Authenticator() {
@@ -28,15 +37,23 @@ public class EmailHelper {
     }
 
     public static String emailSubject() {
-        String emailSubject = "Your reset password is ready!";
+        String emailSubject = "Ester Password Reset";
         return emailSubject;
     }
 
-    public static String emailTemplate() {
+    public static String emailTemplate(Optional<User> user, String scheme, String serverName, String serverPort, String token) {
+        String username = user.get().getUsername();
+        String requestURI = "users/reset-password";
+
+        // Set template email
         String emailTemplate = "" +
-                "Dear user, \n\n" +
-                "Please click link below to reset your password! \n\n" +
-                "http://localhost:8080/users/reset-password/CyJKAHSD7";
+                "Hi " + username + ", " + breakLines +
+                "We've received a request to reset your password. If you didn't make the request," + breakLine +
+                "just ignore this email. Otherwise, you can reset your password using this link, " + breakLine +
+                "click link below to reset your password." + breakLines +
+                scheme + "://" + serverName + pointTwo + serverPort + slash + requestURI + slash + token + breakLines +
+                "Thanks," + breakLine +
+                "The Ester Team";
         return emailTemplate;
     }
 }
