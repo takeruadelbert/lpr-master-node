@@ -7,6 +7,7 @@ import com.stn.ester.rest.exception.ConfirmNewPasswordException;
 import com.stn.ester.rest.exception.InvalidLoginException;
 import com.stn.ester.rest.exception.PasswordMismatchException;
 import com.stn.ester.rest.helper.DateTimeHelper;
+import com.stn.ester.rest.helper.EmailHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
@@ -17,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
@@ -163,13 +166,45 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     passwordReset.setUserId(user.get().getId());
                     this.passwordResetRepository.save(passwordReset);
 
+                    // If email found send link reset password to user.
+                    sendMail(user);
+
                     result.put("status", HttpStatus.OK.value());
-                    result.put("message", "Email found.");
+                    result.put("message", "Url to reset password has been sent to your mail.");
                 } else {
                     result.put("status", HttpStatus.BAD_REQUEST.value());
                     result.put("message", "Email not found.");
                     return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
                 }
+            } catch (Exception ex) {
+                result.put("status", HttpStatus.BAD_REQUEST);
+                result.put("message", ex.getMessage());
+                return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+        }
+        return result;
+    }
+
+    public Object sendMail(Optional<User> user) {
+        Map<String, Object> result = new HashMap<>();
+        if (!user.equals(null)) {
+
+            // Setting properties email.
+            Properties prop = new Properties();
+            prop.put("mail.smtp.host", "smtp.gmail.com");
+            prop.put("mail.smtp.socketFactory.port", "465");
+            prop.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            prop.put("mail.smtp.auth", "true");
+
+            // Check username and password smptn from server.
+            Session session = EmailHelper.passwordAuthentication(prop);
+            try {
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(EmailHelper.emailFrom()));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(EmailHelper.emailTo()));
+                message.setSubject(EmailHelper.subjectEmail());
+                message.setText(EmailHelper.templateEmail());
+                Transport.send(message);
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST);
                 result.put("message", ex.getMessage());
@@ -188,7 +223,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
                     passwordReset.setId(passwordReset.getId());
                     passwordReset.setIsUsed(passwordReset.getIsUsed());
-                    //update data into db
+                    // Update data into db.
                     this.passwordResetRepository.save(passwordReset);
 
                     result.put("status", HttpStatus.OK.value());
