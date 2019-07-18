@@ -81,4 +81,11 @@ public class UserController extends AppController<UserService, User> {
     public Object resetPassword(@PathVariable String token) {
         return service.resetPassword(token);
     }
+
+    @RequestMapping(value = "/confirm-reset-password", method = RequestMethod.PUT)
+    public Object confirmResetPassword(@RequestBody Map<String, String> data) {
+        String new_password = data.get("new_password");
+        String confirm_password = data.get("confirm_password");
+        return service.confirmResetPassword(new_password, confirm_password);
+    }
 }

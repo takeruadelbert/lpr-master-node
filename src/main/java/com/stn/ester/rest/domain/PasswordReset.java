@@ -68,6 +68,10 @@ public class PasswordReset extends AppDomain {
         }
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
     @Override
     public String underscoreName() {return PasswordReset.unique_name;}
 }

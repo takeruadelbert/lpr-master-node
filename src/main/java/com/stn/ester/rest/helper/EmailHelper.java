@@ -11,7 +11,9 @@ public class EmailHelper {
 
     private static final String SMTP_USERNAME = "info@suryateknologi.co.id";
     private static final String SMTP_PASSWORD = "emkF1qRD";
+    public static String resetPasswordToken = "";
 
+    // Configuration username and password SMTP.
     public static Session passwordAuthentication(Properties prop) {
         Session session = Session.getInstance(prop, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -41,7 +43,7 @@ public class EmailHelper {
         String requestURI = "users/reset-password";
         String linkResetPassword = scheme + "://" + serverName + GlobalFunctionHelper.pointTwo + serverPort + GlobalFunctionHelper.slash + requestURI + GlobalFunctionHelper.slash + token;
 
-        // Set email template
+        // Set email template.
         String emailTemplate = "" +
                 "Hi " + username + ", " + GlobalFunctionHelper.breakLines +
                 "Kami telah menerima request untuk mereset password anda. Jika anda tidak membuat request," + GlobalFunctionHelper.breakLine +

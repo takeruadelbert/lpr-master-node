@@ -207,7 +207,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
             String RequestURI = httpServletRequest.getRequestURI();
             String ServerPort = String.valueOf(httpServletRequest.getServerPort());
 
-            // Check username and password smptn from server.
+            // Check smtp username and password from server.
             Session session = EmailHelper.passwordAuthentication(prop);
             try {
                 Message message = new MimeMessage(session);
@@ -237,6 +237,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     // Update data into db.
                     this.passwordResetRepository.save(passwordReset);
 
+                    EmailHelper.resetPasswordToken += token;
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Token found.");
                 } else {
@@ -251,5 +252,17 @@ public class UserService extends AppService implements AssetFileBehaviour {
             }
         }
         return result;
+    }
+
+    public Object confirmResetPassword(String new_password, String confirm_password) {
+        PasswordReset passwordReset = this.passwordResetRepository.findByToken(EmailHelper.resetPasswordToken);
+        User user = this.userRepository.findById(passwordReset.getUserId()).orElse(null);
+        if (!new_password.equals(confirm_password)) {
+            throw new ConfirmNewPasswordException();
+        }
+        user.setId(passwordReset.getUserId());
+        user.setPassword(this.passwordEncoder.encode(new_password));
+        this.userRepository.save(user);
+        return user;
     }
 }
