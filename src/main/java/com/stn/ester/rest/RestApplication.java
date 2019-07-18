@@ -1,11 +1,12 @@
 package com.stn.ester.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
-import com.stn.ester.rest.domain.AssetFile;
-import com.stn.ester.rest.domain.Biodata;
-import com.stn.ester.rest.domain.User;
-import com.stn.ester.rest.domain.UserGroup;
+import com.stn.ester.rest.domain.*;
+import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
+import com.stn.ester.rest.service.MenuService;
+import com.stn.ester.rest.service.ModuleService;
 import com.stn.ester.rest.service.UserGroupService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -41,6 +43,12 @@ public class RestApplication extends SpringBootServletInitializer {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ModuleService moduleService;
+
+    @Autowired
+    private MenuService menuService;
+
     public static Long defaultProfilePictureID;
 
     public static void main(String[] args) {
@@ -52,6 +60,11 @@ public class RestApplication extends SpringBootServletInitializer {
         TimeZone.setDefault(TimeZone.getTimeZone(timezone));
         this.addDefaultProfilePicture();
         this.addSuperAdmin();
+        try {
+            this.addMisc();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -97,5 +110,31 @@ public class RestApplication extends SpringBootServletInitializer {
         biodata.setLastName("Ester");
         user.setBiodata(biodata);
         userService.create(user);
+    }
+
+    public void addMisc() throws IOException {
+        ObjectMapper mapper=new ObjectMapper();
+        String userModuleData="{\n" +
+                "\t\"name\":\"user\",\n" +
+                "\t\"alias\":\"/users\",\n" +
+                "\t\"requestMethod\":\"GET\",\n" +
+                "\t\"moduleLink\":[]\n" +
+                "}";
+        Module userModule=mapper.readValue(userModuleData,Module.class);
+        moduleService.create(userModule);
+        String pengaturanMenuData="{\n" +
+                "\t\"label\":\"Pengaturan\",\n" +
+                "\t\"orderingNumber\":9999\n" +
+                "}";
+        String userMenuData="{\n" +
+                "    \"label\": \"User\",\n" +
+                "    \"orderingNumber\": 3,\n" +
+                "    \"moduleId\": 1,\n" +
+                "    \"parentMenuId\": 1\n" +
+                "}";
+        Menu pengaturanMenu=mapper.readValue(pengaturanMenuData,Menu.class);
+        Menu userMenu=mapper.readValue(userMenuData,Menu.class);
+        menuService.create(pengaturanMenu);
+        menuService.create(userMenu);
     }
 }

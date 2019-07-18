@@ -5,18 +5,23 @@ import com.stn.ester.rest.dao.jpa.MenuRepository;
 import com.stn.ester.rest.dao.jpa.UserGroupRepository;
 import com.stn.ester.rest.domain.AccessGroup;
 import com.stn.ester.rest.domain.Menu;
+import com.stn.ester.rest.domain.Module;
 import com.stn.ester.rest.domain.UserGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 @Service
 public class AccessGroupService extends AppService {
 
     AccessGroupRepository accessGroupRepository;
+    UserGroupRepository userGroupRepository;
 
     @Autowired
     public AccessGroupService(AccessGroupRepository accessGroupRepository, MenuRepository menuRepository, UserGroupRepository userGroupRepository) {
@@ -25,6 +30,7 @@ public class AccessGroupService extends AppService {
         super.repositories.put(Menu.unique_name, menuRepository);
         super.repositories.put(UserGroup.unique_name, userGroupRepository);
         this.accessGroupRepository = accessGroupRepository;
+        this.userGroupRepository = userGroupRepository;
     }
 
     @Transactional
@@ -45,6 +51,19 @@ public class AccessGroupService extends AppService {
                 super.create(accessGroup);
             }
         }
+    }
+
+    public Collection<? extends GrantedAuthority> buildAccessAuthorities(Long userGroupId) {
+        Collection<GrantedAuthority> authorities = new ArrayList();
+        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByUserGroupId(userGroupId);
+        for (AccessGroup accessGroup : accessGroups) {
+            Menu menu = accessGroup.getMenu();
+            Module module = menu.getModule();
+            if (module != null) {
+                authorities.add(new SimpleGrantedAuthority("ACCESS_" + module.getRequestMethod() + "_" + module.getAlias()));
+            }
+        }
+        return authorities;
     }
 
 }

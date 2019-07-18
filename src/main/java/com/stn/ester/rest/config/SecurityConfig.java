@@ -2,6 +2,7 @@ package com.stn.ester.rest.config;
 
 import com.stn.ester.rest.security.JWTAuthenticationFilter;
 import com.stn.ester.rest.security.JWTAuthorizationFilter;
+import com.stn.ester.rest.service.AccessGroupService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserService userService;
 
     @Autowired
+    private AccessGroupService accessGroupService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Bean
@@ -48,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(),accessGroupService))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager()))
                 // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

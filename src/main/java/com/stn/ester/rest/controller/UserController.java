@@ -74,4 +74,9 @@ public class UserController extends AppController<UserService, User> {
     public Map<Gender, String> getGenderList() {
         return this.biodataService.getGenderList();
     }
+
+    @Override
+    public String getAuthority() {
+        return "ACCESS_GET_/users";
+    }
 }

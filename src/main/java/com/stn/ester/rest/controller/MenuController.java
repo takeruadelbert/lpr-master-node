@@ -43,4 +43,9 @@ public class MenuController extends AppController<MenuService, Menu> {
     public Object create(@Valid @RequestBody Menu menu) {
         return service.create(menu);
     }
+
+    @Override
+    public String getAuthority() {
+        return "ACCESS_GET_/menus";
+    }
 }

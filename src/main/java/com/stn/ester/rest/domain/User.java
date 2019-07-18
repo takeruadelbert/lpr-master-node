@@ -1,6 +1,9 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -106,7 +109,7 @@ public class User extends AppDomain implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        ArrayList<GrantedAuthority> authorities=new ArrayList();
+        Collection<GrantedAuthority> authorities = new ArrayList();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + this.userGroup.getName()));
         return authorities;
     }

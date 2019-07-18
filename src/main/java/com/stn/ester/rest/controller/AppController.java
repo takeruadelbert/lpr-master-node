@@ -9,8 +9,10 @@ import com.stn.ester.rest.search.SpecificationsBuilder;
 import com.stn.ester.rest.search.util.SearchOperation;
 import com.stn.ester.rest.service.AppService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +27,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class AppController<T extends AppService, U extends AppDomain> {
+public abstract class AppController<T extends AppService, U extends AppDomain> implements BeanNameAware {
 
     protected static final String DEFAULT_PAGE_SIZE = "10";
     protected static final String DEFAULT_PAGE_NUM = "0";
 
     protected T service;
+    String beanName;
 
     @Autowired
     protected ModelMapper modelMapper;
@@ -39,6 +42,7 @@ public abstract class AppController<T extends AppService, U extends AppDomain> {
         this.service = service;
     }
 
+    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Page<Object> index(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUM) Integer page, @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) Integer size, @RequestParam(value = "search", required = false) String search) throws UnsupportedEncodingException {
         if (search != null) {
@@ -98,5 +102,18 @@ public abstract class AppController<T extends AppService, U extends AppDomain> {
                 specificationsBuilder.with(key, operation, entry.getValue().toString(), null, null);
             }
         }
+    }
+
+    @Override
+    public void setBeanName(final String beanName) {
+        this.beanName = beanName;
+    }
+
+    public String getBeanName() {
+        return beanName;
+    }
+
+    public String getAuthority(){
+        return "NOACCESS";
     }
 }

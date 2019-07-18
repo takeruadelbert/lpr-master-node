@@ -87,6 +87,10 @@ public class AccessGroup extends AppDomain {
         return menuId;
     }
 
+    public Menu getMenu() {
+        return menu;
+    }
+
     @Override
     public String underscoreName() {
         return AccessGroup.unique_name;

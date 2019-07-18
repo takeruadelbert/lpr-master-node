@@ -70,6 +70,10 @@ public class Menu extends AppDomain {
         this.subMenu.addAll(subMenu);
     }
 
+    public Module getModule() {
+        return module;
+    }
+
     @Override
     public String underscoreName() {
         return Menu.unique_name;
