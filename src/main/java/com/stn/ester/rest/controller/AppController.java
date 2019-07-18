@@ -63,11 +63,6 @@ public abstract class AppController<T extends AppService, U extends AppDomain> {
         return service.update(id, domain);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.PUT)
-    public Object update(@Valid @RequestBody U domain) {
-        return service.update((long) 1, domain);
-    }
-
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void delete(@PathVariable long id) {
         service.delete(id);

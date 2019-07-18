@@ -14,7 +14,6 @@ public class SystemProfileController extends AppController<SystemProfileService,
         super(systemProfileService);
     }
 
-    @Override
     @RequestMapping(value = "/system_profiles", method = RequestMethod.PUT)
     public Object update(@Valid @RequestBody SystemProfile systemProfile) {
         return service.updateSingleData(systemProfile);
