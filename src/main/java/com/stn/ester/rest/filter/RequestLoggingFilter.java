@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.google.gson.Gson;
 import com.stn.ester.rest.domain.AccessLog;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
-import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.filter.wrapper.RequestWrapper;
-import org.springframework.stereotype.Component;
+import com.stn.ester.rest.helper.SessionHelper;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -25,9 +24,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     private Gson gson = new Gson();
     private ObjectMapper mapper = new ObjectMapper();
     public static AccessLog accessLog;
-
+    private static String WHITESPACE = " ";
     private static final List<String> EXCLUDE_URL = Arrays.asList(
-        "/users/login"
+            RequestMethod.POST + WHITESPACE + "/users/login"
     );
 
     @Override
@@ -63,6 +62,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return EXCLUDE_URL.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(request.getServletPath()));
+        String servletPath = RequestMethod.valueOf(request.getMethod()) + WHITESPACE + request.getServletPath();
+        return EXCLUDE_URL.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(servletPath));
     }
 }
