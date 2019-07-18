@@ -163,13 +163,25 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 Optional<User> user = this.userRepository.findByEmail(email);
                 if (!user.equals(Optional.empty())) {
                     String token = GlobalFunctionHelper.generateToken();
-                    PasswordReset passwordReset = new PasswordReset();
-                    passwordReset.setToken(token);
-                    passwordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
-                    passwordReset.setUserId(user.get().getId());
-                    this.passwordResetRepository.save(passwordReset);
 
-                    // If email found send link reset password to user.
+                    // If user have token to reset password then update data if not have token next to add new data.
+                    PasswordReset updatePasswordReset = this.passwordResetRepository.findByUserId(user.get().getId());
+                    if (updatePasswordReset != null) {
+                        updatePasswordReset.setToken(token);
+                        updatePasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
+                        updatePasswordReset.setUserId(user.get().getId());
+                        // Update data into db.
+                        this.passwordResetRepository.save(updatePasswordReset);
+                    } else {
+                        PasswordReset addNewPasswordReset = new PasswordReset();
+                        addNewPasswordReset.setToken(token);
+                        addNewPasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
+                        addNewPasswordReset.setUserId(user.get().getId());
+                        // Add new data into db.
+                        this.passwordResetRepository.save(addNewPasswordReset);
+                    }
+
+                    // If e-mail found send link reset password to user.
                     sendLinkResetPassword(user, token);
 
                     result.put("status", HttpStatus.OK.value());
@@ -190,7 +202,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
         Map<String, Object> result = new HashMap<>();
         if (!user.equals(null)) {
 
-            // Setting email properties.
+            // Setting e-mail properties.
             Properties prop = new Properties();
             prop.put("mail.smtp.host", "smtp.gmail.com");
             prop.put("mail.smtp.socketFactory.port", "465");
@@ -259,12 +271,12 @@ public class UserService extends AppService implements AssetFileBehaviour {
 
             passwordReset.setId(passwordReset.getId());
             passwordReset.setIsUsed(passwordReset.getIsUsed());
-            // Update data into db.
+            // Update data into db table passwordReset.
             this.passwordResetRepository.save(passwordReset);
 
             user.setId(passwordReset.getUserId());
             user.setPassword(this.passwordEncoder.encode(new_password));
-            // Update data into db user.
+            // Update data into db table user.
             this.userRepository.save(user);
         }
         throw new OkException("Your new password is succesfully created.");
