@@ -3,9 +3,7 @@ package com.stn.ester.rest.service;
 import com.stn.ester.rest.RestApplication;
 import com.stn.ester.rest.dao.jpa.*;
 import com.stn.ester.rest.domain.*;
-import com.stn.ester.rest.exception.ConfirmNewPasswordException;
-import com.stn.ester.rest.exception.InvalidLoginException;
-import com.stn.ester.rest.exception.PasswordMismatchException;
+import com.stn.ester.rest.exception.*;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.EmailHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
@@ -164,8 +162,8 @@ public class UserService extends AppService implements AssetFileBehaviour {
             try {
                 Optional<User> user = this.userRepository.findByEmail(email);
                 if (!user.equals(Optional.empty())) {
-                    PasswordReset passwordReset = new PasswordReset();
                     String token = GlobalFunctionHelper.generateToken();
+                    PasswordReset passwordReset = new PasswordReset();
                     passwordReset.setToken(token);
                     passwordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
                     passwordReset.setUserId(user.get().getId());
@@ -177,14 +175,12 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Link reset password has been sent to your e-mail.");
                 } else {
-                    result.put("status", HttpStatus.BAD_REQUEST.value());
+                    result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                     result.put("message", "Email not found.");
-                    return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
                 }
             } catch (Exception ex) {
-                result.put("status", HttpStatus.BAD_REQUEST);
+                result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                 result.put("message", ex.getMessage());
-                return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
             }
         }
         return result;
@@ -217,9 +213,8 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 message.setText(EmailHelper.emailTemplate(user, Scheme, ServerName, ServerPort, token));
                 Transport.send(message);
             } catch (Exception ex) {
-                result.put("status", HttpStatus.BAD_REQUEST);
+                result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                 result.put("message", ex.getMessage());
-                return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
             }
         }
         return result;
@@ -232,23 +227,17 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 PasswordReset passwordReset = this.passwordResetRepository.findByToken(token);
                 Date getExpire = passwordReset.getExpire();
                 if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
-                    passwordReset.setId(passwordReset.getId());
-                    passwordReset.setIsUsed(passwordReset.getIsUsed());
-                    // Update data into db.
-                    this.passwordResetRepository.save(passwordReset);
-
                     EmailHelper.resetPasswordToken += token;
+
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Token found.");
                 } else {
-                    result.put("status", HttpStatus.BAD_REQUEST.value());
+                    result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                     result.put("message", "Token not found or token is expired.");
-                    return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
                 }
             } catch (Exception ex) {
-                result.put("status", HttpStatus.BAD_REQUEST);
+                result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                 result.put("message", ex.getMessage());
-                return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
             }
         }
         return result;
@@ -257,12 +246,27 @@ public class UserService extends AppService implements AssetFileBehaviour {
     public Object confirmResetPassword(String new_password, String confirm_password) {
         PasswordReset passwordReset = this.passwordResetRepository.findByToken(EmailHelper.resetPasswordToken);
         User user = this.userRepository.findById(passwordReset.getUserId()).orElse(null);
-        if (!new_password.equals(confirm_password)) {
-            throw new ConfirmNewPasswordException();
+
+        if (new_password.isEmpty()) {throw new EmptyFieldException("New password is empty!");}
+        if (confirm_password.isEmpty()) {throw new EmptyFieldException("Confirm password is empty!");}
+        if (!new_password.isEmpty() && !confirm_password.isEmpty()) {
+            if (passwordReset.equals(null) && user.equals(null)) {
+                throw new UnauthorizedException("User not found.");
+            }
+            if (!new_password.equals(confirm_password)) {
+                throw new ConfirmNewPasswordException("New Password and Confirm Password is different.");
+            }
+
+            passwordReset.setId(passwordReset.getId());
+            passwordReset.setIsUsed(passwordReset.getIsUsed());
+            // Update data into db.
+            this.passwordResetRepository.save(passwordReset);
+
+            user.setId(passwordReset.getUserId());
+            user.setPassword(this.passwordEncoder.encode(new_password));
+            // Update data into db user.
+            this.userRepository.save(user);
         }
-        user.setId(passwordReset.getUserId());
-        user.setPassword(this.passwordEncoder.encode(new_password));
-        this.userRepository.save(user);
-        return user;
+        throw new OkException("Your new password is succesfully created.");
     }
 }
