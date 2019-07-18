@@ -16,18 +16,22 @@ public class GlobalFunctionHelper {
     private static final String timeNow = "yyyy-MM-dd HH:mm:ss";
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+    public static final String slash = "/";
+    public static final String pointTwo = ":";
+    public static final String breakLine = "\n";
+    public static final String breakLines = "\n\n";
 
     @Autowired
     public GlobalFunctionHelper() {
 	}
 	
-    /* get time now */
+    // Get date and time now.
     public static String getDateTimeNow() {
         String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
         return timeStamp;
     }
 
-    /* get name file */
+    // Get name file.
     public static String getNameFile(String vData) {
         if (vData == null) return null;
         int index = vData.lastIndexOf('.');
@@ -36,7 +40,7 @@ public class GlobalFunctionHelper {
         return name;
     }
 
-    /* get extension file */
+    // Get extension file.
     public static String getExtensionFile(String vData) {
         String extension = vData.substring(vData.lastIndexOf(".") + 1);
         return extension;
@@ -46,7 +50,7 @@ public class GlobalFunctionHelper {
         return encodedBase64.split(",");
     }
 
-    /* remove data: from base64 image */
+    // Remove data: from base64 image.
     public static String getRawDataFromEncodedBase64(String encodedBase64) {
         String[] temp = splitDataEncodedBase64(encodedBase64);
         return temp[1];

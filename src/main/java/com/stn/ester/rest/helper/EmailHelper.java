@@ -12,11 +12,6 @@ public class EmailHelper {
     private static final String SMTP_USERNAME = "info@suryateknologi.co.id";
     private static final String SMTP_PASSWORD = "emkF1qRD";
 
-    private static final String slash = "/";
-    private static final String pointTwo = ":";
-    private static final String breakLine = "\n";
-    private static final String breakLines = "\n\n";
-
     public static Session passwordAuthentication(Properties prop) {
         Session session = Session.getInstance(prop, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -44,17 +39,17 @@ public class EmailHelper {
     public static String emailTemplate(Optional<User> user, String scheme, String serverName, String serverPort, String token) {
         String username = user.get().getUsername();
         String requestURI = "users/reset-password";
-        String linkResetPassword = scheme + "://" + serverName + pointTwo + serverPort + slash + requestURI + slash + token;
+        String linkResetPassword = scheme + "://" + serverName + GlobalFunctionHelper.pointTwo + serverPort + GlobalFunctionHelper.slash + requestURI + GlobalFunctionHelper.slash + token;
 
-        // Set template email
+        // Set email template
         String emailTemplate = "" +
-                "Hi " + username + ", " + breakLines +
-                "Kami telah menerima request untuk mereset password anda. Jika anda tidak membuat request," + breakLine +
-                "cukup abaikan email ini. Sebaliknya, anda dapat mereset password menggunakan link ini, " + breakLine +
-                "klik link di bawah ini untuk mereset password anda." + breakLines +
-                linkResetPassword + breakLines +
-                "Terima kasih," + breakLine +
-                "The Ester Team";
+                "Hi " + username + ", " + GlobalFunctionHelper.breakLines +
+                "Kami telah menerima request untuk mereset password anda. Jika anda tidak membuat request," + GlobalFunctionHelper.breakLine +
+                "cukup abaikan email ini. Sebaliknya, anda dapat mereset password menggunakan link ini, " + GlobalFunctionHelper.breakLine +
+                "klik link di bawah ini untuk mereset password anda. Password reset ini hanya berlaku dalam 24 jam kedepan." + GlobalFunctionHelper.breakLines +
+                linkResetPassword + GlobalFunctionHelper.breakLines +
+                "Terima kasih," + GlobalFunctionHelper.breakLine +
+                "Tim Ester";
         return emailTemplate;
     }
 }
