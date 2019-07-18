@@ -25,7 +25,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     private ObjectMapper mapper = new ObjectMapper();
     public static AccessLog accessLog;
     private static String WHITESPACE = " ";
-    private static final List<String> EXCLUDE_URL = Arrays.asList(
+    private static final List<String> IGNORE_REQUEST_BODY_URL = Arrays.asList(
             RequestMethod.POST + WHITESPACE + "/users/login"
     );
 
@@ -44,25 +44,25 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             IPAdress_client = request.getRemoteAddr();
         }
         RequestMethod requestMethod = RequestMethod.valueOf(request_method);
-        String requestBody;
+        String requestBody = null;
 
-        // get request body
-        try {
-            mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
-            Map<String, Object> jsonMap = mapper.readValue(copiedRequest.getInputStream(), Map.class);
-            requestBody = this.gson.toJson(jsonMap);
-        } catch (MismatchedInputException ex) {
-            requestBody = null;
+        if(!this.isExcludedFromList(request)) {
+            // get request body
+            try {
+                mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+                Map<String, Object> jsonMap = mapper.readValue(copiedRequest.getInputStream(), Map.class);
+                requestBody = this.gson.toJson(jsonMap);
+            } catch (MismatchedInputException ex) {
+                requestBody = null;
+            }
         }
-
         accessLog = new AccessLog(IPAdress_client, URI, requestMethod, user_id, requestBody);
 
         chain.doFilter(copiedRequest, response);
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+    private boolean isExcludedFromList(HttpServletRequest request) {
         String servletPath = RequestMethod.valueOf(request.getMethod()) + WHITESPACE + request.getServletPath();
-        return EXCLUDE_URL.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(servletPath));
+        return IGNORE_REQUEST_BODY_URL.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(servletPath));
     }
 }
