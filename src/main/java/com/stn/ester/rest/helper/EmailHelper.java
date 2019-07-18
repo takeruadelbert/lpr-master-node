@@ -46,9 +46,10 @@ public class EmailHelper {
         // Set email template.
         String emailTemplate = "" +
                 "Hi " + username + ", " + GlobalFunctionHelper.breakLines +
-                "Kami telah menerima request untuk mereset password anda. Jika anda tidak membuat request," + GlobalFunctionHelper.breakLine +
-                "cukup abaikan email ini. Sebaliknya, anda dapat mereset password menggunakan link ini, " + GlobalFunctionHelper.breakLine +
-                "klik link di bawah ini untuk mereset password anda. Password reset ini hanya berlaku dalam 24 jam kedepan." + GlobalFunctionHelper.breakLines +
+                "Kami telah menerima request untuk mereset password anda." + GlobalFunctionHelper.breakLine +
+                "Jika anda tidak membuat request, cukup abaikan email ini." + GlobalFunctionHelper.breakLine +
+                "Password reset ini valid 24 jam." + GlobalFunctionHelper.breakLine +
+                "Klik tautan di bawah ini untuk mereset password anda :" + GlobalFunctionHelper.breakLines +
                 linkResetPassword + GlobalFunctionHelper.breakLines +
                 "Terima kasih," + GlobalFunctionHelper.breakLine +
                 "Tim Ester";
