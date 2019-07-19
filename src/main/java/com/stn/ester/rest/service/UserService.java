@@ -72,6 +72,12 @@ public class UserService extends AppService implements AssetFileBehaviour {
         return super.update(id, object);
     }
 
+    @Transactional
+    public Object saveObject(AppDomain o) {
+        Object saved = repositories.get(baseRepoName).save(o);
+        return saved;
+    }
+
     public Map login(String username, String password, HttpSession session) {
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
@@ -167,18 +173,18 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     // If user have token to reset password then update data if not have token next to add new data.
                     PasswordReset updatePasswordReset = this.passwordResetRepository.findByUserId(user.get().getId());
                     if (updatePasswordReset != null) {
-                        // Update data into password reset table.
+                        // If user is exist replace re-new create token.
                         updatePasswordReset.setId(updatePasswordReset.getId());
                         updatePasswordReset.setToken(token);
                         updatePasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
-                        this.passwordResetRepository.save(updatePasswordReset);
+                        super.update(updatePasswordReset.getId(), updatePasswordReset);
                     } else {
-                        // Add new data into password reset table.
+                        // If user not exist create new token and others.
                         PasswordReset addNewPasswordReset = new PasswordReset();
                         addNewPasswordReset.setToken(token);
                         addNewPasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
                         addNewPasswordReset.setUserId(user.get().getId());
-                        this.passwordResetRepository.save(addNewPasswordReset);
+                        this.saveObject(addNewPasswordReset);
                     }
 
                     // If e-mail found send link reset password to user.
@@ -233,7 +239,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 if (updateIsUsed.getIsUsed() == 1) {
                     updateIsUsed.setId(updateIsUsed.getId());
                     updateIsUsed.setIsUsed(0);
-                    this.passwordResetRepository.save(updateIsUsed);
+                    super.update(updateIsUsed.getId(), updateIsUsed);
                 }
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST.value());
@@ -283,12 +289,12 @@ public class UserService extends AppService implements AssetFileBehaviour {
             // Update isUsed to password reset table.
             passwordReset.setId(passwordReset.getId());
             passwordReset.setIsUsed(1);
-            this.passwordResetRepository.save(passwordReset);
+            super.update(passwordReset.getId(), passwordReset);
 
             // Update new password to user table.
             user.setId(passwordReset.getUserId());
             user.setPassword(this.passwordEncoder.encode(new_password));
-            this.userRepository.save(user);
+            super.update(passwordReset.getId(), user);
         }
         return user;
     }

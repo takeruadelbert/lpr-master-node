@@ -73,7 +73,7 @@ public class UserController extends AppController<UserService, User> {
     }
 
     @RequestMapping(value = "/identify-email", method = RequestMethod.POST)
-    public Object identifyEmail(@RequestBody Map<String, String> payload) {
+    public Object identifyEmail(@Validated(AppDomain.New.class) @RequestBody Map<String, String> payload) {
         return service.identifyEmail(payload.get("email"));
     }
 
@@ -83,9 +83,9 @@ public class UserController extends AppController<UserService, User> {
     }
 
     @RequestMapping(value = "/confirm-reset-password", method = RequestMethod.PUT)
-    public Object confirmResetPassword(@RequestBody Map<String, String> data) {
+    public Object confirmResetPassword(@Validated(AppDomain.New.class) @RequestBody Map<String, String> data) {
         String new_password = data.get("new_password");
         String confirm_password = data.get("confirm_password");
-        return service.confirmResetPassword(new_password, confirm_password);
+        return super.service.confirmResetPassword(new_password, confirm_password);
     }
 }
