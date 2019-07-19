@@ -14,6 +14,8 @@ import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static com.stn.ester.rest.security.SecurityConstants.ROLE_PREFIX;
+
 @Data
 @Entity
 public class User extends AppDomain implements UserDetails {
@@ -107,10 +109,12 @@ public class User extends AppDomain implements UserDetails {
         this.username = username;
     }
 
+    @Transient
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.userGroup.getName()));
+        if (this.userGroup != null)
+            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + "_" + this.userGroup.getName()));
         return authorities;
     }
 

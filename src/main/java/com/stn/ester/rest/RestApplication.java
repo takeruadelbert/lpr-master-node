@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.TimeZone;
 
+import static com.stn.ester.rest.security.SecurityConstants.ROLE_SUPERADMIN;
+
 @SpringBootApplication
 public class RestApplication extends SpringBootServletInitializer {
 
@@ -60,11 +62,11 @@ public class RestApplication extends SpringBootServletInitializer {
         TimeZone.setDefault(TimeZone.getTimeZone(timezone));
         this.addDefaultProfilePicture();
         this.addSuperAdmin();
-        try {
-            this.addMisc();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            this.addMisc();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -97,7 +99,7 @@ public class RestApplication extends SpringBootServletInitializer {
 
     public void addSuperAdmin() {
         UserGroup userGroup = new UserGroup();
-        userGroup.setName("SUPERADMIN");
+        userGroup.setName(ROLE_SUPERADMIN);
         userGroup.setLabel("Super Admin");
         userGroup = (UserGroup) userGroupService.create(userGroup);
         User user = new User();

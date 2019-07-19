@@ -7,6 +7,7 @@ import com.stn.ester.rest.domain.AccessGroup;
 import com.stn.ester.rest.domain.Menu;
 import com.stn.ester.rest.domain.Module;
 import com.stn.ester.rest.domain.UserGroup;
+import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -60,7 +61,14 @@ public class AccessGroupService extends AppService {
             Menu menu = accessGroup.getMenu();
             Module module = menu.getModule();
             if (module != null) {
-                authorities.add(new SimpleGrantedAuthority("ACCESS_" + module.getRequestMethod() + "_" + module.getAlias()));
+                if (accessGroup.isViewable())
+                    authorities.add(new SimpleGrantedAuthority("ACCESS_" + module.getRequestMethod() + "_" + module.getName()));
+                if (accessGroup.isAddable())
+                    authorities.add(new SimpleGrantedAuthority("ACCESS_" + RequestMethod.POST + "_" + module.getName()));
+                if (accessGroup.isEditable())
+                    authorities.add(new SimpleGrantedAuthority("ACCESS_" + RequestMethod.PUT + "_" + module.getName()));
+                if (accessGroup.isDeleteable())
+                    authorities.add(new SimpleGrantedAuthority("ACCESS_" + RequestMethod.DELETE + "_" + module.getName()));
             }
         }
         return authorities;

@@ -8,12 +8,9 @@ import com.stn.ester.rest.exception.UnauthorizedException;
 import com.stn.ester.rest.service.BiodataService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
@@ -75,8 +72,4 @@ public class UserController extends AppController<UserService, User> {
         return this.biodataService.getGenderList();
     }
 
-    @Override
-    public String getAuthority() {
-        return "ACCESS_GET_/users";
-    }
 }

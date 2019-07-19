@@ -20,17 +20,17 @@ public class MenuController extends AppController<MenuService, Menu> {
     @Autowired
     public MenuController(MenuService menuService, UserService userService) {
         super(menuService);
-        this.userService=userService;
-        this.menuService=menuService;
+        this.userService = userService;
+        this.menuService = menuService;
     }
 
-    @RequestMapping(value ="/navbar", method = RequestMethod.GET)
-    public Object getAccessGroup(@RequestHeader("access-token") String accessToken){
-        LoginSession loginSession=this.userService.isValidToken(accessToken);
-        if (accessToken==null || loginSession==null){
+    @RequestMapping(value = "/navbar", method = RequestMethod.GET)
+    public Object getAccessGroup(@RequestHeader("access-token") String accessToken) {
+        LoginSession loginSession = this.userService.isValidToken(accessToken);
+        if (accessToken == null || loginSession == null) {
             throw new UnauthorizedException();
         }
-        Long userGroupId=loginSession.getUser().getUserGroupId();
+        Long userGroupId = loginSession.getUser().getUserGroupId();
         return this.menuService.getByUserGroupId(userGroupId);
     }
 
@@ -44,8 +44,4 @@ public class MenuController extends AppController<MenuService, Menu> {
         return service.create(menu);
     }
 
-    @Override
-    public String getAuthority() {
-        return "ACCESS_GET_/menus";
-    }
 }

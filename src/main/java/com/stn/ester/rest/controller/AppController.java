@@ -1,31 +1,29 @@
 package com.stn.ester.rest.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
-import com.stn.ester.rest.search.AppSpecification;
+import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.search.SpecificationsBuilder;
-import com.stn.ester.rest.search.util.SearchOperation;
 import com.stn.ester.rest.service.AppService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.stn.ester.rest.security.SecurityConstants.*;
 
 public abstract class AppController<T extends AppService, U extends AppDomain> implements BeanNameAware {
 
@@ -52,16 +50,19 @@ public abstract class AppController<T extends AppService, U extends AppDomain> i
         return service.index(page, size, spec);
     }
 
+    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Object get(@PathVariable long id) {
         return service.get(id);
     }
 
+    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
     @RequestMapping(value = "", method = RequestMethod.POST)
     public Object create(@Valid @RequestBody U domain) {
         return service.create(domain);
     }
 
+    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public Object update(@PathVariable long id, @Valid @RequestBody U domain) {
         return service.update(id, domain);
@@ -72,6 +73,7 @@ public abstract class AppController<T extends AppService, U extends AppDomain> i
         return service.update((long) 1, domain);
     }
 
+    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void delete(@PathVariable long id) {
         service.delete(id);
@@ -86,7 +88,7 @@ public abstract class AppController<T extends AppService, U extends AppDomain> i
         SpecificationsBuilder builder = new SpecificationsBuilder<>();
         try {
             this.loopSpecToSpecBuilder(builder, GlobalFunctionHelper.jsonStringToMap(searchParameters));
-        }catch(IOException ex){
+        } catch (IOException ex) {
             System.out.println(ex);
         }
         return builder.build();
@@ -113,7 +115,17 @@ public abstract class AppController<T extends AppService, U extends AppDomain> i
         return beanName;
     }
 
-    public String getAuthority(){
-        return "NOACCESS";
+    public String getAuthority() {
+        String authority = "NOACCESS";
+        if (!SessionHelper.isSuperAdmin()) {
+            String currentName = getBeanName().replace("Controller", "");
+            final ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder
+                    .currentRequestAttributes();
+            final HttpServletRequest request = attr.getRequest();
+            authority = AUTHORITY_PREFIX + "_" + request.getMethod() + "_" + currentName;
+        } else {
+            authority = ROLE_PREFIX + "_" + ROLE_SUPERADMIN;
+        }
+        return authority;
     }
 }

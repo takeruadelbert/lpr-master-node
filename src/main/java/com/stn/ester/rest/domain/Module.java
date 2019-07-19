@@ -38,6 +38,10 @@ public class Module extends AppDomain {
         return requestMethod;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String underscoreName() {
         return Module.unique_name;
