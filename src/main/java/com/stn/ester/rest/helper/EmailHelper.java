@@ -38,20 +38,20 @@ public class EmailHelper {
         return emailSubject;
     }
 
-    public static String emailTemplate(Optional<User> user, String scheme, String serverName, String serverPort, String token) {
+    public static String emailTemplate(Optional<User> user, String scheme, String serverName, String serverPort) {
         String username = user.get().getUsername();
         String requestURI = "users/reset-password";
-        String linkResetPassword = scheme + "://" + serverName + GlobalFunctionHelper.pointTwo + serverPort + GlobalFunctionHelper.slash + requestURI + GlobalFunctionHelper.slash + token;
+        String linkResetPassword = scheme + "://" + serverName + ":" + serverPort + "/" + requestURI + "/" + resetPasswordToken;
 
         // Set email template.
         String emailTemplate = "" +
-                "Hi " + username + ", " + GlobalFunctionHelper.breakLines +
-                "Kami telah menerima request untuk mereset password anda." + GlobalFunctionHelper.breakLine +
-                "Jika anda tidak membuat request, cukup abaikan email ini." + GlobalFunctionHelper.breakLine +
-                "Password reset ini valid 24 jam." + GlobalFunctionHelper.breakLine +
-                "Klik tautan di bawah ini untuk mereset password anda :" + GlobalFunctionHelper.breakLines +
-                linkResetPassword + GlobalFunctionHelper.breakLines +
-                "Terima kasih," + GlobalFunctionHelper.breakLine +
+                "Hi " + username + ", \n\n" +
+                "Kami telah menerima request untuk mereset password anda. \n" +
+                "Jika anda tidak membuat request, cukup abaikan email ini. \n" +
+                "Password reset ini valid 24 jam.\n" +
+                "Klik tautan di bawah ini untuk mereset password anda : \n\n" +
+                linkResetPassword + "\n\n" +
+                "Terima kasih, \n" +
                 "Tim Ester";
         return emailTemplate;
     }

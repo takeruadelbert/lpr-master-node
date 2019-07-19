@@ -16,10 +16,6 @@ public class GlobalFunctionHelper {
     private static final String timeNow = "yyyy-MM-dd HH:mm:ss";
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
-    public static final String slash = "/";
-    public static final String pointTwo = ":";
-    public static final String breakLine = "\n";
-    public static final String breakLines = "\n\n";
 
     @Autowired
     public GlobalFunctionHelper() {

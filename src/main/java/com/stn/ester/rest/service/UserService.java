@@ -191,7 +191,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     result.put("message", "Email not found.");
                 }
             } catch (Exception ex) {
-                result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+                result.put("status", HttpStatus.BAD_REQUEST.value());
                 result.put("message", ex.getMessage());
             }
         }
@@ -222,11 +222,13 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 message.setFrom(new InternetAddress(EmailHelper.emailFrom()));
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(EmailHelper.emailTo()));
                 message.setSubject(EmailHelper.emailSubject());
-                message.setText(EmailHelper.emailTemplate(user, Scheme, ServerName, ServerPort, token));
+                message.setText(EmailHelper.emailTemplate(user, Scheme, ServerName, ServerPort));
                 Transport.send(message);
 
+                // Set token into variable resetPasswordToken in EmailHelper.
+                EmailHelper.resetPasswordToken = token;
+
                 PasswordReset updateIsUsed = this.passwordResetRepository.findByUserId(user.get().getId());
-                System.out.println("getIsUsed = " + updateIsUsed.getIsUsed());
                 // Update isUsed to default if user make re-request to reset password.
                 if (updateIsUsed.getIsUsed() == 1) {
                     updateIsUsed.setId(updateIsUsed.getId());
@@ -234,7 +236,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     this.passwordResetRepository.save(updateIsUsed);
                 }
             } catch (Exception ex) {
-                result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+                result.put("status", HttpStatus.BAD_REQUEST.value());
                 result.put("message", ex.getMessage());
             }
         }
@@ -245,10 +247,10 @@ public class UserService extends AppService implements AssetFileBehaviour {
         Map<String, Object> result = new HashMap<>();
         if (!token.isEmpty()) {
             try {
+                // Getting token from variable resetPasswordToken in EmailHelper.
                 PasswordReset passwordReset = this.passwordResetRepository.findByToken(token);
                 Date getExpire = passwordReset.getExpire();
                 if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
-                    EmailHelper.resetPasswordToken = token;
 
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Token found.");
@@ -257,7 +259,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     result.put("message", "Token not found or token is expired.");
                 }
             } catch (Exception ex) {
-                result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+                result.put("status", HttpStatus.BAD_REQUEST.value());
                 result.put("message", ex.getMessage());
             }
         }
