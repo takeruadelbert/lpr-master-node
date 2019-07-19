@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PasswordResetRepository extends AppRepository<PasswordReset, IdList> {
     PasswordReset findByToken(String token);
+
     PasswordReset findByUserId(Long id);
 }

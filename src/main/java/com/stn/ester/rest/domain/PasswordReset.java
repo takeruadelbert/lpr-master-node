@@ -63,9 +63,7 @@ public class PasswordReset extends AppDomain {
     }
 
     public void setIsUsed(int isUsed) {
-        if (isUsed == 0) {
-            this.isUsed = 1;
-        }
+        this.isUsed = isUsed;
     }
 
     public Long getUserId() {

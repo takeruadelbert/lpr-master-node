@@ -167,17 +167,17 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     // If user have token to reset password then update data if not have token next to add new data.
                     PasswordReset updatePasswordReset = this.passwordResetRepository.findByUserId(user.get().getId());
                     if (updatePasswordReset != null) {
+                        // Update data into password reset table.
+                        updatePasswordReset.setId(updatePasswordReset.getId());
                         updatePasswordReset.setToken(token);
                         updatePasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
-                        updatePasswordReset.setUserId(user.get().getId());
-                        // Update data into db.
                         this.passwordResetRepository.save(updatePasswordReset);
                     } else {
+                        // Add new data into password reset table.
                         PasswordReset addNewPasswordReset = new PasswordReset();
                         addNewPasswordReset.setToken(token);
                         addNewPasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
                         addNewPasswordReset.setUserId(user.get().getId());
-                        // Add new data into db.
                         this.passwordResetRepository.save(addNewPasswordReset);
                     }
 
@@ -224,6 +224,15 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 message.setSubject(EmailHelper.emailSubject());
                 message.setText(EmailHelper.emailTemplate(user, Scheme, ServerName, ServerPort, token));
                 Transport.send(message);
+
+                PasswordReset updateIsUsed = this.passwordResetRepository.findByUserId(user.get().getId());
+                System.out.println("getIsUsed = " + updateIsUsed.getIsUsed());
+                // Update isUsed to default if user make re-request to reset password.
+                if (updateIsUsed.getIsUsed() == 1) {
+                    updateIsUsed.setId(updateIsUsed.getId());
+                    updateIsUsed.setIsUsed(0);
+                    this.passwordResetRepository.save(updateIsUsed);
+                }
             } catch (Exception ex) {
                 result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                 result.put("message", ex.getMessage());
@@ -239,7 +248,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 PasswordReset passwordReset = this.passwordResetRepository.findByToken(token);
                 Date getExpire = passwordReset.getExpire();
                 if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
-                    EmailHelper.resetPasswordToken += token;
+                    EmailHelper.resetPasswordToken = token;
 
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Token found.");
@@ -269,16 +278,16 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 throw new ConfirmNewPasswordException("New Password and Confirm Password is different.");
             }
 
+            // Update isUsed to password reset table.
             passwordReset.setId(passwordReset.getId());
-            passwordReset.setIsUsed(passwordReset.getIsUsed());
-            // Update data into db table passwordReset.
+            passwordReset.setIsUsed(1);
             this.passwordResetRepository.save(passwordReset);
 
+            // Update new password to user table.
             user.setId(passwordReset.getUserId());
             user.setPassword(this.passwordEncoder.encode(new_password));
-            // Update data into db table user.
             this.userRepository.save(user);
         }
-        throw new OkException("Your new password is succesfully created.");
+        return user;
     }
 }
