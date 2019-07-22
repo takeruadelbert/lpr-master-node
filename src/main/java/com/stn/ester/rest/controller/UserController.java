@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -73,8 +74,8 @@ public class UserController extends AppController<UserService, User> {
     }
 
     @RequestMapping(value = "/identify-email", method = RequestMethod.POST)
-    public Object identifyEmail(@Validated(AppDomain.New.class) @RequestBody Map<String, String> payload) {
-        return service.identifyEmail(payload.get("email"));
+    public Object identifyEmail(@Valid @RequestBody Map<String, String> payload) {
+        return userService.identifyEmail(payload.get("email"));
     }
 
     @RequestMapping(value = "/reset-password/{token}", method = RequestMethod.GET)
@@ -83,9 +84,9 @@ public class UserController extends AppController<UserService, User> {
     }
 
     @RequestMapping(value = "/confirm-reset-password", method = RequestMethod.PUT)
-    public Object confirmResetPassword(@Validated(AppDomain.New.class) @RequestBody Map<String, String> data) {
+    public Object confirmResetPassword(@Valid @RequestBody Map<String, String> data) {
         String new_password = data.get("new_password");
         String confirm_password = data.get("confirm_password");
-        return super.service.confirmResetPassword(new_password, confirm_password);
+        return userService.confirmResetPassword(new_password, confirm_password);
     }
 }

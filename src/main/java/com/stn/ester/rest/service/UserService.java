@@ -67,17 +67,6 @@ public class UserService extends AppService implements AssetFileBehaviour {
         return super.create(o);
     }
 
-    @Override
-    public Object update(Long id, AppDomain object) {
-        return super.update(id, object);
-    }
-
-    @Transactional
-    public Object saveObject(AppDomain o) {
-        Object saved = repositories.get(baseRepoName).save(o);
-        return saved;
-    }
-
     public Map login(String username, String password, HttpSession session) {
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
@@ -184,8 +173,11 @@ public class UserService extends AppService implements AssetFileBehaviour {
                         addNewPasswordReset.setToken(token);
                         addNewPasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
                         addNewPasswordReset.setUserId(user.get().getId());
-                        this.saveObject(addNewPasswordReset);
+                        super.save(addNewPasswordReset);
                     }
+
+                    // Set token into variable resetPasswordToken in EmailHelper.
+                    EmailHelper.resetPasswordToken = token;
 
                     // If e-mail found send link reset password to user.
                     sendLinkResetPassword(user, token);
@@ -230,9 +222,6 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 message.setSubject(EmailHelper.emailSubject());
                 message.setText(EmailHelper.emailTemplate(user, Scheme, ServerName, ServerPort));
                 Transport.send(message);
-
-                // Set token into variable resetPasswordToken in EmailHelper.
-                EmailHelper.resetPasswordToken = token;
 
                 PasswordReset updateIsUsed = this.passwordResetRepository.findByUserId(user.get().getId());
                 // Update isUsed to default if user make re-request to reset password.
