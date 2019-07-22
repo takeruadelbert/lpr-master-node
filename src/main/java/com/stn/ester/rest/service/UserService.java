@@ -182,23 +182,26 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     EmailHelper.resetPasswordToken = token;
 
                     // If e-mail found send link reset password to user.
-                    sendLinkResetPassword(user, token);
+                    sendLinkResetPassword(user);
 
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Link reset password has been sent to your e-mail.");
+                    return new ResponseEntity<>(result, HttpStatus.OK);
                 } else {
                     result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                     result.put("message", "Email not found.");
+                    return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
                 }
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST.value());
                 result.put("message", ex.getMessage());
+                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
             }
         }
-        return result;
+        throw new EmptyFieldException("Email is empty!");
     }
 
-    public Object sendLinkResetPassword(Optional<User> user, String token) {
+    public Object sendLinkResetPassword(Optional<User> user) {
         Map<String, Object> result = new HashMap<>();
         if (!user.equals(null)) {
 
@@ -235,6 +238,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST.value());
                 result.put("message", ex.getMessage());
+                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
             }
         }
         return result;
@@ -244,20 +248,23 @@ public class UserService extends AppService implements AssetFileBehaviour {
         Map<String, Object> result = new HashMap<>();
         if (!token.isEmpty()) {
             try {
-                // Getting token from variable resetPasswordToken in EmailHelper.
                 PasswordReset passwordReset = this.passwordResetRepository.findByToken(token);
+                if (passwordReset == null) {throw new NotFoundException("Token not found.");}
+
                 Date getExpire = passwordReset.getExpire();
                 if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
-
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Token found.");
+                    return new ResponseEntity<>(result, HttpStatus.OK);
                 } else {
                     result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                     result.put("message", "Token not found or token is expired.");
+                    return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
                 }
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST.value());
                 result.put("message", ex.getMessage());
+                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
             }
         }
         return result;
