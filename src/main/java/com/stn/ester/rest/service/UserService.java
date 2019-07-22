@@ -32,6 +32,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     private UserGroupRepository userGroupRepository;
     private AssetFileService assetFileService;
     private PasswordResetRepository passwordResetRepository;
+    private PasswordResetService passwordResetService;
     private String asset_path = "profile_picture";
 
     @Value("${ester.session.login.timeout}")
@@ -44,7 +45,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     HttpServletRequest httpServletRequest;
 
     @Autowired
-    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository) {
+    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository, PasswordResetService passwordResetService) {
         super(User.unique_name);
         super.repositories.put(User.unique_name, userRepository);
         super.repositories.put(Biodata.unique_name, biodataRepository);
@@ -54,6 +55,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
         this.userGroupRepository = userGroupRepository;
         this.passwordResetRepository = passwordResetRepository;
         this.assetFileService = assetFileService;
+        this.passwordResetService = passwordResetService;
     }
 
     @Override
@@ -173,7 +175,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                         addNewPasswordReset.setToken(token);
                         addNewPasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
                         addNewPasswordReset.setUserId(user.get().getId());
-                        super.save(addNewPasswordReset);
+                        passwordResetService.create(addNewPasswordReset);
                     }
 
                     // Set token into variable resetPasswordToken in EmailHelper.
