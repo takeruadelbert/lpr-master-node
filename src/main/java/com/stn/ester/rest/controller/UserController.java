@@ -38,13 +38,13 @@ public class UserController extends AppController<UserService, User> {
         return super.service.update(id, user);
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    //@RequestMapping(value = "/login", method = RequestMethod.POST)
     public Map login(@RequestBody Map<String, String> payload, HttpSession session) {
         Map<String, Object> loginToken = service.login(payload.get("username"), payload.get("password"), session);
         return loginToken;
     }
 
-    @RequestMapping(value = "/heartbeat")
+    //@RequestMapping(value = "/heartbeat")
     public Object isValid(@RequestHeader("access-token") String accessToken) {
         LoginSession loginSession = this.userService.tokenHeartbeat(accessToken);
         if (loginSession == null) {

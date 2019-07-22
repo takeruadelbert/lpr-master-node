@@ -62,7 +62,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         User user = ((User) auth.getPrincipal());
         Collection<GrantedAuthority> authorities=new ArrayList();
         authorities.addAll(auth.getAuthorities());
-        authorities.addAll(accessGroupService.buildAccessAuthorities(user.getUserGroupId()));
+        //authorities.addAll(accessGroupService.buildAccessAuthorities(user.getUserGroupId()));
         final String authoritiesString = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));

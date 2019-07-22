@@ -6,6 +6,8 @@ import com.stn.ester.rest.domain.AccessGroup;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -14,4 +16,6 @@ public interface AccessGroupRepository extends AppRepository<AccessGroup, IdList
     Set<AccessGroup> findAllByUserGroupId(Long userGroupId);
 
     Set<AccessGroup> findAllByUserGroupIdAndViewable(Long userGroupId,boolean viewable);
+
+    List<AccessGroup> findAllByMenuIdAndUserGroupId(Long menuId,Long userGroupId);
 }

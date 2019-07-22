@@ -146,6 +146,10 @@ public class User extends AppDomain implements UserDetails {
         this.biodata = biodata;
     }
 
+    public UserGroup getUserGroup() {
+        return userGroup;
+    }
+
     @Override
     public String underscoreName() {
         return User.unique_name;

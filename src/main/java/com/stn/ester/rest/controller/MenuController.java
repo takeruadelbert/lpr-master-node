@@ -2,7 +2,9 @@ package com.stn.ester.rest.controller;
 
 import com.stn.ester.rest.domain.LoginSession;
 import com.stn.ester.rest.domain.Menu;
+import com.stn.ester.rest.domain.User;
 import com.stn.ester.rest.exception.UnauthorizedException;
+import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.MenuService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +27,12 @@ public class MenuController extends AppController<MenuService, Menu> {
     }
 
     @RequestMapping(value = "/navbar", method = RequestMethod.GET)
-    public Object getAccessGroup(@RequestHeader("access-token") String accessToken) {
-        LoginSession loginSession = this.userService.isValidToken(accessToken);
-        if (accessToken == null || loginSession == null) {
+    public Object getAccessGroup() {
+        User user = SessionHelper.getCurrentUser();
+        if (user == null) {
             throw new UnauthorizedException();
         }
-        Long userGroupId = loginSession.getUser().getUserGroupId();
-        return this.menuService.getByUserGroupId(userGroupId);
+        return this.menuService.getByUserGroupId(user.getUserGroupId());
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)

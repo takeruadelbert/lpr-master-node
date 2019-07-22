@@ -4,6 +4,7 @@ import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.search.SpecificationsBuilder;
+import com.stn.ester.rest.service.AccessGroupService;
 import com.stn.ester.rest.service.AppService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.BeanNameAware;
@@ -34,13 +35,16 @@ public abstract class AppController<T extends AppService, U extends AppDomain> i
     String beanName;
 
     @Autowired
+    private AccessGroupService accessGroupService;
+
+    @Autowired
     protected ModelMapper modelMapper;
 
     public AppController(T service) {
         this.service = service;
     }
 
-    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Page<Object> index(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUM) Integer page, @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) Integer size, @RequestParam(value = "search", required = false) String search) throws UnsupportedEncodingException {
         if (search != null) {
@@ -50,19 +54,19 @@ public abstract class AppController<T extends AppService, U extends AppDomain> i
         return service.index(page, size, spec);
     }
 
-    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Object get(@PathVariable long id) {
         return service.get(id);
     }
 
-    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "", method = RequestMethod.POST)
     public Object create(@Valid @RequestBody U domain) {
         return service.create(domain);
     }
 
-    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public Object update(@PathVariable long id, @Valid @RequestBody U domain) {
         return service.update(id, domain);
@@ -115,17 +119,18 @@ public abstract class AppController<T extends AppService, U extends AppDomain> i
         return beanName;
     }
 
-    public String getAuthority() {
-        String authority = "NOACCESS";
+    public String readCurrentUserRole() {
+        String role = "NOACCESS";
         if (!SessionHelper.isSuperAdmin()) {
             String currentName = getBeanName().replace("Controller", "");
             final ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder
                     .currentRequestAttributes();
             final HttpServletRequest request = attr.getRequest();
-            authority = AUTHORITY_PREFIX + "_" + request.getMethod() + "_" + currentName;
+            role = this.accessGroupService.findAccessRole(com.stn.ester.rest.domain.enumerate.RequestMethod.valueOf(request.getMethod().toUpperCase()), currentName);
         } else {
-            authority = ROLE_PREFIX + "_" + ROLE_SUPERADMIN;
+            role = ROLE_PREFIX + "_" + ROLE_SUPERADMIN;
         }
-        return authority;
+        System.out.println("Current role : " + role);
+        return role;
     }
 }

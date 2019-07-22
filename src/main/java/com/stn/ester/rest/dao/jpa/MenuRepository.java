@@ -7,6 +7,7 @@ import com.stn.ester.rest.domain.Menu;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -18,4 +19,6 @@ public interface MenuRepository extends AppRepository<Menu,IdLabelList> {
     List<Menu> findAllByIdInAndParentMenuIdOrderByOrderingNumber(Set<Long> id,Long parentId);
 
     List<Menu> findAllByParentMenuIdIsNull();
+
+    List<Menu> findAllByModuleId(Long moduleId);
 }
