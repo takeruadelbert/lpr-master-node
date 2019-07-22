@@ -1,5 +1,6 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.crud;
 
+import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.UserGroup;
 import com.stn.ester.rest.service.AccessGroupService;
 import com.stn.ester.rest.service.UserGroupService;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 
 @RestController
 @RequestMapping("/user_groups")
-public class UserGroupController extends AppController<UserGroupService, UserGroup> {
+public class UserGroupController extends CrudController<UserGroupService, UserGroup> {
 
     AccessGroupService accessGroupService;
 

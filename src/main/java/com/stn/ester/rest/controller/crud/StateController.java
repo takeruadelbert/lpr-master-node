@@ -1,15 +1,14 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.crud;
 
+import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.State;
 import com.stn.ester.rest.service.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-
 @RestController
 @RequestMapping("/states")
-public class StateController extends AppController<StateService, State> {
+public class StateController extends CrudController<StateService, State> {
     @Autowired
     public StateController(StateService stateService) {
         super(stateService);

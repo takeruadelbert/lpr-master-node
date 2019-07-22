@@ -1,4 +1,4 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.base;
 
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 import static com.stn.ester.rest.security.SecurityConstants.*;
 
-public abstract class AppController<T extends AppService, U extends AppDomain> implements BeanNameAware {
+public abstract class CrudController<T extends AppService, U extends AppDomain> implements BeanNameAware {
 
     protected static final String DEFAULT_PAGE_SIZE = "10";
     protected static final String DEFAULT_PAGE_NUM = "0";
@@ -40,7 +40,7 @@ public abstract class AppController<T extends AppService, U extends AppDomain> i
     @Autowired
     protected ModelMapper modelMapper;
 
-    public AppController(T service) {
+    public CrudController(T service) {
         this.service = service;
     }
 

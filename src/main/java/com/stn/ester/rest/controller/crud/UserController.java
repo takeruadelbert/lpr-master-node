@@ -1,5 +1,6 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.crud;
 
+import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.LoginSession;
 import com.stn.ester.rest.domain.User;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
-public class UserController extends AppController<UserService, User> {
+public class UserController extends CrudController<UserService, User> {
 
     private UserService userService;
     private BiodataService biodataService;

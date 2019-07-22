@@ -1,5 +1,6 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.crud;
 
+import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.Employee;
 import com.stn.ester.rest.domain.enumerate.EmployeeWorkStatus;
 import com.stn.ester.rest.service.EmployeeService;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/employees")
-public class EmployeeController extends AppController<EmployeeService, Employee> {
+public class EmployeeController extends CrudController<EmployeeService, Employee> {
     @Autowired
     public EmployeeController(EmployeeService employeeService) {
         super(employeeService);

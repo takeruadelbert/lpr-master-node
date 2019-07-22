@@ -1,6 +1,6 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.crud;
 
-import com.stn.ester.rest.domain.LoginSession;
+import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.Menu;
 import com.stn.ester.rest.domain.User;
 import com.stn.ester.rest.exception.UnauthorizedException;
@@ -14,7 +14,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("menus")
-public class MenuController extends AppController<MenuService, Menu> {
+public class MenuController extends CrudController<MenuService, Menu> {
 
     private UserService userService;
     private MenuService menuService;

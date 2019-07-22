@@ -1,5 +1,6 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.crud;
 
+import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.service.AssetFileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import javax.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/asset_files")
-public class AssetFileController extends AppController<AssetFileService, AssetFile> {
+public class AssetFileController extends CrudController<AssetFileService, AssetFile> {
 
     @Autowired
     public AssetFileController(AssetFileService assetFileService) {
