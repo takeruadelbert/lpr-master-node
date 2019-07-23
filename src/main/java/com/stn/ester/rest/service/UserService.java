@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import java.beans.Transient;
 import java.util.*;
 
 @Service
@@ -160,5 +161,13 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         return usersOptional
                 .get();
+    }
+
+    @Transactional
+    public Object createIfUsernameNotExist(User user,String username){
+        if (!this.userRepository.findByUsername(username).isPresent()){
+            return this.create(user);
+        }
+        return null;
     }
 }

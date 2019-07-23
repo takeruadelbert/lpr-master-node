@@ -62,11 +62,6 @@ public class RestApplication extends SpringBootServletInitializer {
         TimeZone.setDefault(TimeZone.getTimeZone(timezone));
         this.addDefaultProfilePicture();
         this.addSuperAdmin();
-//        try {
-//            this.addMisc();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override
@@ -101,9 +96,10 @@ public class RestApplication extends SpringBootServletInitializer {
         UserGroup userGroup = new UserGroup();
         userGroup.setName(ROLE_SUPERADMIN);
         userGroup.setLabel("Super Admin");
-        userGroup = (UserGroup) userGroupService.create(userGroup);
+        userGroup = (UserGroup) userGroupService.createIfNameNotExist(userGroup, ROLE_SUPERADMIN);
         User user = new User();
-        user.setUsername("admin");
+        String username = "admin";
+        user.setUsername(username);
         user.setPassword("adminstn");
         user.setEmail("info@suryateknologi.co.id");
         user.setUserGroupId(userGroup.getId());
@@ -111,32 +107,6 @@ public class RestApplication extends SpringBootServletInitializer {
         biodata.setFirstName("STN");
         biodata.setLastName("Ester");
         user.setBiodata(biodata);
-        userService.create(user);
-    }
-
-    public void addMisc() throws IOException {
-        ObjectMapper mapper=new ObjectMapper();
-        String userModuleData="{\n" +
-                "\t\"name\":\"user\",\n" +
-                "\t\"alias\":\"/users\",\n" +
-                "\t\"requestMethod\":\"GET\",\n" +
-                "\t\"moduleLink\":[]\n" +
-                "}";
-        Module userModule=mapper.readValue(userModuleData,Module.class);
-        moduleService.create(userModule);
-        String pengaturanMenuData="{\n" +
-                "\t\"label\":\"Pengaturan\",\n" +
-                "\t\"orderingNumber\":9999\n" +
-                "}";
-        String userMenuData="{\n" +
-                "    \"label\": \"User\",\n" +
-                "    \"orderingNumber\": 3,\n" +
-                "    \"moduleId\": 1,\n" +
-                "    \"parentMenuId\": 1\n" +
-                "}";
-        Menu pengaturanMenu=mapper.readValue(pengaturanMenuData,Menu.class);
-        Menu userMenu=mapper.readValue(userMenuData,Menu.class);
-        menuService.create(pengaturanMenu);
-        menuService.create(userMenu);
+        userService.createIfUsernameNotExist(user, username);
     }
 }

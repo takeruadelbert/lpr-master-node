@@ -64,4 +64,12 @@ public class UserGroupService extends AppService {
         userGroup.mergeAccessGroup(new HashSet<>(accessGroups));
         return userGroup;
     }
+
+    @Transactional
+    public Object createIfNameNotExist(UserGroup userGroup, String name) {
+        if (this.userGroupRepository.findByName(name) == null) {
+            return this.create(userGroup);
+        }
+        return null;
+    }
 }
