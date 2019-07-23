@@ -104,12 +104,12 @@ public class AccessGroupService extends AppService {
             System.out.println("access group not found");
             return "NOACCESS";
         }
-        if (!this.hasAccess(requestMethod, accessGroups.get(0)))
+        if (!this.hasAccess(requestMethod, accessGroups.get(0),modules.get(0)))
             return "NOACCESS";
         return ROLE_PREFIX + "_" + SessionHelper.getCurrentUser().getUserGroup().getName();
     }
 
-    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup) {
+    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup,Module module) {
         if (accessGroup.isViewable() && requestMethod.equals(RequestMethod.GET)) {
             return true;
         }
@@ -120,6 +120,9 @@ public class AccessGroupService extends AppService {
             return true;
         }
         if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
+            return true;
+        }
+        if (module.getRequestMethod().equals(requestMethod)){
             return true;
         }
         return false;
