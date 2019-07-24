@@ -213,9 +213,14 @@ public class AssetFileService extends AppService {
         Path path = Paths.get(pathFileEmailTemplate);
         Charset charset = StandardCharsets.UTF_8;
         String content = new String(Files.readAllBytes(path), charset);
+
+        // Get href element link reset password.
         int index = content.indexOf("href", content.indexOf("href") + 1);
+
+        // Get ends of link reset password.
         int index2 = content.indexOf("target");
-        String oldLink = content.substring(7116, 7191);
+
+        String oldLink = content.substring(7162, 7237);
         content = content.replace(oldLink, linkResetPassword);
         Files.write(path, content.getBytes(charset));
         return content;
