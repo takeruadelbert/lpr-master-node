@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.Map;
@@ -74,13 +75,13 @@ public class UserController extends AppController<UserService, User> {
     }
 
     @RequestMapping(value = "/identify-email", method = RequestMethod.POST)
-    public Object identifyEmail(@Valid @RequestBody Map<String, String> payload) {
-        return userService.identifyEmail(payload.get("email"));
+    public Object identifyEmail(@Valid @RequestBody Map<String, String> payload, HttpServletRequest request) {
+        return userService.identifyEmail(payload.get("email"), request);
     }
 
     @RequestMapping(value = "/reset-password/{token}", method = RequestMethod.GET)
     public Object resetPassword(@PathVariable String token) {
-        return service.resetPassword(token);
+        return userService.resetPassword(token);
     }
 
     @RequestMapping(value = "/confirm-reset-password", method = RequestMethod.PUT)

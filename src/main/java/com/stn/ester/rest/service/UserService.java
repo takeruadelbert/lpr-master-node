@@ -42,9 +42,6 @@ public class UserService extends AppService implements AssetFileBehaviour {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    HttpServletRequest httpServletRequest;
-
-    @Autowired
     public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository, PasswordResetService passwordResetService) {
         super(User.unique_name);
         super.repositories.put(User.unique_name, userRepository);
@@ -153,7 +150,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    public Object identifyEmail(String email) {
+    public Object identifyEmail(String email, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
         if (!email.isEmpty()) {
             try {
@@ -164,13 +161,13 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     // If user have token to reset password then update data if not have token next to add new data.
                     PasswordReset updatePasswordReset = this.passwordResetRepository.findByUserId(user.get().getId());
                     if (updatePasswordReset != null) {
-                        // If user is exist replace re-new create token.
+                        // If user is exist replace old token and re-create expire token.
                         updatePasswordReset.setId(updatePasswordReset.getId());
                         updatePasswordReset.setToken(token);
                         updatePasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
                         super.update(updatePasswordReset.getId(), updatePasswordReset);
                     } else {
-                        // If user not exist create new token and others.
+                        // If user not exist create new token and others data.
                         PasswordReset addNewPasswordReset = new PasswordReset();
                         addNewPasswordReset.setToken(token);
                         addNewPasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
@@ -182,7 +179,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                     EmailHelper.resetPasswordToken = token;
 
                     // If e-mail found send link reset password to user.
-                    sendLinkResetPassword(user);
+                    sendLinkResetPassword(user, request);
 
                     result.put("status", HttpStatus.OK.value());
                     result.put("message", "Link reset password has been sent to your e-mail.");
@@ -201,7 +198,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
         throw new EmptyFieldException("Email is empty!");
     }
 
-    public Object sendLinkResetPassword(Optional<User> user) {
+    public Object sendLinkResetPassword(Optional<User> user, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
         if (!user.equals(null)) {
 
@@ -213,10 +210,10 @@ public class UserService extends AppService implements AssetFileBehaviour {
             prop.put("mail.smtp.auth", "true");
 
             // Getting hostname, port and others from http servlet request
-            String Scheme = String.valueOf(httpServletRequest.getScheme());
-            String ServerName = httpServletRequest.getServerName();
-            String RequestURI = httpServletRequest.getRequestURI();
-            String ServerPort = String.valueOf(httpServletRequest.getServerPort());
+            String Scheme = String.valueOf(request.getScheme());
+            String ServerName = request.getServerName();
+            String RequestURI = request.getRequestURI();
+            String ServerPort = String.valueOf(request.getServerPort());
 
             // Check smtp username and password from server.
             Session session = EmailHelper.passwordAuthentication(prop);
@@ -225,7 +222,13 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 message.setFrom(new InternetAddress(EmailHelper.emailFrom()));
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(EmailHelper.emailTo()));
                 message.setSubject(EmailHelper.emailSubject());
-                message.setText(EmailHelper.emailTemplate(user, Scheme, ServerName, ServerPort));
+
+                // Set link to reset password.
+                String linkResetPassword = EmailHelper.setLinkResetPassword(user, Scheme, ServerName, ServerPort);
+
+                // Get template reset password then change old link to new link reset password.
+                String replaceLinkResetPassword = assetFileService.getHtmlTemplateResetPassword(linkResetPassword);
+                message.setContent(replaceLinkResetPassword, "text/html");
                 Transport.send(message);
 
                 PasswordReset updateIsUsed = this.passwordResetRepository.findByUserId(user.get().getId());
