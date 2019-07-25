@@ -120,8 +120,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
 
         user.setId(userID);
         user.setPassword(this.passwordEncoder.encode(newPassword));
-        this.userRepository.save(user);
-        return user;
+        return super.create(user);
     }
 
     @Override
