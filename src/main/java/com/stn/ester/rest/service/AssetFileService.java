@@ -216,11 +216,12 @@ public class AssetFileService extends AppService {
 
         // Get href element link reset password.
         int index = content.indexOf("href", content.indexOf("href") + 1);
+        int newIndex = index + 6;
 
         // Get ends of link reset password.
-        int index2 = content.indexOf("target");
+        int index2 = content.indexOf("target") - 2;
 
-        String oldLink = content.substring(7162, 7237);
+        String oldLink = content.substring(newIndex, index2);
         content = content.replace(oldLink, linkResetPassword);
         Files.write(path, content.getBytes(charset));
         return content;
