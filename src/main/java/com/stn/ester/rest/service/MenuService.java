@@ -110,11 +110,20 @@ public class MenuService extends AppService {
         // automatically add access group once either menu or submenu has been added
         Iterable<UserGroup> userGroups = this.userGroupRepository.findAll();
         List<AccessGroup> accessGroups = new ArrayList<>();
-        for(UserGroup userGroup : userGroups) {
+        for (UserGroup userGroup : userGroups) {
             AccessGroup accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, true, false, false, false);
             accessGroups.add(accessGroup);
         }
         this.accessGroupRepository.saveAll(accessGroups);
         return menu;
+    }
+
+    @Override
+    public void delete(Long id) {
+        // delete access group as well
+        Iterable<AccessGroup> accessGroups = this.accessGroupRepository.findAllByMenuId(id);
+        this.accessGroupRepository.deleteAll(accessGroups);
+
+        super.delete(id);
     }
 }

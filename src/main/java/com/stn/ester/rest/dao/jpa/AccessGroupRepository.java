@@ -13,5 +13,7 @@ public interface AccessGroupRepository extends AppRepository<AccessGroup, IdList
 
     Set<AccessGroup> findAllByUserGroupId(Long userGroupId);
 
-    Set<AccessGroup> findAllByUserGroupIdAndViewable(Long userGroupId,boolean viewable);
+    Set<AccessGroup> findAllByUserGroupIdAndViewable(Long userGroupId, boolean viewable);
+
+    Iterable<AccessGroup> findAllByMenuId(Long menuId);
 }
