@@ -9,6 +9,7 @@ import com.stn.ester.rest.service.MenuService;
 import com.stn.ester.rest.service.ModuleService;
 import com.stn.ester.rest.service.UserGroupService;
 import com.stn.ester.rest.service.UserService;
+import com.stn.ester.rest.service.AssetFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -38,6 +39,8 @@ public class RestApplication extends SpringBootServletInitializer {
 
     @Autowired
     private AssetFileRepository assetFileRepository;
+    @Autowired
+    private AssetFileService assetFileService;
 
     @Autowired
     private UserGroupService userGroupService;
@@ -82,7 +85,7 @@ public class RestApplication extends SpringBootServletInitializer {
                 String filename = "default-pp.png";
                 String defaultProfilePictPath = DS + this.assetPath + DS + this.assetDefault + DS + filename;
                 AssetFile defaultPP = new AssetFile(defaultProfilePictPath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
-                this.assetFileRepository.save(defaultPP);
+                this.assetFileService.create(defaultPP);
                 defaultProfilePictureID = defaultPP.getId();
             } else {
                 defaultProfilePictureID = existingDefaultPP.get().getId();

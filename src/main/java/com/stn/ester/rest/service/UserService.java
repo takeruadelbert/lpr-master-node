@@ -110,6 +110,7 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
         return savedLoginSession;
     }
 
+    @Transactional
     public Object changePassword(Long userID, String oldPassword, String newPassword, String retypeNewPassword) {
         // check if new password is same with retype one
         if (!newPassword.equals(retypeNewPassword)) {
@@ -124,8 +125,7 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
 
         user.setId(userID);
         user.setPassword(this.passwordEncoder.encode(newPassword));
-        this.userRepository.save(user);
-        return user;
+        return super.create(user);
     }
 
     @Override
