@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
+import org.thymeleaf.context.Context;
 
 @Service
 public class UserService extends AppService implements AssetFileBehaviour {
@@ -40,6 +42,9 @@ public class UserService extends AppService implements AssetFileBehaviour {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SpringTemplateEngine templateEngine;
 
     @Autowired
     public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository, PasswordResetService passwordResetService) {
@@ -226,9 +231,14 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 // Set link to reset password.
                 String linkResetPassword = EmailHelper.setLinkResetPassword(user, Scheme, ServerName, ServerPort);
 
-                // Get template reset password then change old link to new link reset password.
-                String replaceLinkResetPassword = assetFileService.getHtmlTemplateResetPassword(linkResetPassword);
-                message.setContent(replaceLinkResetPassword, "text/html");
+                // Append username and url_action into email template.
+                Context context = new Context();
+                context.setVariable("username", user.get().getUsername());
+                context.setVariable("url_action", linkResetPassword);
+                String htmlFile = templateEngine.process("email_template", context);
+
+                // Set content html file.
+                message.setContent(htmlFile,"text/html");
                 Transport.send(message);
 
                 PasswordReset updateIsUsed = this.passwordResetRepository.findByUserId(user.get().getId());

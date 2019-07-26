@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -34,9 +31,6 @@ public class AssetFileService extends AppService {
     private String assetTempPath;
 
     private String parentDirectory = new File(System.getProperty("user.dir")).getParent() != null ? new File(System.getProperty("user.dir")).getParent() : new File(System.getProperty("user.dir")).toString();
-
-    private String userDir = System.getProperty("user.dir");
-    private String pathFileEmailTemplate = userDir + DS + "assets" + DS + "temp" + DS + "template_reset_password.html";
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
@@ -207,23 +201,5 @@ public class AssetFileService extends AppService {
             ex.printStackTrace();
             return result;
         }
-    }
-
-    public String getHtmlTemplateResetPassword(String linkResetPassword) throws IOException {
-        Path path = Paths.get(pathFileEmailTemplate);
-        Charset charset = StandardCharsets.UTF_8;
-        String content = new String(Files.readAllBytes(path), charset);
-
-        // Get href element link reset password.
-        int index = content.indexOf("href", content.indexOf("href") + 1);
-        int newIndex = index + 6;
-
-        // Get ends of link reset password.
-        int index2 = content.indexOf("target") - 2;
-
-        String oldLink = content.substring(newIndex, index2);
-        content = content.replace(oldLink, linkResetPassword);
-        Files.write(path, content.getBytes(charset));
-        return content;
     }
 }
