@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -108,5 +110,27 @@ public class NewsService extends AppService implements AssetFileBehaviour {
             result.put(newsStatus, newsStatus.getLabel());
         }
         return result;
+    }
+
+    public Object changeNewsStatus(Long newsId, NewsStatus newsStatus) {
+        Map<String, Object> result = new HashMap<>();
+        int code;
+        String message;
+        HttpStatus status;
+        if (newsId != null && newsStatus != null) {
+            News news = this.newsRepository.findById(newsId).get();
+            news.setNewsStatus(newsStatus);
+            super.update(newsId, news);
+            code = HttpStatus.OK.value();
+            message = "Successfully changed status.";
+            status = HttpStatus.OK;
+        } else {
+            code = HttpStatus.BAD_REQUEST.value();
+            message = "Failed to change status : invalid news ID and/or news status.";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        result.put("code", code);
+        result.put("message", message);
+        return new ResponseEntity<>(result, status);
     }
 }
