@@ -1,9 +1,7 @@
 package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.PositionRepository;
-import com.stn.ester.rest.domain.Department;
 import com.stn.ester.rest.domain.Position;
-import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;

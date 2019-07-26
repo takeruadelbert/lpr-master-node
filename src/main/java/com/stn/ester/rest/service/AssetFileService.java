@@ -70,7 +70,7 @@ public class AssetFileService extends AppService {
 
                     AssetFile assetFile = new AssetFile(pathFile, filename, ext);
                     assetFile.setToken(GlobalFunctionHelper.generateToken());
-                    data.add(this.assetFileRepository.save(assetFile));
+                    data.add((AssetFile) super.create(assetFile));
                 } catch (Exception ex) {
                     result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                     result.put("message", ex.getMessage());
@@ -116,7 +116,7 @@ public class AssetFileService extends AppService {
                 // save decoded file to database
                 AssetFile assetFile = new AssetFile(path, name, ext);
                 assetFile.setToken(GlobalFunctionHelper.generateToken());
-                this.assetFileRepository.save(assetFile);
+                super.create(assetFile);
 
                 result.put("data", assetFile);
                 result.put("status", HttpStatus.OK.value());
@@ -192,7 +192,7 @@ public class AssetFileService extends AppService {
                 // update path data of asset file
                 file.get().setId(asset_file_id);
                 file.get().setPath(to.replace(this.parentDirectory, ""));
-                this.assetFileRepository.save(file.get());
+                super.create(file.get());
                 return asset_file_id;
             } else {
                 return result;
