@@ -21,4 +21,9 @@ public class SystemProfileController {
     public Object update(@Valid @RequestBody SystemProfile systemProfile) {
         return service.updateSingleData(systemProfile);
     }
+
+    @RequestMapping(value = "/system_profiles", method = RequestMethod.GET)
+    public Object get() {
+        return this.service.get();
+    }
 }
