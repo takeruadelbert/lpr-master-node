@@ -42,4 +42,11 @@ public class NewsController extends AppController<NewsService, News> {
     public Map<NewsStatus, String> getStatusList() {
         return service.getStatusList();
     }
+
+    @RequestMapping(value = "/{id}/status/change", method = RequestMethod.PUT)
+    public Object changeNewsStatus(@PathVariable Long id, @RequestBody Map<String, String> data) {
+        String dataNewsStatus = data.get("status");
+        NewsStatus newsStatus = NewsStatus.valueOf(dataNewsStatus);
+        return service.changeNewsStatus(id, newsStatus);
+    }
 }
