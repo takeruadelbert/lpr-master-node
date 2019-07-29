@@ -8,14 +8,22 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-public class SystemProfileController extends AppController<SystemProfileService, SystemProfile> {
+public class SystemProfileController {
+
+    public SystemProfileService service;
+
     @Autowired
     public SystemProfileController(SystemProfileService systemProfileService) {
-        super(systemProfileService);
+        this.service=systemProfileService;
     }
 
     @RequestMapping(value = "/system_profiles", method = RequestMethod.PUT)
     public Object update(@Valid @RequestBody SystemProfile systemProfile) {
         return service.updateSingleData(systemProfile);
+    }
+
+    @RequestMapping(value = "/system_profiles", method = RequestMethod.GET)
+    public Object get() {
+        return this.service.get();
     }
 }
