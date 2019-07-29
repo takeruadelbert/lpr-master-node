@@ -49,4 +49,8 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
     public Long claimFile(String fileToken) {
         return this.assetFileService.moveTempDirToPermanentDir(fileToken, this.getAssetPath());
     }
+
+    public SystemProfile get() {
+        return this.systemProfileRepository.findById(1L).get();
+    }
 }
