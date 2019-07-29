@@ -126,4 +126,10 @@ public class MenuService extends AppService {
 
         super.delete(id);
     }
+
+    @Transactional
+    public Object update(long id, AppDomain o) {
+        super.update(id, o);
+        return o;
+    }
 }
