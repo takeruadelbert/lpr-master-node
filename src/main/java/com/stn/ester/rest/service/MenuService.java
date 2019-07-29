@@ -45,7 +45,7 @@ public class MenuService extends AppService {
     }
 
     public Object getByUserGroupId(Long userGroupId) {
-        Set<AccessGroup> accessGroups = this.accessGroupRepository.findAllByUserGroupIdAndViewable(userGroupId, true);
+        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByUserGroupIdAndViewable(userGroupId, true);
         Set<Long> menuIds = new LinkedHashSet<>();
         for (AccessGroup accessGroup : accessGroups) {
             menuIds.add(accessGroup.getMenuId());
@@ -121,7 +121,7 @@ public class MenuService extends AppService {
     @Override
     public void delete(Long id) {
         // delete access group as well
-        Iterable<AccessGroup> accessGroups = this.accessGroupRepository.findAllByMenuId(id);
+        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByMenuId(id);
         this.accessGroupRepository.deleteAll(accessGroups);
 
         super.delete(id);
