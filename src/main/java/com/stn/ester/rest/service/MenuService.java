@@ -117,4 +117,10 @@ public class MenuService extends AppService {
         this.accessGroupRepository.saveAll(accessGroups);
         return menu;
     }
+
+    @Transactional
+    public Object update(long id, AppDomain o) {
+        super.update(id, o);
+        return o;
+    }
 }
