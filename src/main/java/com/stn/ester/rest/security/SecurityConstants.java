@@ -6,6 +6,7 @@ public class SecurityConstants {
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER_STRING = "Authorization";
     public static final String SIGN_UP_URL = "/users";
+    public static final String SYSTEM_PROFILE_URL = "/system_profiles";
     public static final String AUTHORITIES_KEY = "authorities";
     public static final String ROLE_SUPERADMIN = "SUPERADMIN";
     public static final String AUTHORITY_PREFIX = "ACCESS";
