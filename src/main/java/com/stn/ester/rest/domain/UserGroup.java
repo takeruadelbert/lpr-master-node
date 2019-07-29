@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,9 +24,9 @@ public class UserGroup extends AppDomain {
     private String name;
 
     @Transient
-    private Set<AccessGroup> accessGroups=new HashSet<AccessGroup>();
+    private Collection<AccessGroup> accessGroups=new HashSet<AccessGroup>();
 
-    public Set<AccessGroup> mergeAccessGroup(Set<AccessGroup> accessGroups){
+    public Collection<AccessGroup> mergeAccessGroup(Collection<AccessGroup> accessGroups){
         this.accessGroups.addAll(accessGroups);
         return this.accessGroups;
     }
