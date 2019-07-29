@@ -42,7 +42,7 @@ public class UserGroupService extends AppService {
         if (!this.userGroupRepository.existsById(id))
             throw new ResourceNotFoundException();
         UserGroup userGroup = this.userGroupRepository.findById(id).get();
-        Set<AccessGroup> accessGroups = this.accessGroupRepository.findAllByUserGroupId(id);
+        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByUserGroupId(id);
         userGroup.mergeAccessGroup(accessGroups);
         return userGroup;
     }
@@ -63,5 +63,13 @@ public class UserGroupService extends AppService {
         this.accessGroupRepository.saveAll(accessGroups);
         userGroup.mergeAccessGroup(new HashSet<>(accessGroups));
         return userGroup;
+    }
+
+    @Override
+    public void delete(Long id) {
+        // delete access group as well
+        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByUserGroupId(id);
+        this.accessGroupRepository.deleteAll(accessGroups);
+        super.delete(id);
     }
 }
