@@ -43,7 +43,7 @@ public class UserGroup extends AppDomain {
         this.name = name;
     }
 
-    public Set<AccessGroup> getAccessGroups() {
+    public Collection<AccessGroup> getAccessGroups() {
         return accessGroups;
     }
 

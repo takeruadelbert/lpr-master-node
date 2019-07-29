@@ -1,5 +1,6 @@
 package com.stn.ester.rest.service;
 
+import com.google.common.collect.Iterables;
 import com.stn.ester.rest.dao.jpa.AccessGroupRepository;
 import com.stn.ester.rest.dao.jpa.MenuRepository;
 import com.stn.ester.rest.dao.jpa.ModuleRepository;
@@ -99,17 +100,18 @@ public class AccessGroupService extends AppService {
             return "NOACCESS";
         }
         Long userGroupId = SessionHelper.getCurrentUser().getUserGroupId();
-        List<AccessGroup> accessGroups = this.accessGroupRepository.findAllByMenuIdAndUserGroupId(menus.get(0).getId(), userGroupId);
+        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByMenuIdAndUserGroupId(menus.get(0).getId(), userGroupId);
         if (accessGroups.isEmpty()) {
             System.out.println("access group not found");
             return "NOACCESS";
         }
-        if (!this.hasAccess(requestMethod, accessGroups.get(0),modules.get(0)))
+
+        if (!this.hasAccess(requestMethod, Iterables.get(accessGroups, 0), modules.get(0)))
             return "NOACCESS";
         return ROLE_PREFIX + "_" + SessionHelper.getCurrentUser().getUserGroup().getName();
     }
 
-    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup,Module module) {
+    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup, Module module) {
         if (accessGroup.isViewable() && requestMethod.equals(RequestMethod.GET)) {
             return true;
         }
@@ -122,7 +124,7 @@ public class AccessGroupService extends AppService {
         if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
             return true;
         }
-        if (module.getRequestMethod().equals(requestMethod)){
+        if (module.getRequestMethod().equals(requestMethod)) {
             return true;
         }
         return false;
