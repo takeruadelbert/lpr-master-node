@@ -6,12 +6,15 @@ import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,6 +34,13 @@ public class AssetFileService extends AppService {
     private String assetTempPath;
 
     private String parentDirectory = new File(System.getProperty("user.dir")).getParent() != null ? new File(System.getProperty("user.dir")).getParent() : new File(System.getProperty("user.dir")).toString();
+
+    @Value("${ester.asset.default}")
+    private String assetDefault;
+    @Autowired
+    private ResourceLoader resourceLoader;
+    private static final String DS = File.separator;
+    public static Long defaultProfilePictureID;
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
@@ -200,6 +210,29 @@ public class AssetFileService extends AppService {
         } catch (Exception ex) {
             ex.printStackTrace();
             return result;
+        }
+    }
+
+    @Transactional
+    public void addDefaultProfilePicture() {
+        try {
+            Optional<AssetFile> existingDefaultPP = this.assetFileRepository.findByNameAndExtension("default-pp", "png");
+            if (existingDefaultPP.equals(Optional.empty())) {
+                String defaultProfilePicturePath = this.assetDefault + DS + "profile_picture" + DS + "default-pp.png";
+                Resource resource = resourceLoader.getResource("classpath:" + defaultProfilePicturePath);
+                String realDefaultPPPath = resource.getFile().getAbsolutePath();
+                realDefaultPPPath = realDefaultPPPath.replace(this.parentDirectory, "");
+
+                // add default profile picture to Asset File table
+                String filename = resource.getFilename();
+                AssetFile defaultPP = new AssetFile(realDefaultPPPath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
+                super.create(defaultPP);
+                defaultProfilePictureID = defaultPP.getId();
+            } else {
+                defaultProfilePictureID = existingDefaultPP.get().getId();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }
