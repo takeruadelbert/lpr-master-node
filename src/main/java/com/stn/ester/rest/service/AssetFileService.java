@@ -2,6 +2,7 @@ package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import com.stn.ester.rest.domain.AssetFile;
+import com.stn.ester.rest.domain.SystemProfile;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -225,14 +226,46 @@ public class AssetFileService extends AppService {
 
                 // add default profile picture to Asset File table
                 String filename = resource.getFilename();
-                AssetFile defaultPP = new AssetFile(realDefaultPPPath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
-                super.create(defaultPP);
-                defaultProfilePictureID = defaultPP.getId();
+                defaultProfilePictureID = this.saveAssetFile(realDefaultPPPath, filename);
             } else {
                 defaultProfilePictureID = existingDefaultPP.get().getId();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Transactional
+    public void addDefaultSystemProfile() {
+        try {
+            String address = "Jalan Sawah Kurung No. 4A";
+            String email = "suryateknologi@yahoo.co.id";
+            String header = "<h1>Test</h1>";
+            String name = "Surya Teknologi Nasional";
+            String shortname = "STN";
+            String telephone = "022 123456789";
+            String website = "http://suryateknologi.co.id/";
+
+            // add default logo
+            String defaultLogoPath = this.assetDefault + DS + "system_profile" + DS + "stn.png";
+            Resource resource = resourceLoader.getResource("classpath:" + defaultLogoPath);
+            String realDefaultLogoPath = resource.getFile().getAbsolutePath();
+            realDefaultLogoPath = realDefaultLogoPath.replace(this.parentDirectory, "");
+            String filename = resource.getFilename();
+            Long logo_id = this.saveAssetFile(realDefaultLogoPath, filename);
+
+            // save default data
+            SystemProfile systemProfile = new SystemProfile(address, telephone, name, shortname, header, email, website, logo_id);
+            super.create(systemProfile);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Transactional
+    public Long saveAssetFile(String filepath, String filename) {
+        AssetFile assetFile = new AssetFile(filepath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
+        super.create(assetFile);
+        return assetFile.getId();
     }
 }

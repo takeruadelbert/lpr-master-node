@@ -27,6 +27,7 @@ public class RestApplication extends SpringBootServletInitializer {
     public void init() {
         TimeZone.setDefault(TimeZone.getTimeZone(timezone));
         this.addDefaultProfilePicture();
+        this.addDefaultSystemProfile();
     }
 
     @Override
@@ -36,5 +37,9 @@ public class RestApplication extends SpringBootServletInitializer {
 
     private void addDefaultProfilePicture() {
         this.assetFileService.addDefaultProfilePicture();
+    }
+
+    private void addDefaultSystemProfile() {
+        this.assetFileService.addDefaultSystemProfile();
     }
 }

@@ -39,6 +39,21 @@ public class SystemProfile extends AppDomain {
     @URL(regexp = "^(http|https).*", message = "Invalid URL Website")
     private String website;
 
+    public SystemProfile() {
+
+    }
+
+    public SystemProfile(String address, String telephone, String name, String shortname, String header, String email, String website, Long assetFileId) {
+        this.address = address;
+        this.telephone = telephone;
+        this.name = name;
+        this.shortname = shortname;
+        this.header = header;
+        this.email = email;
+        this.website = website;
+        this.assetFileId = assetFileId;
+    }
+
     public String getToken() {
         return this.token;
     }
