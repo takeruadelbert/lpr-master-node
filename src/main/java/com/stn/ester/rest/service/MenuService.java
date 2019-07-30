@@ -128,8 +128,8 @@ public class MenuService extends AppService {
     }
 
     @Transactional
-    public Object update(long id, AppDomain o) {
-        super.update(id, o);
-        return o;
+    public Object update(Long id, Menu menu) {
+        menu.setId(id);
+        return this.menuRepository.save(menu);
     }
 }

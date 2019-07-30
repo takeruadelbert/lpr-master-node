@@ -36,10 +36,21 @@ public class Menu extends AppDomain {
     @Column(name = "module_id")
     private Long moduleId;
 
+    public Menu(long id, String label, Long moduleId, int orderingNumber, Long parentMenuId) {
+        this.id = id;
+        this.label = label;
+        this.moduleId = moduleId;
+        this.orderingNumber = orderingNumber;
+        this.parentMenuId = parentMenuId;
+    }
+
+    public Menu() {
+
+    }
+
     @JsonSetter("moduleId")
-    public void setModuleId(long moduleId) {
-        if (moduleId != 0)
-            this.moduleId = moduleId;
+    public void setModuleId(Long moduleId) {
+        this.moduleId = moduleId;
     }
 
     @Transient
@@ -48,7 +59,6 @@ public class Menu extends AppDomain {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_menu_id", insertable = false, updatable = false)
-    @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Menu parentMenu;
 
@@ -57,13 +67,16 @@ public class Menu extends AppDomain {
     private Long parentMenuId;
 
     @JsonSetter("parentMenuId")
-    public void setParentMenuId(long parentMenuId) {
-        if (parentMenuId != 0)
-            this.parentMenuId = parentMenuId;
+    public void setParentMenuId(Long parentMenuId) {
+        this.parentMenuId = parentMenuId;
     }
 
     public Long getParentMenuId() {
         return parentMenuId;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     public void mergeSubMenu(List<Menu> subMenu) {
