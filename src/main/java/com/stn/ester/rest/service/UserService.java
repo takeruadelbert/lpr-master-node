@@ -1,6 +1,5 @@
 package com.stn.ester.rest.service;
 
-import com.stn.ester.rest.RestApplication;
 import com.stn.ester.rest.dao.jpa.BiodataRepository;
 import com.stn.ester.rest.dao.jpa.LoginSessionRepository;
 import com.stn.ester.rest.dao.jpa.UserGroupRepository;
@@ -20,7 +19,10 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class UserService extends AppService implements AssetFileBehaviour {
@@ -53,21 +55,21 @@ public class UserService extends AppService implements AssetFileBehaviour {
     @Transactional
     public Object create(AppDomain o) {
         // set default profile picture
-        if(((User) o).getToken() == null) {
-            ((User) o).setAssetFileId(RestApplication.defaultProfilePictureID);
+        if (((User) o).getToken() == null) {
+            ((User) o).setAssetFileId(AssetFileService.defaultProfilePictureID);
         }
         ((User) o).setPassword(passwordEncoder.encode(((User) o).getPassword()));
         return super.create(o);
     }
 
     @Override
-    public Object update(Long id, AppDomain object){
-        return super.update(id,object);
+    public Object update(Long id, AppDomain object) {
+        return super.update(id, object);
     }
 
-    public Map login(String username, String password, HttpSession session){
-        User user=userRepository.findByUsername(username).orElse(null);
-        if (user == null || !passwordEncoder.matches(password,user.getPassword())){
+    public Map login(String username, String password, HttpSession session) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new InvalidLoginException();
         }
         UUID randomUUID = UUID.randomUUID();
@@ -134,7 +136,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     }
 
     public Object changeProfilePicture(String token) {
-        if(!token.isEmpty()) {
+        if (!token.isEmpty()) {
             Long user_id = SessionHelper.getUserID();
             Long asset_file_id = this.claimFile(token);
             User user = this.userRepository.findById(user_id).get();
@@ -142,9 +144,13 @@ public class UserService extends AppService implements AssetFileBehaviour {
             user.setAssetFileId(asset_file_id);
             return super.update(user_id, user);
         }
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
         result.put("message", "Failed to change profile picture : Invalid Token.");
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    public void addDefaultProfilePicture() {
+
     }
 }

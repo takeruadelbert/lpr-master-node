@@ -1,11 +1,13 @@
 package com.stn.ester.rest.service;
 
-import com.stn.ester.rest.RestApplication;
 import com.stn.ester.rest.dao.jpa.EmployeeRepository;
 import com.stn.ester.rest.dao.jpa.PositionRepository;
-import com.stn.ester.rest.domain.enumerate.EmployeeWorkStatus;
 import com.stn.ester.rest.dao.jpa.UserRepository;
-import com.stn.ester.rest.domain.*;
+import com.stn.ester.rest.domain.AppDomain;
+import com.stn.ester.rest.domain.Employee;
+import com.stn.ester.rest.domain.Position;
+import com.stn.ester.rest.domain.User;
+import com.stn.ester.rest.domain.enumerate.EmployeeWorkStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,8 +42,8 @@ public class EmployeeService extends AppService {
         long user_group_id = position.getUserGroupId();
         ((Employee) domain).getUser().setUserGroupId(user_group_id);
 
-        if(((Employee) domain).getUser().getToken() == null) {
-            ((Employee) domain).getUser().setAssetFileId(RestApplication.defaultProfilePictureID); // set default profile picture
+        if (((Employee) domain).getUser().getToken() == null) {
+            ((Employee) domain).getUser().setAssetFileId(AssetFileService.defaultProfilePictureID); // set default profile picture
         }
 
         // append data Employee Work NewsStatus
