@@ -72,18 +72,14 @@ public abstract class CrudController<T extends AppService, U extends AppDomain> 
         return service.update(id, domain);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.PUT)
-    public Object update(@Valid @RequestBody U domain) {
-        return service.update((long) 1, domain);
-    }
-
-    @PreAuthorize("hasAuthority(#this.this.getAuthority())")
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void delete(@PathVariable long id) {
         service.delete(id);
     }
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
+    @RequestMapping(value = "", method = RequestMethod.OPTIONS)
     public Object list() {
         return service.getList();
     }

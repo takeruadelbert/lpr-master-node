@@ -112,7 +112,7 @@ public class AccessGroupService extends AppService {
     }
 
     private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup, Module module) {
-        if (accessGroup.isViewable() && requestMethod.equals(RequestMethod.GET)) {
+        if (accessGroup.isViewable() && (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.OPTIONS))) {
             return true;
         }
         if (accessGroup.isAddable() && requestMethod.equals(RequestMethod.POST)) {
