@@ -23,7 +23,7 @@ public class CityController extends CrudController<CityService, City> {
         return service.getCityListByState(state_id);
     }
 
-    @RequestMapping(value = "/city_status/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/city_status", method = RequestMethod.OPTIONS)
     public Map<CityStatus,String> getCityStatusList() {
         return service.getCityStatusList();
     }

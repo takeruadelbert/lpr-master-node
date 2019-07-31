@@ -35,7 +35,7 @@ public class NewsController extends CrudController<NewsService, News> {
         return service.dashboard(page, size, PageRequest.of(page, size));
     }
 
-    @RequestMapping(value = "/status/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/status", method = RequestMethod.OPTIONS)
     public Map<NewsStatus, String> getStatusList() {
         return service.getStatusList();
     }

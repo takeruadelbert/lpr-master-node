@@ -7,6 +7,7 @@ import com.stn.ester.rest.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -25,7 +26,7 @@ public class EmployeeController extends CrudController<EmployeeService, Employee
         return service.create(employee);
     }
 
-    @RequestMapping(value = "/work_status/list")
+    @RequestMapping(value = "/work_status",method = RequestMethod.OPTIONS)
     public Map<EmployeeWorkStatus, String> getEmployeeWorkStatusList() {
         return service.getEmployeeWorkStatusList();
     }
