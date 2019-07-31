@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -38,6 +39,7 @@ public class AssetFileService extends AppService {
         super.repositories.put(AssetFile.unique_name, assetFileRepository);
     }
 
+    @Transactional
     public Object uploadFile(MultipartFile[] files) {
         Map<String, Object> result = new HashMap<>();
         List<AssetFile> data = new ArrayList<>();
@@ -84,6 +86,7 @@ public class AssetFileService extends AppService {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @Transactional
     public Object uploadEncodedFile(String filename, String encoded_file) {
         Map<String, Object> result = new HashMap<>();
 
@@ -170,6 +173,7 @@ public class AssetFileService extends AppService {
         }
     }
 
+    @Transactional
     public Long moveTempDirToPermanentDir(String token, String assetDir) {
         Long result = null;
         try {
