@@ -1,8 +1,6 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
 import com.stn.ester.rest.base.OnDeleteSetParentNull;
 import com.stn.ester.rest.base.TableFieldPair;
 import com.stn.ester.rest.service.MenuService;
@@ -21,10 +19,12 @@ import java.util.Set;
 @OnDeleteSetParentNull({
         @TableFieldPair(service = MenuService.class, tableName = "menu", fieldName = "parent_menu_id")
 })
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Menu extends AppDomain {
 
     public static final String unique_name = "menu";
 
+    private long id;
     private String label;
     private int orderingNumber;
 
@@ -35,14 +35,6 @@ public class Menu extends AppDomain {
     @JsonProperty("moduleId")
     @Column(name = "module_id")
     private Long moduleId;
-
-    public Menu(long id, String label, Long moduleId, int orderingNumber, Long parentMenuId) {
-        this.id = id;
-        this.label = label;
-        this.moduleId = moduleId;
-        this.orderingNumber = orderingNumber;
-        this.parentMenuId = parentMenuId;
-    }
 
     public Menu() {
 
@@ -59,6 +51,7 @@ public class Menu extends AppDomain {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_menu_id", insertable = false, updatable = false)
+    @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Menu parentMenu;
 
