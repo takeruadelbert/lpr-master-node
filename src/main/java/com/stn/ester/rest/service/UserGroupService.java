@@ -75,9 +75,10 @@ public class UserGroupService extends AppService {
 
     @Transactional
     public Object createIfNameNotExist(UserGroup userGroup, String name) {
-        if (this.userGroupRepository.findByName(name) == null) {
+        UserGroup currentUserGroup=this.userGroupRepository.findByName(name);
+        if (currentUserGroup == null) {
             return this.create(userGroup);
         }
-        return null;
+        return currentUserGroup;
     }
 }
