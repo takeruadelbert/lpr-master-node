@@ -187,26 +187,25 @@ public class AssetFileService extends AppService {
     public Long moveTempDirToPermanentDir(String token, String assetDir) {
         Long result = null;
         try {
-            Optional<AssetFile> file = this.assetFileRepository.findByToken(token);
+            AssetFile file = this.assetFileRepository.findByToken(token).get();
             if (!file.equals(Optional.empty())) {
-                long asset_file_id = file.get().getId();
+                long asset_file_id = file.getId();
                 String path = this.assetRootPath + DS + assetDir;
 
                 // create if the path doesn't exists
                 GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + path);
 
-                String from = this.parentDirectory + file.get().getPath();
+                String from = this.parentDirectory + file.getPath();
                 String to = from.replace("temp", this.assetRootPath + DS + assetDir);
-
                 // move file from folder "temp"
                 Files.copy(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
                 Files.delete(Paths.get(from));
 //                Files.move(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
 
                 // update path data of asset file
-                file.get().setId(asset_file_id);
-                file.get().setPath(to.replace(this.parentDirectory, ""));
-                super.create(file.get());
+                file.setId(asset_file_id);
+                file.setPath(to.replace(this.parentDirectory, ""));
+                super.update(file.getId(), file);
                 return asset_file_id;
             } else {
                 return result;
