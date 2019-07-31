@@ -6,6 +6,7 @@ import com.stn.ester.rest.domain.LoginSession;
 import com.stn.ester.rest.domain.User;
 import com.stn.ester.rest.domain.enumerate.Gender;
 import com.stn.ester.rest.exception.UnauthorizedException;
+import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.BiodataService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,15 +47,16 @@ public class UserController extends CrudController<UserService, User> {
     }
 
     @RequestMapping(value = "/heartbeat")
-    public void isValid() {
+    public User isValid() {
+        return SessionHelper.getCurrentUser();
     }
 
-    @RequestMapping(value = "/{id}/change-password", method = RequestMethod.PUT)
-    public Object changePassword(@PathVariable Long id, @RequestBody Map<String, String> data) {
+    @RequestMapping(value = "/change-password", method = RequestMethod.PUT)
+    public Object changePassword (@RequestBody Map<String, String> data) {
         String old_password = data.get("old_password");
         String new_password = data.get("new_password");
         String retype_new_password = data.get("retype_new_password");
-        return service.changePassword(id, old_password, new_password, retype_new_password);
+        return service.changePassword(SessionHelper.getUserID(), old_password, new_password, retype_new_password);
     }
 
     @RequestMapping(value = "/change-profile-picture", method = RequestMethod.POST)
