@@ -45,14 +45,8 @@ public class UserController extends CrudController<UserService, User> {
         return loginToken;
     }
 
-    //@RequestMapping(value = "/heartbeat")
-    public Object isValid(@RequestHeader("access-token") String accessToken) {
-        LoginSession loginSession = this.userService.tokenHeartbeat(accessToken);
-        if (loginSession == null) {
-            throw new UnauthorizedException();
-        } else {
-            return loginSession;
-        }
+    @RequestMapping(value = "/heartbeat")
+    public void isValid() {
     }
 
     @RequestMapping(value = "/{id}/change-password", method = RequestMethod.PUT)
@@ -68,7 +62,7 @@ public class UserController extends CrudController<UserService, User> {
         return service.changeProfilePicture(data.get("token"));
     }
 
-    @RequestMapping(value = "/gender/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/gender", method = RequestMethod.OPTIONS)
     public Map<Gender, String> getGenderList() {
         return this.biodataService.getGenderList();
     }
