@@ -122,9 +122,8 @@ public class AssetFileService extends AppService {
                 }
                 String path = DS + this.assetTempPath + DS + filename;
                 String pathfile = this.parentDirectory + DS + this.assetTempPath + DS + filename;
-                FileOutputStream fileOutputStream = new FileOutputStream(pathfile);
                 byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
-                fileOutputStream.write(fileByteArray);
+                GlobalFunctionHelper.writeByteArraysToFile(pathfile, fileByteArray);
 
                 // save decoded file to database
                 AssetFile assetFile = new AssetFile(path, name, ext);
