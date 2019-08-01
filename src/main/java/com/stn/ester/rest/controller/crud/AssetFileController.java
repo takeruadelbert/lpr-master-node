@@ -4,6 +4,7 @@ import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.service.AssetFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,16 +22,19 @@ public class AssetFileController extends CrudController<AssetFileService, AssetF
         super(assetFileService);
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public Object uploadFile(@RequestParam MultipartFile[] files) {
         return service.uploadFile(files);
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/upload-encoded", method = RequestMethod.POST)
     public Object uploadEncodedFile(@RequestParam String filename, @RequestParam String files) {
         return service.uploadEncodedFile(filename, files);
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/**", method = RequestMethod.GET)
     @NotNull
     public Object getFile(HttpServletRequest request, @RequestParam(value = "dl", required = false) Integer flag_dl) {

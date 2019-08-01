@@ -9,6 +9,8 @@ public class AppPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object o, Object o1) {
+        if (o1.equals("allowall"))
+            return true;
         return false;
     }
 
