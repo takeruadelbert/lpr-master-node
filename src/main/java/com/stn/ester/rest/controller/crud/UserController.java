@@ -40,12 +40,6 @@ public class UserController extends CrudController<UserService, User> {
         return super.service.update(id, user);
     }
 
-    //@RequestMapping(value = "/login", method = RequestMethod.POST)
-    public Map login(@RequestBody Map<String, String> payload, HttpSession session) {
-        Map<String, Object> loginToken = service.login(payload.get("username"), payload.get("password"), session);
-        return loginToken;
-    }
-
     @RequestMapping(value = "/heartbeat")
     public User isValid() {
         return SessionHelper.getCurrentUser();
