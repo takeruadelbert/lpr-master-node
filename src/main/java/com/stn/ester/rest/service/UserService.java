@@ -1,6 +1,5 @@
 package com.stn.ester.rest.service;
 
-import com.stn.ester.rest.RestApplication;
 import com.stn.ester.rest.dao.jpa.*;
 import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.exception.*;
@@ -15,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.*;
@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
-import org.thymeleaf.context.Context;
 
 @Service
 public class UserService extends AppService implements AssetFileBehaviour {
@@ -58,6 +57,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
         this.passwordResetRepository = passwordResetRepository;
         this.assetFileService = assetFileService;
         this.passwordResetService = passwordResetService;
+
     }
 
     @Override
@@ -65,10 +65,15 @@ public class UserService extends AppService implements AssetFileBehaviour {
     public Object create(AppDomain o) {
         // set default profile picture
         if (((User) o).getToken() == null) {
-            ((User) o).setAssetFileId(RestApplication.defaultProfilePictureID);
+            ((User) o).setAssetFileId(AssetFileService.defaultProfilePictureID);
         }
         ((User) o).setPassword(passwordEncoder.encode(((User) o).getPassword()));
         return super.create(o);
+    }
+
+    @Override
+    public Object update(Long id, AppDomain object) {
+        return super.update(id, object);
     }
 
     public Map login(String username, String password, HttpSession session) {
@@ -153,6 +158,10 @@ public class UserService extends AppService implements AssetFileBehaviour {
         result.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
         result.put("message", "Failed to change profile picture : Invalid Token.");
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    public void addDefaultProfilePicture() {
+
     }
 
     public Object identifyEmail(String email, HttpServletRequest request) {
@@ -287,8 +296,12 @@ public class UserService extends AppService implements AssetFileBehaviour {
         PasswordReset passwordReset = this.passwordResetRepository.findByToken(EmailHelper.resetPasswordToken);
         User user = this.userRepository.findById(passwordReset.getUserId()).orElse(null);
 
-        if (new_password.isEmpty()) {throw new EmptyFieldException("New password is empty!");}
-        if (confirm_password.isEmpty()) {throw new EmptyFieldException("Confirm password is empty!");}
+        if (new_password.isEmpty()) {
+            throw new EmptyFieldException("New password is empty!");
+        }
+        if (confirm_password.isEmpty()) {
+            throw new EmptyFieldException("Confirm password is empty!");
+        }
         if (!new_password.isEmpty() && !confirm_password.isEmpty()) {
             if (passwordReset.equals(null) && user.equals(null)) {
                 throw new UnauthorizedException("User not found.");

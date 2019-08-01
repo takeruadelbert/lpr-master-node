@@ -2,10 +2,13 @@ package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import com.stn.ester.rest.domain.AssetFile;
+import com.stn.ester.rest.domain.SystemProfile;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +35,13 @@ public class AssetFileService extends AppService {
     private String assetTempPath;
 
     private String parentDirectory = new File(System.getProperty("user.dir")).getParent() != null ? new File(System.getProperty("user.dir")).getParent() : new File(System.getProperty("user.dir")).toString();
+
+    @Value("${ester.asset.default}")
+    private String assetDefault;
+    @Autowired
+    private ResourceLoader resourceLoader;
+    private static final String DS = File.separator;
+    public static Long defaultProfilePictureID;
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
@@ -204,5 +214,60 @@ public class AssetFileService extends AppService {
             ex.printStackTrace();
             return result;
         }
+    }
+
+    @Transactional
+    public void addDefaultProfilePicture() {
+        try {
+            Optional<AssetFile> existingDefaultPP = this.assetFileRepository.findByNameAndExtension("default-pp", "png");
+            if (existingDefaultPP.equals(Optional.empty())) {
+                String defaultProfilePicturePath = this.assetDefault + DS + "profile_picture" + DS + "default-pp.png";
+                Resource resource = resourceLoader.getResource("classpath:" + defaultProfilePicturePath);
+                String realDefaultPPPath = resource.getFile().getAbsolutePath();
+                realDefaultPPPath = realDefaultPPPath.replace(this.parentDirectory, "");
+
+                // add default profile picture to Asset File table
+                String filename = resource.getFilename();
+                defaultProfilePictureID = this.saveAssetFile(realDefaultPPPath, filename);
+            } else {
+                defaultProfilePictureID = existingDefaultPP.get().getId();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Transactional
+    public void addDefaultSystemProfile() {
+        try {
+            String address = "Jalan Sawah Kurung No. 4A";
+            String email = "suryateknologi@yahoo.co.id";
+            String header = "<h1>Test</h1>";
+            String name = "Surya Teknologi Nasional";
+            String shortname = "STN";
+            String telephone = "022 123456789";
+            String website = "http://suryateknologi.co.id/";
+
+            // add default logo
+            String defaultLogoPath = this.assetDefault + DS + "system_profile" + DS + "stn.png";
+            Resource resource = resourceLoader.getResource("classpath:" + defaultLogoPath);
+            String realDefaultLogoPath = resource.getFile().getAbsolutePath();
+            realDefaultLogoPath = realDefaultLogoPath.replace(this.parentDirectory, "");
+            String filename = resource.getFilename();
+            Long logo_id = this.saveAssetFile(realDefaultLogoPath, filename);
+
+            // save default data
+            SystemProfile systemProfile = new SystemProfile(address, telephone, name, shortname, header, email, website, logo_id);
+            super.create(systemProfile);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Transactional
+    public Long saveAssetFile(String filepath, String filename) {
+        AssetFile assetFile = new AssetFile(filepath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
+        super.create(assetFile);
+        return assetFile.getId();
     }
 }
