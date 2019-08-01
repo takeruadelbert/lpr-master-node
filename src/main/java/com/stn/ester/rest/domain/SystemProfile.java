@@ -58,6 +58,18 @@ public class SystemProfile extends AppDomain {
         return this.token;
     }
 
+    public String getAddress() {
+        return this.address;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getWebsite() {
+        return this.website;
+    }
+
     @Override
     public String underscoreName() {
         return unique_name;

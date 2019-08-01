@@ -98,7 +98,7 @@
                                             <th class="column" width="145" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
                                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                     <tr>
-                                                        <td class="text-center h5" style="background: #f4f4f4; color:#5f5c5c; font-family:sans-serif; font-size:28px; line-height:28px; font-weight:bolder; text-align:center; height:80px;"><span style="border-bottom:3px solid #a79f9f; border-top:3px solid #a79f9f; display:inline-block;">ESTER</span></td>
+                                                        <td class="text-center h5" style="background: #f4f4f4; color:#5f5c5c; font-family:sans-serif; font-size:28px; line-height:28px; font-weight:bolder; text-align:center; height:80px;"><span style="border-bottom:3px solid #a79f9f; border-top:3px solid #a79f9f; display:inline-block;"><span th:text="${name}"></span></span></td>
                                                     </tr>
                                                 </table>
                                             </th>
@@ -128,12 +128,12 @@
                                                         <td class="p30-15" style="padding: 30px 30px 40px 30px; border-left:1px solid #f4f4f4; border-right:1px solid #f4f4f4;">
                                                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                 <tr>
-                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:30px; text-align:left; padding-bottom:25px; font-weight: bold;">
+                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:23px; text-align:left; padding-bottom:25px; font-weight: bold;">
                                                                         Hi <span th:text="${username}"></span>,<br />
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:30px; text-align:left; padding-bottom:25px;">
+                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:23px; text-align:left; padding-bottom:25px;">
                                                                         Kami telah menerima request untuk mereset password anda. <br />
                                                                         Klik tautan di bawah ini untuk mereset password anda. <span style="font-weight: bold;">Password reset ini valid 24 jam. </span>
                                                                     </td>
@@ -150,24 +150,24 @@
                                                                 </tr>
                                                                 <!-- END Button -->
                                                                 <tr>
-                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:30px; text-align:left; padding-top: 25px;padding-bottom:25px;">
+                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:23px; text-align:left; padding-top: 25px;padding-bottom:25px;">
                                                                         Jika anda tidak membuat request, cukup abaikan email ini.
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:30px; text-align:left;">
+                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:23px; text-align:left;">
                                                                         Terima kasih. <br />
-                                                                        Tim Ester
+                                                                        Tim <span th:text="${name}"></span>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:left; padding-bottom:25px; padding-top:25px;">
+                                                                    <td class="text-left pb25" style="color:#777777; padding-bottom:25px; padding-top:25px;">
                                                                         <hr />
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:14px; line-height:30px; text-align:left;">
-                                                                        Jika anda memiliki masalah dengan tombol di atas, salin dan tempel URL di bawah ke dalam web browser anda. <br />
+                                                                    <td class="text-left pb25" style="color:#777777; font-family:'Lato', Arial,sans-serif; font-size:14px; line-height:21px; text-align:left;">
+                                                                        Jika anda memiliki masalah dengan tombol di atas, salin dan tempel URL di bawah ke dalam web browser anda. <br /><br />
                                                                         <a th:href="${url_action}"><span th:text="${url_action}"></span></a>
                                                                     </td>
                                                                 </tr>
@@ -200,24 +200,22 @@
                                             <td align="center" style="padding-top:30px; background:#f4f4f4;">
                                                 <table border="0" cellspacing="0" cellpadding="0">
                                                     <tr>
-                                                        <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="facebook.png" width="34" height="34" border="0" alt="" /></a></td>
-                                                        <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="twitter.png" width="34" height="34" border="0" alt="" /></a></td>
-                                                        <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="linkedin.png" width="34" height="34" border="0" alt="" /></a></td>
-                                                        <td class="img" width="34" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="my_website.png" width="34" height="34" border="0" alt="" /></a></td>
+                                                        <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="image/facebook.png" width="34" height="34" border="0" alt="" /></a></td>
+                                                        <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="image/twitter.png" width="34" height="34" border="0" alt="" /></a></td>
+                                                        <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="image/linkedin.png" width="34" height="34" border="0" alt="" /></a></td>
+                                                        <td class="img" width="34" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="image/my_website.png" width="34" height="34" border="0" alt="" /></a></td>
                                                     </tr>
                                                 </table>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="text-footer1 pb10" style="background: #f4f4f4; color:#999999; font-family:'Lato', Arial,sans-serif; font-size:13px; line-height:20px; text-align:center; padding-bottom:10px; padding-top: 10px;">
-                                                &copy; 2019 Ester. All right reserved.
+                                                &copy; 2019 <a th:href="${website}"><span th:text="${name}"></span></a>. All right reserved.
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-footer1 pb10" style="background: #f4f4f4; color:#999999; font-family:'Lato', Arial,sans-serif; font-size:13px; line-height:20px; text-align:center; padding-bottom:10px;">
-                                                [Ester, LLC] <br />
-                                                123 Street Rd. <br />
-                                                Suite 1234.
+                                            <td class="text-footer1 pb10" style="background: #f4f4f4; color:#999999; font-family:'Lato', Arial,sans-serif; font-size:13px; line-height:20px; text-align:center; padding-bottom:70px;">
+                                                <span th:text="${address}"></span>. <br />
                                             </td>
                                         </tr>
                                     </table>

@@ -34,11 +34,11 @@ public class EmailHelper {
     }
 
     public static String emailSubject() {
-        String emailSubject = "Ester Password Reset";
+        String emailSubject = "Password Reset";
         return emailSubject;
     }
 
-    public static String setLinkResetPassword(Optional<User> user, String scheme, String serverName, String serverPort) {
+    public static String createLinkResetPassword(Optional<User> user, String scheme, String serverName, String serverPort) {
         String username = user.get().getUsername();
         String requestURI = "users/reset-password";
         String linkResetPassword = scheme + "://" + serverName + ":" + serverPort + "/" + requestURI + "/" + resetPasswordToken;

@@ -34,6 +34,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     private AssetFileService assetFileService;
     private PasswordResetRepository passwordResetRepository;
     private PasswordResetService passwordResetService;
+    private SystemProfileRepository systemProfileRepository;
     private String asset_path = "profile_picture";
 
     @Value("${ester.session.login.timeout}")
@@ -46,7 +47,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
     private SpringTemplateEngine templateEngine;
 
     @Autowired
-    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository, PasswordResetService passwordResetService) {
+    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository, PasswordResetService passwordResetService, SystemProfileRepository systemProfileRepository) {
         super(User.unique_name);
         super.repositories.put(User.unique_name, userRepository);
         super.repositories.put(Biodata.unique_name, biodataRepository);
@@ -57,7 +58,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
         this.passwordResetRepository = passwordResetRepository;
         this.assetFileService = assetFileService;
         this.passwordResetService = passwordResetService;
-
+        this.systemProfileRepository = systemProfileRepository;
     }
 
     @Override
@@ -214,16 +215,16 @@ public class UserService extends AppService implements AssetFileBehaviour {
 
     public Object sendLinkResetPassword(Optional<User> user, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
-        if (!user.equals(null)) {
+        if (user != null) {
 
-            // Setting e-mail properties.
+            // Create configuration email.
             Properties prop = new Properties();
             prop.put("mail.smtp.host", "smtp.gmail.com");
             prop.put("mail.smtp.socketFactory.port", "465");
             prop.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
             prop.put("mail.smtp.auth", "true");
 
-            // Getting hostname, port and others from http servlet request
+            // Getting hostname, port and others from http servlet request.
             String Scheme = String.valueOf(request.getScheme());
             String ServerName = request.getServerName();
             String RequestURI = request.getRequestURI();
@@ -237,16 +238,20 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(EmailHelper.emailTo()));
                 message.setSubject(EmailHelper.emailSubject());
 
-                // Set link to reset password.
-                String linkResetPassword = EmailHelper.setLinkResetPassword(user, Scheme, ServerName, ServerPort);
-
-                // Append username and url_action into email template.
+                // Create thymeleaf context.
                 Context context = new Context();
                 context.setVariable("username", user.get().getUsername());
+                // Create link to reset password.
+                String linkResetPassword = EmailHelper.createLinkResetPassword(user, Scheme, ServerName, ServerPort);
                 context.setVariable("url_action", linkResetPassword);
+                // Get address from system profile table
+                SystemProfile systemProfile = this.systemProfileRepository.findById(1L).get();
+                context.setVariable("address", systemProfile.getAddress());
+                context.setVariable("name", systemProfile.getName());
+                context.setVariable("website", systemProfile.getWebsite());
                 String htmlFile = templateEngine.process("email_template", context);
 
-                // Set content html file.
+                // Append username and others into email template.
                 message.setContent(htmlFile,"text/html");
                 Transport.send(message);
 
