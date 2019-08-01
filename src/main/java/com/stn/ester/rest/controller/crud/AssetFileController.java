@@ -34,7 +34,6 @@ public class AssetFileController extends CrudController<AssetFileService, AssetF
         return service.uploadEncodedFile(filename, files);
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/**", method = RequestMethod.GET)
     @NotNull
     public Object getFile(HttpServletRequest request, @RequestParam(value = "dl", required = false) Integer flag_dl) {
