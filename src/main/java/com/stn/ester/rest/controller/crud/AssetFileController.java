@@ -1,5 +1,6 @@
 package com.stn.ester.rest.controller.crud;
 
+import com.stn.ester.rest.base.AccessAllowed;
 import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.service.AssetFileService;
@@ -34,6 +35,7 @@ public class AssetFileController extends CrudController<AssetFileService, AssetF
         return service.uploadEncodedFile(filename, files);
     }
 
+    @AccessAllowed
     @RequestMapping(value = "/**", method = RequestMethod.GET)
     @NotNull
     public Object getFile(HttpServletRequest request, @RequestParam(value = "dl", required = false) Integer flag_dl) {

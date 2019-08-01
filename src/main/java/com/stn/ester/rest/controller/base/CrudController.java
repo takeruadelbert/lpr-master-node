@@ -2,6 +2,7 @@ package com.stn.ester.rest.controller.base;
 
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
+import com.stn.ester.rest.helper.SearchAndFilterHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.search.SpecificationsBuilder;
 import com.stn.ester.rest.service.AccessGroupService;
@@ -26,16 +27,12 @@ import java.util.Map;
 
 import static com.stn.ester.rest.security.SecurityConstants.*;
 
-public abstract class CrudController<T extends AppService, U extends AppDomain> implements BeanNameAware {
+public abstract class CrudController<T extends AppService, U extends AppDomain> extends SecuredController {
 
     protected static final String DEFAULT_PAGE_SIZE = "10";
     protected static final String DEFAULT_PAGE_NUM = "0";
 
     protected T service;
-    String beanName;
-
-    @Autowired
-    private AccessGroupService accessGroupService;
 
     @Autowired
     protected ModelMapper modelMapper;
@@ -50,7 +47,7 @@ public abstract class CrudController<T extends AppService, U extends AppDomain> 
         if (search != null) {
             search = URLDecoder.decode(search, StandardCharsets.UTF_8.toString());
         }
-        Specification<U> spec = resolveSpecification(search);
+        Specification<U> spec = SearchAndFilterHelper.resolveSpecification(search);
         return service.index(page, size, spec);
     }
 
@@ -84,49 +81,5 @@ public abstract class CrudController<T extends AppService, U extends AppDomain> 
         return service.getList();
     }
 
-    protected Specification<U> resolveSpecification(String searchParameters) {
-        SpecificationsBuilder builder = new SpecificationsBuilder<>();
-        try {
-            this.loopSpecToSpecBuilder(builder, GlobalFunctionHelper.jsonStringToMap(searchParameters));
-        } catch (IOException ex) {
-            System.out.println(ex);
-        }
-        return builder.build();
-    }
 
-    private void loopSpecToSpecBuilder(SpecificationsBuilder specificationsBuilder, Map<String, Object> jsonMap) {
-        for (Map.Entry<String, Object> entry : jsonMap.entrySet()) {
-            if (Map.class.isAssignableFrom(entry.getValue().getClass())) {
-                this.loopSpecToSpecBuilder(specificationsBuilder, (Map<String, Object>) entry.getValue());
-            } else {
-                String operation = entry.getKey().substring(0, 1);
-                String key = entry.getKey().substring(1);
-                specificationsBuilder.with(key, operation, entry.getValue().toString(), null, null);
-            }
-        }
-    }
-
-    @Override
-    public void setBeanName(final String beanName) {
-        this.beanName = beanName;
-    }
-
-    public String getBeanName() {
-        return beanName;
-    }
-
-    public String readCurrentUserRole() {
-        String role = "NOACCESS";
-        if (!SessionHelper.isSuperAdmin()) {
-            String currentName = getBeanName().replace("Controller", "");
-            final ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder
-                    .currentRequestAttributes();
-            final HttpServletRequest request = attr.getRequest();
-            role = this.accessGroupService.findAccessRole(com.stn.ester.rest.domain.enumerate.RequestMethod.valueOf(request.getMethod().toUpperCase()), currentName);
-        } else {
-            role = ROLE_PREFIX + "_" + ROLE_SUPERADMIN;
-        }
-        System.out.println("Current role : " + role);
-        return role;
-    }
 }
