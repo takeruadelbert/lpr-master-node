@@ -23,7 +23,12 @@ public class SessionHelper {
     }
 
     public static Long getUserID() {
-        return getCurrentUser().getId();
+        User user=getCurrentUser();
+        if (user!=null) {
+            return getCurrentUser().getId();
+        }else{
+            return null;
+        }
     }
 
     public static Long getDepartmentID() {
@@ -33,8 +38,12 @@ public class SessionHelper {
     public static User getCurrentUser() {
         //jwt set username on auth, not user object
         Authentication auth = SecurityContextHelper.getAuthentication();
-        String username = auth.getPrincipal().toString();
-        return (User) userService.loadUserByUsername(username);
+        if (auth!=null) {
+            String username = auth.getPrincipal().toString();
+            return (User) userService.loadUserByUsername(username);
+        }else{
+            return null;
+        }
     }
 
     public static boolean isSuperAdmin() {
