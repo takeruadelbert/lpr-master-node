@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SystemProfileRepository extends AppRepository<SystemProfile, IdList> {
-
+    SystemProfile findFirstByIdIsNotNull();
 }
