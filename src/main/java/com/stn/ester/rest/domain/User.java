@@ -27,10 +27,6 @@ public class User extends AppDomain {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private Biodata biodata;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "profile_picture_id", insertable = false, updatable = false)
     private AssetFile assetFile;

@@ -48,7 +48,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         RequestMethod requestMethod = RequestMethod.valueOf(request_method);
         String requestBody = null;
 
-        if(!this.isExcludedFromList(request)) {
+        if (!this.isExcludedFromList(request)) {
             // get request body
             try {
                 mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
