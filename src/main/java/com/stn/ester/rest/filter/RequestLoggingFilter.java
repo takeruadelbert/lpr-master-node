@@ -26,7 +26,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     public static AccessLog accessLog;
     private static String WHITESPACE = " ";
     private static final List<String> IGNORE_REQUEST_BODY_URL = Arrays.asList(
-            RequestMethod.POST + WHITESPACE + "/users/login"
+            RequestMethod.POST + WHITESPACE + "/users/login",
+            RequestMethod.POST + WHITESPACE + "/asset_files/upload",
+            RequestMethod.POST + WHITESPACE + "/asset_files/upload-encoded"
     );
 
     @Override
