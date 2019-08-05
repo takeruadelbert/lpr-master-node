@@ -17,6 +17,10 @@ public class SystemProfile extends AppDomain {
     @JoinColumn(name = "logo_id", insertable = false, updatable = false)
     private AssetFile assetFile;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "social_media_id", insertable = false, updatable = false)
+    private SocialMedia socialMedia;
+
     @JsonProperty("assetFileId")
     @Column(name = "logo_id")
     private Long assetFileId;

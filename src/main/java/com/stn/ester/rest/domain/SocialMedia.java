@@ -2,8 +2,7 @@ package com.stn.ester.rest.domain;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -17,6 +16,10 @@ public class SocialMedia extends AppDomain {
 
     private String url;
     private int orderingNumber;
+
+    public SocialMedia() {
+
+    }
 
     public String underscoreName() {
         return unique_name;
