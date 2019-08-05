@@ -1,6 +1,7 @@
 package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
+import com.stn.ester.rest.dao.jpa.SystemProfileRepository;
 import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.domain.SystemProfile;
 import com.stn.ester.rest.helper.DateTimeHelper;
@@ -27,7 +28,8 @@ public class AssetFileService extends AppService {
 
     @Autowired
     private AssetFileRepository assetFileRepository;
-
+    @Autowired
+    private SystemProfileRepository systemProfileRepository;
     @Value("${ester.asset.root}")
     private String assetRootPath;
 
@@ -238,29 +240,32 @@ public class AssetFileService extends AppService {
     }
 
     @Transactional
-    public void addDefaultSystemProfile() {
-        try {
-            String address = "Jalan Sawah Kurung No. 4A";
-            String email = "suryateknologi@yahoo.co.id";
-            String header = "<h1>Test</h1>";
-            String name = "Surya Teknologi Nasional";
-            String shortname = "STN";
-            String telephone = "022 123456789";
-            String website = "http://suryateknologi.co.id/";
+    public void addDefaultSystemProfileIfDoesntExist() {
+        SystemProfile existingSystemProfile = this.systemProfileRepository.findFirstByIdIsNotNull();
+        if(existingSystemProfile == null) {
+            try {
+                String address = "Jalan Sawah Kurung No. 4A";
+                String email = "suryateknologi@yahoo.co.id";
+                String header = "<h1>Test</h1>";
+                String name = "Surya Teknologi Nasional";
+                String shortname = "STN";
+                String telephone = "022 123456789";
+                String website = "http://suryateknologi.co.id/";
 
-            // add default logo
-            String defaultLogoPath = this.assetDefault + DS + "system_profile" + DS + "stn.png";
-            Resource resource = resourceLoader.getResource("classpath:" + defaultLogoPath);
-            String realDefaultLogoPath = resource.getFile().getAbsolutePath();
-            realDefaultLogoPath = realDefaultLogoPath.replace(this.parentDirectory, "");
-            String filename = resource.getFilename();
-            Long logo_id = this.saveAssetFile(realDefaultLogoPath, filename);
+                // add default logo
+                String defaultLogoPath = this.assetDefault + DS + "system_profile" + DS + "stn.png";
+                Resource resource = resourceLoader.getResource("classpath:" + defaultLogoPath);
+                String realDefaultLogoPath = resource.getFile().getAbsolutePath();
+                realDefaultLogoPath = realDefaultLogoPath.replace(this.parentDirectory, "");
+                String filename = resource.getFilename();
+                Long logo_id = this.saveAssetFile(realDefaultLogoPath, filename);
 
-            // save default data
-            SystemProfile systemProfile = new SystemProfile(address, telephone, name, shortname, header, email, website, logo_id);
-            super.create(systemProfile);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+                // save default data
+                SystemProfile systemProfile = new SystemProfile(address, telephone, name, shortname, header, email, website, logo_id);
+                super.create(systemProfile);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
