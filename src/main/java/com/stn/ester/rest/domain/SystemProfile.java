@@ -25,6 +25,10 @@ public class SystemProfile extends AppDomain {
     @JoinColumn(name = "city_id", insertable = false, updatable = false)
     private City city;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "country_id", insertable = false, updatable = false)
+    private Country country;
+
     @JsonProperty("assetFileId")
     @Column(name = "logo_id")
     private Long assetFileId;
