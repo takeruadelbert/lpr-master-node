@@ -5,9 +5,10 @@ import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.domain.SystemProfile;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -150,16 +152,11 @@ public class AssetFileService extends AppService {
         path = DS + path;
         Map<String, Object> result = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
-        String filename = this.parentDirectory + path;
-
-        try (InputStream inputFile = new FileInputStream(filename)) {
+        String filename = path;
+        try (InputStream inputFile = getClass().getResourceAsStream(filename)) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            byte[] buffer = Files.readAllBytes(Paths.get(filename));
-            int l = inputFile.read(buffer);
-            while (l >= 0) {
-                outputStream.write(buffer, 0, l);
-                l = inputFile.read(buffer);
-            }
+            byte[] buffer = IOUtils.toByteArray(inputFile);
+            outputStream.write(buffer, 0, buffer.length);
             String[] temp = path.split("/");
             String name = temp[temp.length - 1];
             String extension = GlobalFunctionHelper.getExtensionFile(name);
@@ -177,6 +174,7 @@ public class AssetFileService extends AppService {
             }
             return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             result.put("status", HttpStatus.NOT_FOUND.value());
             result.put("message", e.getMessage());
             return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
@@ -222,13 +220,11 @@ public class AssetFileService extends AppService {
             Optional<AssetFile> existingDefaultPP = this.assetFileRepository.findByNameAndExtension("default-pp", "png");
             if (existingDefaultPP.equals(Optional.empty())) {
                 String defaultProfilePicturePath = this.assetDefault + DS + "profile_picture" + DS + "default-pp.png";
-                Resource resource = resourceLoader.getResource("classpath:" + defaultProfilePicturePath);
-                String realDefaultPPPath = resource.getFile().getAbsolutePath();
-                realDefaultPPPath = realDefaultPPPath.replace(this.parentDirectory, "");
+                URL url = getClass().getClassLoader().getResource(defaultProfilePicturePath);
 
                 // add default profile picture to Asset File table
-                String filename = resource.getFilename();
-                defaultProfilePictureID = this.saveAssetFile(realDefaultPPPath, filename);
+                String filename = FilenameUtils.getName(url.getPath());
+                defaultProfilePictureID = this.saveAssetFile(defaultProfilePicturePath, filename);
             } else {
                 defaultProfilePictureID = existingDefaultPP.get().getId();
             }
@@ -250,11 +246,9 @@ public class AssetFileService extends AppService {
 
             // add default logo
             String defaultLogoPath = this.assetDefault + DS + "system_profile" + DS + "stn.png";
-            Resource resource = resourceLoader.getResource("classpath:" + defaultLogoPath);
-            String realDefaultLogoPath = resource.getFile().getAbsolutePath();
-            realDefaultLogoPath = realDefaultLogoPath.replace(this.parentDirectory, "");
-            String filename = resource.getFilename();
-            Long logo_id = this.saveAssetFile(realDefaultLogoPath, filename);
+            URL url = getClass().getClassLoader().getResource(defaultLogoPath);
+            String filename = FilenameUtils.getName(url.getPath());
+            Long logo_id = this.saveAssetFile(defaultLogoPath, filename);
 
             // save default data
             SystemProfile systemProfile = new SystemProfile(address, telephone, name, shortname, header, email, website, logo_id);
@@ -270,4 +264,16 @@ public class AssetFileService extends AppService {
         super.create(assetFile);
         return assetFile.getId();
     }
+
+    private String readFromInputStream(InputStream inputStream) throws IOException {
+        StringBuilder resultStringBuilder = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                resultStringBuilder.append(line).append("\n");
+            }
+        }
+        return resultStringBuilder.toString();
+    }
+
 }
