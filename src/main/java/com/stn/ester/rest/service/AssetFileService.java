@@ -83,7 +83,6 @@ public class AssetFileService extends AppService {
                     fileOutputStream.close();
 
                     AssetFile assetFile = new AssetFile(pathFile, filename, ext);
-                    assetFile.setToken(GlobalFunctionHelper.generateToken());
                     data.add((AssetFile) super.create(assetFile));
                 } catch (Exception ex) {
                     result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -130,7 +129,6 @@ public class AssetFileService extends AppService {
 
                 // save decoded file to database
                 AssetFile assetFile = new AssetFile(path, name, ext);
-                assetFile.setToken(GlobalFunctionHelper.generateToken());
                 super.create(assetFile);
 
                 result.put("data", assetFile);
@@ -148,35 +146,45 @@ public class AssetFileService extends AppService {
         return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
     }
 
-    public Object getFile(String path, boolean is_download) {
-        path = DS + path;
+    public Object getFile(String token, boolean is_download) {
         Map<String, Object> result = new HashMap<>();
-        HttpHeaders headers = new HttpHeaders();
-        String filename = path;
-        try (InputStream inputFile = getClass().getResourceAsStream(filename)) {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            byte[] buffer = IOUtils.toByteArray(inputFile);
-            outputStream.write(buffer, 0, buffer.length);
-            String[] temp = path.split("/");
-            String name = temp[temp.length - 1];
-            String extension = GlobalFunctionHelper.getExtensionFile(name);
-            if (is_download) {
-                headers.set("Content-Type", "application/x-javascript; charset=utf-8");
-                headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
-            } else {
-                if (extension.matches("(.*)jpg(.*)") || extension.matches("(.*)jpeg(.*)") || extension.matches("(.*)png(.*)") || extension.matches("(.*)gif(.*)") || extension.matches("(.*)bmp(.*)")) {
-                    headers.set("Content-Type", "image/" + extension);
-                    headers.set("Content-Disposition", "inline; filename=\"" + name + "");
-                } else {
+        Optional<AssetFile> assetFile = this.assetFileRepository.findByToken(token);
+        if (!assetFile.equals(Optional.empty())) {
+            int is_default = assetFile.get().getIsDefault();
+            String path = assetFile.get().getPath();
+            path = DS + path;
+            HttpHeaders headers = new HttpHeaders();
+            String filename = is_default == 1 ? path : this.parentDirectory + path;
+            try {
+                InputStream inputFile = is_default == 1 ? getClass().getResourceAsStream(filename) : new FileInputStream(filename);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                byte[] buffer = IOUtils.toByteArray(inputFile);
+                outputStream.write(buffer, 0, buffer.length);
+                String[] temp = path.split("/");
+                String name = temp[temp.length - 1];
+                String extension = GlobalFunctionHelper.getExtensionFile(name);
+                if (is_download) {
                     headers.set("Content-Type", "application/x-javascript; charset=utf-8");
                     headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
+                } else {
+                    if (extension.matches("(.*)jpg(.*)") || extension.matches("(.*)jpeg(.*)") || extension.matches("(.*)png(.*)") || extension.matches("(.*)gif(.*)") || extension.matches("(.*)bmp(.*)")) {
+                        headers.set("Content-Type", "image/" + extension);
+                        headers.set("Content-Disposition", "inline; filename=\"" + name + "");
+                    } else {
+                        headers.set("Content-Type", "application/x-javascript; charset=utf-8");
+                        headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
+                    }
                 }
+                return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
+            } catch (Exception e) {
+                e.printStackTrace();
+                result.put("status", HttpStatus.NOT_FOUND.value());
+                result.put("message", e.getMessage());
+                return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
             result.put("status", HttpStatus.NOT_FOUND.value());
-            result.put("message", e.getMessage());
+            result.put("message", HttpStatus.NOT_FOUND);
             return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
         }
     }
@@ -261,19 +269,9 @@ public class AssetFileService extends AppService {
     @Transactional
     public Long saveAssetFile(String filepath, String filename) {
         AssetFile assetFile = new AssetFile(filepath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
+        assetFile.setAssetFileToDefault();
         super.create(assetFile);
         return assetFile.getId();
-    }
-
-    private String readFromInputStream(InputStream inputStream) throws IOException {
-        StringBuilder resultStringBuilder = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                resultStringBuilder.append(line).append("\n");
-            }
-        }
-        return resultStringBuilder.toString();
     }
 
 }
