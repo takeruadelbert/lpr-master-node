@@ -170,42 +170,39 @@ public class UserService extends AppService implements AssetFileBehaviour {
 
     public Object identifyEmail(String email, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
-        if (!email.isEmpty()) {
-            try {
-                Optional<User> user = this.userRepository.findByEmail(email);
-                if (!user.equals(Optional.empty())) {
-                    String token = GlobalFunctionHelper.generateToken();
-                    // Check while user have token start update data password reset if not have create new password reset.
-                    PasswordReset passwordReset = this.passwordResetRepository.findByUserId(user.get().getId());
-                    if (passwordReset != null) {
-                        passwordReset.setId(passwordReset.getId());
-                        passwordReset.setToken(token);
-                        passwordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
-                        super.update(passwordReset.getId(), passwordReset);
-                    } else {
-                        PasswordReset pReset = new PasswordReset();
-                        pReset.setToken(token);
-                        pReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
-                        pReset.setUserId(user.get().getId());
-                        passwordResetService.create(pReset);
-                    }
-                    sendingEmail(user, token, request);
-
-                    result.put("status", HttpStatus.OK.value());
-                    result.put("message", "Kami telah mengirimi anda email. \n Silakan cek e-mail anda, untuk mereset password silakan klik link yang terdapat pada email anda.");
-                    return new ResponseEntity<>(result, HttpStatus.OK);
+        try {
+            Optional<User> user = this.userRepository.findByEmail(email);
+            if (!user.equals(Optional.empty())) {
+                String token = GlobalFunctionHelper.generateToken();
+                // Check while user have token start update data password reset if not have create new password reset.
+                PasswordReset passwordReset = this.passwordResetRepository.findByUserId(user.get().getId());
+                if (passwordReset != null) {
+                    passwordReset.setId(passwordReset.getId());
+                    passwordReset.setToken(token);
+                    passwordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
+                    super.update(passwordReset.getId(), passwordReset);
                 } else {
-                    result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
-                    result.put("message", "Email not found.");
-                    return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+                    PasswordReset pReset = new PasswordReset();
+                    pReset.setToken(token);
+                    pReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
+                    pReset.setUserId(user.get().getId());
+                    passwordResetService.create(pReset);
                 }
-            } catch (Exception ex) {
-                result.put("status", HttpStatus.BAD_REQUEST.value());
-                result.put("message", ex.getMessage());
-                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+                sendingEmail(user, token, request);
+
+                result.put("status", HttpStatus.OK.value());
+                result.put("message", "Kami telah mengirimi anda email. \n Silakan cek e-mail anda, untuk mereset password silakan klik link yang terdapat pada email anda.");
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+                result.put("message", "Email tidak ditemukan.");
+                return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
             }
+        } catch (Exception ex) {
+            result.put("status", HttpStatus.BAD_REQUEST.value());
+            result.put("message", ex.getMessage());
+            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         }
-        throw new EmptyFieldException("Email is empty!");
     }
 
     public Object sendingEmail(Optional<User> user, String token, HttpServletRequest request) {

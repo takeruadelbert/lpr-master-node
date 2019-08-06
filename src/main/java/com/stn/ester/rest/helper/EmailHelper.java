@@ -21,8 +21,8 @@ public class EmailHelper {
     public static String createLinkResetPassword(String token, HttpServletRequest request) {
         String Scheme = String.valueOf(request.getScheme());
         String ServerName = request.getServerName();
-        String RequestURI = request.getRequestURI();
         String ServerPort = String.valueOf(request.getServerPort());
+        String RequestURI = "users/password-reset";
         String linkResetPassword = Scheme + "://" + ServerName + ":" + ServerPort + "/" + RequestURI + "/" + token;
         return linkResetPassword;
     }
