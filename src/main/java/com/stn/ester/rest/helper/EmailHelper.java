@@ -1,28 +1,8 @@
 package com.stn.ester.rest.helper;
 
-import com.stn.ester.rest.domain.User;
-
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import java.util.Optional;
-import java.util.Properties;
+import javax.servlet.http.HttpServletRequest;
 
 public class EmailHelper {
-
-    private static final String SMTP_USERNAME = "info@suryateknologi.co.id";
-    private static final String SMTP_PASSWORD = "emkF1qRD";
-    public static String resetPasswordToken = "";
-
-    // Configuration username and password SMTP.
-    public static Session passwordAuthentication(Properties prop) {
-        Session session = Session.getInstance(prop, new javax.mail.Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(SMTP_USERNAME, SMTP_PASSWORD);
-            }
-        });
-        return session;
-    }
-
     public static String emailFrom() {
         String emailFrom = "mailtest.stn@gmail.com";
         return emailFrom;
@@ -34,14 +14,16 @@ public class EmailHelper {
     }
 
     public static String emailSubject() {
-        String emailSubject = "Password Reset";
+        String emailSubject = "Konfirmasi Reset Password";
         return emailSubject;
     }
 
-    public static String createLinkResetPassword(Optional<User> user, String scheme, String serverName, String serverPort) {
-        String username = user.get().getUsername();
-        String requestURI = "users/reset-password";
-        String linkResetPassword = scheme + "://" + serverName + ":" + serverPort + "/" + requestURI + "/" + resetPasswordToken;
+    public static String createLinkResetPassword(String token, HttpServletRequest request) {
+        String Scheme = String.valueOf(request.getScheme());
+        String ServerName = request.getServerName();
+        String RequestURI = request.getRequestURI();
+        String ServerPort = String.valueOf(request.getServerPort());
+        String linkResetPassword = Scheme + "://" + ServerName + ":" + ServerPort + "/" + RequestURI + "/" + token;
         return linkResetPassword;
     }
 }

@@ -79,15 +79,10 @@ public class UserController extends AppController<UserService, User> {
         return userService.identifyEmail(payload.get("email"), request);
     }
 
-    @RequestMapping(value = "/reset-password/{token}", method = RequestMethod.GET)
-    public Object resetPassword(@PathVariable String token) {
-        return userService.resetPassword(token);
-    }
-
-    @RequestMapping(value = "/confirm-reset-password", method = RequestMethod.PUT)
-    public Object confirmResetPassword(@Valid @RequestBody Map<String, String> data) {
+    @RequestMapping(value = "/password-reset/{token}", method = RequestMethod.PUT)
+    public Object passwordReset(@PathVariable String token, @Valid @RequestBody(required = false) Map<String, String> data) {
         String new_password = data.get("new_password");
         String confirm_password = data.get("confirm_password");
-        return userService.confirmResetPassword(new_password, confirm_password);
+        return userService.passwordReset(token, new_password, confirm_password);
     }
 }

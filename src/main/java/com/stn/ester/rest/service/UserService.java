@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -45,6 +45,9 @@ public class UserService extends AppService implements AssetFileBehaviour {
 
     @Autowired
     private SpringTemplateEngine templateEngine;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Autowired
     public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository, PasswordResetService passwordResetService, SystemProfileRepository systemProfileRepository) {
@@ -172,32 +175,24 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 Optional<User> user = this.userRepository.findByEmail(email);
                 if (!user.equals(Optional.empty())) {
                     String token = GlobalFunctionHelper.generateToken();
-
-                    // If user have token to reset password then update data if not have token next to add new data.
-                    PasswordReset updatePasswordReset = this.passwordResetRepository.findByUserId(user.get().getId());
-                    if (updatePasswordReset != null) {
-                        // If user is exist replace old token and re-create expire token.
-                        updatePasswordReset.setId(updatePasswordReset.getId());
-                        updatePasswordReset.setToken(token);
-                        updatePasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
-                        super.update(updatePasswordReset.getId(), updatePasswordReset);
+                    // Check while user have token start update data password reset if not have create new password reset.
+                    PasswordReset passwordReset = this.passwordResetRepository.findByUserId(user.get().getId());
+                    if (passwordReset != null) {
+                        passwordReset.setId(passwordReset.getId());
+                        passwordReset.setToken(token);
+                        passwordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
+                        super.update(passwordReset.getId(), passwordReset);
                     } else {
-                        // If user not exist create new token and others data.
-                        PasswordReset addNewPasswordReset = new PasswordReset();
-                        addNewPasswordReset.setToken(token);
-                        addNewPasswordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
-                        addNewPasswordReset.setUserId(user.get().getId());
-                        passwordResetService.create(addNewPasswordReset);
+                        PasswordReset pReset = new PasswordReset();
+                        pReset.setToken(token);
+                        pReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
+                        pReset.setUserId(user.get().getId());
+                        passwordResetService.create(pReset);
                     }
-
-                    // Set token into variable resetPasswordToken in EmailHelper.
-                    EmailHelper.resetPasswordToken = token;
-
-                    // If e-mail found send link reset password to user.
-                    sendLinkResetPassword(user, request);
+                    sendingEmail(user, token, request);
 
                     result.put("status", HttpStatus.OK.value());
-                    result.put("message", "Link reset password has been sent to your e-mail.");
+                    result.put("message", "Kami telah mengirimi anda email. \n Silakan cek e-mail anda, untuk mereset password silakan klik link yang terdapat pada email anda.");
                     return new ResponseEntity<>(result, HttpStatus.OK);
                 } else {
                     result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -213,54 +208,34 @@ public class UserService extends AppService implements AssetFileBehaviour {
         throw new EmptyFieldException("Email is empty!");
     }
 
-    public Object sendLinkResetPassword(Optional<User> user, HttpServletRequest request) {
+    public Object sendingEmail(Optional<User> user, String token, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
         if (user != null) {
-
-            // Create configuration email.
-            Properties prop = new Properties();
-            prop.put("mail.smtp.host", "smtp.gmail.com");
-            prop.put("mail.smtp.socketFactory.port", "465");
-            prop.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            prop.put("mail.smtp.auth", "true");
-
-            // Getting hostname, port and others from http servlet request.
-            String Scheme = String.valueOf(request.getScheme());
-            String ServerName = request.getServerName();
-            String RequestURI = request.getRequestURI();
-            String ServerPort = String.valueOf(request.getServerPort());
-
-            // Check smtp username and password from server.
-            Session session = EmailHelper.passwordAuthentication(prop);
             try {
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(EmailHelper.emailFrom()));
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(EmailHelper.emailTo()));
-                message.setSubject(EmailHelper.emailSubject());
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
+                helper.setFrom(EmailHelper.emailFrom());
+                helper.setTo(EmailHelper.emailTo());
+                helper.setSubject(EmailHelper.emailSubject());
 
-                // Create thymeleaf context.
                 Context context = new Context();
-                context.setVariable("username", user.get().getUsername());
-                // Create link to reset password.
-                String linkResetPassword = EmailHelper.createLinkResetPassword(user, Scheme, ServerName, ServerPort);
-                context.setVariable("url_action", linkResetPassword);
-                // Get address from system profile table
+                String linkResetPassword = EmailHelper.createLinkResetPassword(token, request);
                 SystemProfile systemProfile = this.systemProfileRepository.findById(1L).get();
+                context.setVariable("username", user.get().getUsername());
+                context.setVariable("url_action", linkResetPassword);
                 context.setVariable("address", systemProfile.getAddress());
                 context.setVariable("name", systemProfile.getName());
                 context.setVariable("website", systemProfile.getWebsite());
-                String htmlFile = templateEngine.process("email_template", context);
+                String html = templateEngine.process("email_template", context);
+                message.setContent(html, "text/html");
+                mailSender.send(message);
 
-                // Append username and others into email template.
-                message.setContent(htmlFile,"text/html");
-                Transport.send(message);
-
-                PasswordReset updateIsUsed = this.passwordResetRepository.findByUserId(user.get().getId());
-                // Update isUsed to default if user make re-request to reset password.
-                if (updateIsUsed.getIsUsed() == 1) {
-                    updateIsUsed.setId(updateIsUsed.getId());
-                    updateIsUsed.setIsUsed(0);
-                    super.update(updateIsUsed.getId(), updateIsUsed);
+                PasswordReset passwordReset = this.passwordResetRepository.findByUserId(user.get().getId());
+                // Update is used to default if user make re-request password reset.
+                if (passwordReset.getIsUsed() == 1) {
+                    passwordReset.setId(passwordReset.getId());
+                    passwordReset.setIsUsed(0);
+                    super.update(passwordReset.getId(), passwordReset);
                 }
             } catch (Exception ex) {
                 result.put("status", HttpStatus.BAD_REQUEST.value());
@@ -271,21 +246,24 @@ public class UserService extends AppService implements AssetFileBehaviour {
         return result;
     }
 
-    public Object resetPassword(String token) {
+    public Object passwordReset(String token, String new_password, String confirm_password) {
         Map<String, Object> result = new HashMap<>();
         if (!token.isEmpty()) {
             try {
                 PasswordReset passwordReset = this.passwordResetRepository.findByToken(token);
-                if (passwordReset == null) {throw new NotFoundException("Token not found.");}
-
+                if (passwordReset == null) {
+                    throw new NotFoundException("Token tidak ditemukan.");
+                }
                 Date getExpire = passwordReset.getExpire();
                 if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
+                    confirmPasswordReset(passwordReset, new_password, confirm_password);
+
                     result.put("status", HttpStatus.OK.value());
-                    result.put("message", "Token found.");
+                    result.put("message", "Password baru telah berhasil dibuat.");
                     return new ResponseEntity<>(result, HttpStatus.OK);
                 } else {
                     result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
-                    result.put("message", "Token not found or token is expired.");
+                    result.put("message", "Token tidak ditemukan atau token telah kadaluwarsa.");
                     return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
                 }
             } catch (Exception ex) {
@@ -297,30 +275,23 @@ public class UserService extends AppService implements AssetFileBehaviour {
         return result;
     }
 
-    public Object confirmResetPassword(String new_password, String confirm_password) {
-        PasswordReset passwordReset = this.passwordResetRepository.findByToken(EmailHelper.resetPasswordToken);
+    public Object confirmPasswordReset(PasswordReset pReset, String new_password, String confirm_password) {
+        PasswordReset passwordReset = this.passwordResetRepository.findByToken(pReset.getToken());
         User user = this.userRepository.findById(passwordReset.getUserId()).orElse(null);
-
-        if (new_password.isEmpty()) {
-            throw new EmptyFieldException("New password is empty!");
-        }
-        if (confirm_password.isEmpty()) {
-            throw new EmptyFieldException("Confirm password is empty!");
-        }
+        if (new_password.isEmpty())
+            throw new EmptyFieldException("Silakan isi bidang password baru!");
+        if (confirm_password.isEmpty())
+            throw new EmptyFieldException("Silakan isi bidang konfirmasi password!");
         if (!new_password.isEmpty() && !confirm_password.isEmpty()) {
-            if (passwordReset.equals(null) && user.equals(null)) {
-                throw new UnauthorizedException("User not found.");
-            }
-            if (!new_password.equals(confirm_password)) {
-                throw new ConfirmNewPasswordException("New Password and Confirm Password is different.");
-            }
-
-            // Update isUsed to password reset table.
+            if (passwordReset.equals(null) && user.equals(null))
+                throw new UnauthorizedException("User tidak ditemukan.");
+            if (!new_password.equals(confirm_password))
+                throw new ConfirmNewPasswordException("Password baru dan konfirmasi password tidak sesuai.");
+            // Set is used not default if user is has been succesfully create new password.
             passwordReset.setId(passwordReset.getId());
             passwordReset.setIsUsed(1);
             super.update(passwordReset.getId(), passwordReset);
-
-            // Update new password to user table.
+            // Updates new password user.
             user.setId(passwordReset.getUserId());
             user.setPassword(this.passwordEncoder.encode(new_password));
             super.update(passwordReset.getId(), user);
