@@ -50,7 +50,7 @@ public class Menu extends AppDomain {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_menu_id", insertable = false, updatable = false)
-    @JsonIgnore
+    @JsonProperty(access= JsonProperty.Access.READ_ONLY)
     @EqualsAndHashCode.Exclude
     private Menu parentMenu;
 
