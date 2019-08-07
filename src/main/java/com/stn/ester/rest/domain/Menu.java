@@ -19,7 +19,6 @@ import java.util.Set;
 @OnDeleteSetParentNull({
         @TableFieldPair(service = MenuService.class, tableName = "menu", fieldName = "parent_menu_id")
 })
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Menu extends AppDomain {
 
     public static final String unique_name = "menu";
