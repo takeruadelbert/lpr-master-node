@@ -150,8 +150,4 @@ public class UserService extends AppService implements AssetFileBehaviour {
         result.put("message", "Failed to change profile picture : Invalid Token.");
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
     }
-
-    public void addDefaultProfilePicture() {
-
-    }
 }
