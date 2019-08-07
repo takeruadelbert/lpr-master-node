@@ -126,4 +126,10 @@ public class MenuService extends AppService {
 
         super.delete(id);
     }
+
+    @Transactional
+    public Object update(Long id, Menu menu) {
+        menu.setId(id);
+        return this.menuRepository.save(menu);
+    }
 }

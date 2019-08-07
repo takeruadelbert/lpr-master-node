@@ -66,7 +66,7 @@ public class RestApplication extends SpringBootServletInitializer {
     }
 
     private void addDefaultSystemProfile() {
-        this.assetFileService.addDefaultSystemProfile();
+        this.assetFileService.addDefaultSystemProfileIfDoesntExist();
     }
 
     public void addSuperAdmin() {

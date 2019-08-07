@@ -17,6 +17,18 @@ public class SystemProfile extends AppDomain {
     @JoinColumn(name = "logo_id", insertable = false, updatable = false)
     private AssetFile assetFile;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "social_media_id", insertable = false, updatable = false)
+    private SocialMedia socialMedia;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "city_id", insertable = false, updatable = false)
+    private City city;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "country_id", insertable = false, updatable = false)
+    private Country country;
+
     @JsonProperty("assetFileId")
     @Column(name = "logo_id")
     private Long assetFileId;
@@ -56,6 +68,18 @@ public class SystemProfile extends AppDomain {
 
     public String getToken() {
         return this.token;
+    }
+
+    public String getAddress() {
+        return this.address;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getWebsite() {
+        return this.website;
     }
 
     @Override

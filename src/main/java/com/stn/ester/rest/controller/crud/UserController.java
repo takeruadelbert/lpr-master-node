@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -61,6 +62,18 @@ public class UserController extends CrudController<UserService, User> {
     @RequestMapping(value = "/gender", method = RequestMethod.OPTIONS)
     public Map<Gender, String> getGenderList() {
         return this.biodataService.getGenderList();
+    }
+
+    @RequestMapping(value = "/identify-email", method = RequestMethod.POST)
+    public Object identifyEmail(@Valid @RequestBody Map<String, String> payload, HttpServletRequest request) {
+        return userService.identifyEmail(payload.get("email"), request);
+    }
+
+    @RequestMapping(value = "/password-reset/{token}", method = RequestMethod.PUT)
+    public Object passwordReset(@PathVariable String token, @Valid @RequestBody(required = false) Map<String, String> data) {
+        String new_password = data.get("new_password");
+        String confirm_password = data.get("confirm_password");
+        return userService.passwordReset(token, new_password, confirm_password);
     }
 
 }

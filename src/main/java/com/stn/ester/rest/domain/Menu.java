@@ -1,8 +1,6 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
 import com.stn.ester.rest.base.OnDeleteSetParentNull;
 import com.stn.ester.rest.base.TableFieldPair;
 import com.stn.ester.rest.service.MenuService;
@@ -21,10 +19,12 @@ import java.util.Set;
 @OnDeleteSetParentNull({
         @TableFieldPair(service = MenuService.class, tableName = "menu", fieldName = "parent_menu_id")
 })
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Menu extends AppDomain {
 
     public static final String unique_name = "menu";
 
+    private long id;
     private String label;
     private int orderingNumber;
 
@@ -36,10 +36,13 @@ public class Menu extends AppDomain {
     @Column(name = "module_id")
     private Long moduleId;
 
+    public Menu() {
+
+    }
+
     @JsonSetter("moduleId")
-    public void setModuleId(long moduleId) {
-        if (moduleId != 0)
-            this.moduleId = moduleId;
+    public void setModuleId(Long moduleId) {
+        this.moduleId = moduleId;
     }
 
     @Transient
@@ -57,13 +60,16 @@ public class Menu extends AppDomain {
     private Long parentMenuId;
 
     @JsonSetter("parentMenuId")
-    public void setParentMenuId(long parentMenuId) {
-        if (parentMenuId != 0)
-            this.parentMenuId = parentMenuId;
+    public void setParentMenuId(Long parentMenuId) {
+        this.parentMenuId = parentMenuId;
     }
 
     public Long getParentMenuId() {
         return parentMenuId;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     public void mergeSubMenu(List<Menu> subMenu) {

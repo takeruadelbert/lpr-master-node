@@ -5,10 +5,12 @@ import com.stn.ester.rest.dao.jpa.BiodataRepository;
 import com.stn.ester.rest.dao.jpa.LoginSessionRepository;
 import com.stn.ester.rest.dao.jpa.UserGroupRepository;
 import com.stn.ester.rest.dao.jpa.UserRepository;
+import com.stn.ester.rest.dao.jpa.*;
 import com.stn.ester.rest.domain.*;
-import com.stn.ester.rest.exception.ConfirmNewPasswordException;
-import com.stn.ester.rest.exception.InvalidLoginException;
-import com.stn.ester.rest.exception.PasswordMismatchException;
+import com.stn.ester.rest.exception.*;
+import com.stn.ester.rest.helper.DateTimeHelper;
+import com.stn.ester.rest.helper.EmailHelper;
+import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +20,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.beans.Transient;
@@ -29,6 +37,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService extends AppService implements AssetFileBehaviour, UserDetailsService {
@@ -37,6 +46,9 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
     private LoginSessionRepository loginSessionRepository;
     private UserGroupRepository userGroupRepository;
     private AssetFileService assetFileService;
+    private PasswordResetRepository passwordResetRepository;
+    private PasswordResetService passwordResetService;
+    private SystemProfileRepository systemProfileRepository;
     private String asset_path = "profile_picture";
 
     @Value("${ester.session.login.timeout}")
@@ -46,7 +58,13 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService) {
+    private SpringTemplateEngine templateEngine;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
+    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository, PasswordResetService passwordResetService, SystemProfileRepository systemProfileRepository) {
         super(User.unique_name);
         super.repositories.put(User.unique_name, userRepository);
         super.repositories.put(Biodata.unique_name, biodataRepository);
@@ -54,7 +72,10 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
         this.userRepository = userRepository;
         this.loginSessionRepository = loginSessionRepository;
         this.userGroupRepository = userGroupRepository;
+        this.passwordResetRepository = passwordResetRepository;
         this.assetFileService = assetFileService;
+        this.passwordResetService = passwordResetService;
+        this.systemProfileRepository = systemProfileRepository;
     }
 
     @Override
@@ -177,5 +198,133 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
             return this.create(user);
         }
         return null;
+    }
+
+    public Object identifyEmail(String email, HttpServletRequest request) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Optional<User> user = this.userRepository.findByEmail(email);
+            if (!user.equals(Optional.empty())) {
+                String token = GlobalFunctionHelper.generateToken();
+                // Check while user have token start update data password reset if not have create new password reset.
+                PasswordReset passwordReset = this.passwordResetRepository.findByUserId(user.get().getId());
+                if (passwordReset != null) {
+                    passwordReset.setId(passwordReset.getId());
+                    passwordReset.setToken(token);
+                    passwordReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
+                    super.update(passwordReset.getId(), passwordReset);
+                } else {
+                    PasswordReset pReset = new PasswordReset();
+                    pReset.setToken(token);
+                    pReset.setExpire(DateTimeHelper.getDateTimeNowPlusSeveralDays(1));
+                    pReset.setUserId(user.get().getId());
+                    passwordResetService.create(pReset);
+                }
+                sendingEmail(user, token, request);
+
+                result.put("status", HttpStatus.OK.value());
+                result.put("message", "Kami telah mengirimi anda email. \n Silakan cek e-mail anda, untuk mereset password silakan klik link yang terdapat pada email anda.");
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+                result.put("message", "Email tidak ditemukan.");
+                return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+        } catch (Exception ex) {
+            result.put("status", HttpStatus.BAD_REQUEST.value());
+            result.put("message", ex.getMessage());
+            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public Object sendingEmail(Optional<User> user, String token, HttpServletRequest request) {
+        Map<String, Object> result = new HashMap<>();
+        if (user != null) {
+            try {
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
+                helper.setFrom(EmailHelper.emailFrom());
+                helper.setTo(EmailHelper.emailTo());
+                helper.setSubject(EmailHelper.emailSubject());
+
+                Context context = new Context();
+                String linkResetPassword = EmailHelper.createLinkResetPassword(token, request);
+                SystemProfile systemProfile = this.systemProfileRepository.findById(1L).get();
+                context.setVariable("username", user.get().getUsername());
+                context.setVariable("url_action", linkResetPassword);
+                context.setVariable("address", systemProfile.getAddress());
+                context.setVariable("name", systemProfile.getName());
+                context.setVariable("website", systemProfile.getWebsite());
+                String html = templateEngine.process("email_template", context);
+                message.setContent(html, "text/html");
+                mailSender.send(message);
+
+                PasswordReset passwordReset = this.passwordResetRepository.findByUserId(user.get().getId());
+                // Update is used to default if user make re-request password reset.
+                if (passwordReset.getIsUsed() == 1) {
+                    passwordReset.setId(passwordReset.getId());
+                    passwordReset.setIsUsed(0);
+                    super.update(passwordReset.getId(), passwordReset);
+                }
+            } catch (Exception ex) {
+                result.put("status", HttpStatus.BAD_REQUEST.value());
+                result.put("message", ex.getMessage());
+                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+            }
+        }
+        return result;
+    }
+
+    public Object passwordReset(String token, String new_password, String confirm_password) {
+        Map<String, Object> result = new HashMap<>();
+        if (!token.isEmpty()) {
+            try {
+                PasswordReset passwordReset = this.passwordResetRepository.findByToken(token);
+                if (passwordReset == null) {
+                    throw new NotFoundException("Token tidak ditemukan.");
+                }
+                Date getExpire = passwordReset.getExpire();
+                if (DateTimeHelper.getDateTimeNow().before(getExpire)) {
+                    confirmPasswordReset(passwordReset, new_password, confirm_password);
+
+                    result.put("status", HttpStatus.OK.value());
+                    result.put("message", "Password baru telah berhasil dibuat.");
+                    return new ResponseEntity<>(result, HttpStatus.OK);
+                } else {
+                    result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+                    result.put("message", "Token tidak ditemukan atau token telah kadaluwarsa.");
+                    return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+                }
+            } catch (Exception ex) {
+                result.put("status", HttpStatus.BAD_REQUEST.value());
+                result.put("message", ex.getMessage());
+                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+            }
+        }
+        return result;
+    }
+
+    public Object confirmPasswordReset(PasswordReset pReset, String new_password, String confirm_password) {
+        PasswordReset passwordReset = this.passwordResetRepository.findByToken(pReset.getToken());
+        User user = this.userRepository.findById(passwordReset.getUserId()).orElse(null);
+        if (new_password.isEmpty())
+            throw new EmptyFieldException("Silakan isi bidang password baru!");
+        if (confirm_password.isEmpty())
+            throw new EmptyFieldException("Silakan isi bidang konfirmasi password!");
+        if (!new_password.isEmpty() && !confirm_password.isEmpty()) {
+            if (passwordReset.equals(null) && user.equals(null))
+                throw new UnauthorizedException("User tidak ditemukan.");
+            if (!new_password.equals(confirm_password))
+                throw new ConfirmNewPasswordException("Password baru dan konfirmasi password tidak sesuai.");
+            // Set is used not default if user is has been succesfully create new password.
+            passwordReset.setId(passwordReset.getId());
+            passwordReset.setIsUsed(1);
+            super.update(passwordReset.getId(), passwordReset);
+            // Updates new password user.
+            user.setId(passwordReset.getUserId());
+            user.setPassword(this.passwordEncoder.encode(new_password));
+            super.update(passwordReset.getId(), user);
+        }
+        return user;
     }
 }

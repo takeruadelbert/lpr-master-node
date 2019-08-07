@@ -1,4 +1,4 @@
-package com.stn.ester.rest.controller.crud;
+package com.stn.ester.rest.controller;
 
 import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.Menu;
@@ -43,6 +43,11 @@ public class MenuController extends CrudController<MenuService, Menu> {
     @RequestMapping(value = "", method = RequestMethod.POST)
     public Object create(@Valid @RequestBody Menu menu) {
         return service.create(menu);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public Object update(@PathVariable long id, @Valid @RequestBody Menu menu) {
+        return menuService.update(id, menu);
     }
 
 }

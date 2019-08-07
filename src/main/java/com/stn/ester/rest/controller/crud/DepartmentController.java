@@ -5,7 +5,6 @@ import com.stn.ester.rest.domain.Department;
 import com.stn.ester.rest.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,10 +17,5 @@ public class DepartmentController extends CrudController<DepartmentService, Depa
     public DepartmentController(DepartmentService departmentService) {
         super(departmentService);
         this.departmentService = departmentService;
-    }
-
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public Object viewDepartmentGroupList() {
-        return this.departmentService.getDepartmentAndSubDepartmentGroupList();
     }
 }
