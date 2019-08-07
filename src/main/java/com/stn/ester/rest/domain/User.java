@@ -50,6 +50,10 @@ public class User extends AppDomain {
     @JsonBackReference
     private Employee employee;
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private PasswordReset passwordReset;
+
     //contoh belongsto(unidirection manytoone)
     //start
     @ManyToOne(fetch = FetchType.EAGER)
@@ -71,6 +75,10 @@ public class User extends AppDomain {
     @Transient
     private String token;
 
+    public long getId() {return id;}
+
+    public void setId() {this.id = id;}
+
     public String getUsername() {
         return username;
     }
@@ -86,6 +94,12 @@ public class User extends AppDomain {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getEmail() {
+        return  email;
+    }
+
+    public void setEmail(String email) {this.email = email;}
 
     public Long getUserGroupId() {
         return userGroupId;

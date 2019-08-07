@@ -69,6 +69,12 @@ public abstract class AppService implements OptionBehaviour {
         return saved;
     }
 
+    @Transactional
+    public Object save(AppDomain o) {
+        Object saved = repositories.get(baseRepoName).save(o);
+        return saved;
+    }
+
     public Object get(Long id) {
         if (repositories.get(baseRepoName).existsById(id)) {
             return repositories.get(

@@ -1,8 +1,7 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
+import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,10 +21,6 @@ public class Department extends AppDomain {
     private String name;
     private String label;
 
-    @Transient
-    @EqualsAndHashCode.Exclude
-    private Set<Department> subDepartment = new HashSet<Department>();
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_department_id", insertable = false, updatable = false)
     @JsonIgnore
@@ -42,9 +37,9 @@ public class Department extends AppDomain {
             this.parentDepartmentId = parentDepartmentId;
     }
 
-    public Long getParentDepartmentId() {
-        return parentDepartmentId;
-    }
+    @Transient
+    @EqualsAndHashCode.Exclude
+    private Set<Department> subDepartment = new HashSet<Department>();
 
     public void mergeSubDepartment(List<Department> subDepartment) {
         this.subDepartment.addAll(subDepartment);
@@ -57,6 +52,8 @@ public class Department extends AppDomain {
     public Department getParentDepartment() {
         return this.parentDepartment;
     }
+
+    public Long getParentDepartmentId() {return this.parentDepartmentId;}
 
     @Override
     public String underscoreName() {

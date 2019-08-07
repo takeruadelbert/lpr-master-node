@@ -1,7 +1,6 @@
 package com.stn.ester.rest.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
@@ -20,16 +19,15 @@ public class GlobalFunctionHelper {
 
     @Autowired
     public GlobalFunctionHelper() {
-
-    }
-
-    // get Time now
+	}
+	
+    // Get date and time now.
     public static String getDateTimeNow() {
         String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
         return timeStamp;
     }
 
-    // get name file
+    // Get name file.
     public static String getNameFile(String vData) {
         if (vData == null) return null;
         int index = vData.lastIndexOf('.');
@@ -38,7 +36,7 @@ public class GlobalFunctionHelper {
         return name;
     }
 
-    // get extension file
+    // Get extension file.
     public static String getExtensionFile(String vData) {
         String extension = vData.substring(vData.lastIndexOf(".") + 1);
         return extension;
@@ -48,7 +46,7 @@ public class GlobalFunctionHelper {
         return encodedBase64.split(",");
     }
 
-    // remove data: from base64 image
+    // Remove data: from base64 image.
     public static String getRawDataFromEncodedBase64(String encodedBase64) {
         String[] temp = splitDataEncodedBase64(encodedBase64);
         return temp[1];
