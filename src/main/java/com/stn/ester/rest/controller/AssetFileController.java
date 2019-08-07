@@ -39,13 +39,4 @@ public class AssetFileController {
         }
         return assetFileService.getFile(token, is_dl);
     }
-
-    private static String extractFilePath(HttpServletRequest request) {
-        String path = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String bestMatchPattern = (String) request.getAttribute(
-                HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        AntPathMatcher apm = new AntPathMatcher();
-        return apm.extractPathWithinPattern(bestMatchPattern, path);
-    }
 }
