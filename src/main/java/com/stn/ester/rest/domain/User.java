@@ -139,8 +139,6 @@ public class User extends AppDomain implements UserDetails {
         return  email;
     }
 
-    public void setEmail(String email) {this.email = email;}
-
     public Long getUserGroupId() {
         return userGroupId;
     }
