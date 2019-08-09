@@ -5,12 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.stn.ester.rest.domain.enumerate.Gender;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Data
 @Entity
+@EqualsAndHashCode(exclude = {"user"})
+@ToString(exclude = {"user"})
 public class Biodata extends AppDomain {
 
     public static final String unique_name = "biodata";
@@ -31,7 +35,7 @@ public class Biodata extends AppDomain {
     @Column(nullable = true)
     private String phoneNumber;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
