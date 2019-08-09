@@ -1,8 +1,10 @@
 package com.stn.ester.rest.domain;
 
-import javax.persistence.*;
-
+import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import lombok.Data;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
 @Data
 @Entity
@@ -13,6 +15,8 @@ public class AssetFile extends AppDomain {
     private String name;
     private String extension;
     private String token;
+    @Column(columnDefinition = "tinyint default 0")
+    private int isDefault;
 
     public AssetFile() {
 
@@ -22,6 +26,7 @@ public class AssetFile extends AppDomain {
         this.path = path;
         this.name = name;
         this.extension = extension;
+        this.token = GlobalFunctionHelper.generateToken();
     }
 
     public String getPath() {
@@ -38,6 +43,14 @@ public class AssetFile extends AppDomain {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public void setAssetFileToDefault() {
+        this.isDefault = 1;
+    }
+
+    public int getIsDefault() {
+        return this.isDefault;
     }
 
     @Override

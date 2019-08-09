@@ -58,10 +58,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
         this.userRepository = userRepository;
         this.loginSessionRepository = loginSessionRepository;
         this.userGroupRepository = userGroupRepository;
-        this.passwordResetRepository = passwordResetRepository;
         this.assetFileService = assetFileService;
-        this.passwordResetService = passwordResetService;
-        this.systemProfileRepository = systemProfileRepository;
     }
 
     @Override
@@ -162,10 +159,6 @@ public class UserService extends AppService implements AssetFileBehaviour {
         result.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
         result.put("message", "Failed to change profile picture : Invalid Token.");
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    public void addDefaultProfilePicture() {
-
     }
 
     public Object identifyEmail(String email, HttpServletRequest request) {
