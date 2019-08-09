@@ -26,7 +26,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     public static AccessLog accessLog;
     private static String WHITESPACE = " ";
     private static final List<String> IGNORE_REQUEST_BODY_URL = Arrays.asList(
-            RequestMethod.POST + WHITESPACE + "/users/login"
+            RequestMethod.POST + WHITESPACE + "/users/login",
+            RequestMethod.POST + WHITESPACE + "/asset_files/upload",
+            RequestMethod.POST + WHITESPACE + "/asset_files/upload-encoded"
     );
 
     @Override
@@ -46,7 +48,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         RequestMethod requestMethod = RequestMethod.valueOf(request_method);
         String requestBody = null;
 
-        if(!this.isExcludedFromList(request)) {
+        if (!this.isExcludedFromList(request)) {
             // get request body
             try {
                 mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);

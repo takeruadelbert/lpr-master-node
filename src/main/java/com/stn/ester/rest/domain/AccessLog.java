@@ -38,6 +38,19 @@ public class AccessLog extends AppDomain {
         this.userId = userId;
     }
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "upload_file_id", insertable = false, updatable = false)
+    private AssetFile uploadFile;
+
+    @JsonProperty("uploadFileId")
+    @Column(name = "upload_file_id")
+    private Long uploadFileId;
+
+    public void setUploadFileId(Long uploadFileId) {
+        if (uploadFileId != null)
+            this.uploadFileId = uploadFileId;
+    }
+
     public AccessLog() {
 
     }
