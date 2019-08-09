@@ -64,49 +64,61 @@ public class AssetFileService extends AppService {
     public Object uploadFile(MultipartFile[] files) {
         Map<String, Object> result = new HashMap<>();
         List<AssetFile> data = new ArrayList<>();
-        if (files != null) {
-            for (MultipartFile file : files) {
-                String filename = GlobalFunctionHelper.getNameFile(file.getOriginalFilename());
-                String ext = GlobalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+        try {
+            if (files.length != 0) {
+                for (MultipartFile file : files) {
+                    if (!file.isEmpty()) {
+                        String filename = GlobalFunctionHelper.getNameFile(file.getOriginalFilename());
+                        String ext = GlobalFunctionHelper.getExtensionFile(file.getOriginalFilename());
 
-                // replace all whitespace characters to none
-                filename = filename.replaceAll(" ", "");
-                Optional<AssetFile> temp = this.assetFileRepository.findByNameAndExtension(filename, ext);
+                        // replace all whitespace characters to none
+                        filename = filename.replaceAll(" ", "");
+                        Optional<AssetFile> temp = this.assetFileRepository.findByNameAndExtension(filename, ext);
 
-                /*
-                 check if uploaded file(s) already exist in database or with the same name.
-                 If so, added suffix timestamp (milliseconds) from uploaded file.
-                 */
-                if (!temp.equals(Optional.empty())) {
-                    filename += DateTimeHelper.getCurrentTimeStamp();
+                        /*
+                         check if uploaded file(s) already exist in database or with the same name.
+                         If so, added suffix timestamp (milliseconds) from uploaded file.
+                         */
+                        if (!temp.equals(Optional.empty())) {
+                            filename += DateTimeHelper.getCurrentTimeStamp();
+                        }
+
+                        // store file into asset using FileOutputStream
+                        String pathFile = DS + this.assetTempPath + DS + filename + "." + ext;
+
+                        GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
+
+                        FileOutputStream fileOutputStream = new FileOutputStream(this.parentDirectory + DS + pathFile);
+                        fileOutputStream.write(file.getBytes());
+                        fileOutputStream.close();
+
+                        AssetFile assetFile = new AssetFile(pathFile, filename, ext);
+                        data.add((AssetFile) super.create(assetFile));
+
+                        Long accessLogId = AccessLogInterceptor.accessLogId.get();
+                        Long assetFileId = assetFile.getId();
+                        updateAccessLog(accessLogId, assetFileId);
+                    } else {
+                        System.out.println("NULL");
+                    }
                 }
-
-                // store file into asset using FileOutputStream
-                try {
-                    String pathFile = DS + this.assetTempPath + DS + filename + "." + ext;
-
-                    GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
-
-                    FileOutputStream fileOutputStream = new FileOutputStream(this.parentDirectory + DS + pathFile);
-                    fileOutputStream.write(file.getBytes());
-                    fileOutputStream.close();
-
-                    AssetFile assetFile = new AssetFile(pathFile, filename, ext);
-                    data.add((AssetFile) super.create(assetFile));
-                    Long accessLogId = AccessLogInterceptor.accessLogId.get();
-                    Long assetFileId = assetFile.getId();
-                    updateAccessLog(accessLogId, assetFileId);
-                } catch (Exception ex) {
-                    result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
-                    result.put("message", ex.getMessage());
-                    return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
-                }
+                result.put("status", HttpStatus.OK.value());
+                result.put("message", "File(s) has been uploaded successfully.");
+                result.put("data", data);
+            } else {
+                String message = "No File Uploaded.";
+                result.put("status", HttpStatus.UNPROCESSABLE_ENTITY);
+                result.put("message", message);
+                return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
             }
-            result.put("status", HttpStatus.OK.value());
-            result.put("message", "File(s) has been uploaded successfully.");
-            result.put("data", data);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+            result.put("message", ex.getMessage());
+            return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+        } finally {
+            return new ResponseEntity<>(result, HttpStatus.OK);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Transactional
