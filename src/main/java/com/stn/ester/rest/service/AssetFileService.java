@@ -1,13 +1,10 @@
 package com.stn.ester.rest.service;
 
-import com.stn.ester.rest.dao.jpa.AccessLogRepository;
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
-import com.stn.ester.rest.domain.AccessLog;
 import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.domain.SystemProfile;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
-import com.stn.ester.rest.interceptor.AccessLogInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -41,15 +38,10 @@ public class AssetFileService extends AppService {
 
     @Value("${ester.asset.default}")
     private String assetDefault;
-
     @Autowired
     private ResourceLoader resourceLoader;
     private static final String DS = File.separator;
     public static Long defaultProfilePictureID;
-    @Autowired
-    private AccessLogService accessLogService;
-    @Autowired
-    private AccessLogRepository accessLogRepository;
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
@@ -91,11 +83,7 @@ public class AssetFileService extends AppService {
                     AssetFile assetFile = new AssetFile(pathFile, filename, ext);
                     assetFile.setToken(GlobalFunctionHelper.generateToken());
                     data.add((AssetFile) super.create(assetFile));
-                    Long accessLogId = AccessLogInterceptor.accessLogId.get();
-                    Long assetFileId = assetFile.getId();
-                    updateAccessLog(accessLogId, assetFileId);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
                     result.put("message", ex.getMessage());
                     return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
@@ -134,17 +122,14 @@ public class AssetFileService extends AppService {
                 }
                 String path = DS + this.assetTempPath + DS + filename;
                 String pathfile = this.parentDirectory + DS + this.assetTempPath + DS + filename;
+                FileOutputStream fileOutputStream = new FileOutputStream(pathfile);
                 byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
-                GlobalFunctionHelper.writeByteArraysToFile(pathfile, fileByteArray);
+                fileOutputStream.write(fileByteArray);
 
                 // save decoded file to database
                 AssetFile assetFile = new AssetFile(path, name, ext);
                 assetFile.setToken(GlobalFunctionHelper.generateToken());
                 super.create(assetFile);
-
-                Long accessLogId = AccessLogInterceptor.accessLogId.get();
-                Long assetFileId = assetFile.getId();
-                updateAccessLog(accessLogId, assetFileId);
 
                 result.put("data", assetFile);
                 result.put("status", HttpStatus.OK.value());
@@ -284,19 +269,5 @@ public class AssetFileService extends AppService {
         AssetFile assetFile = new AssetFile(filepath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
         super.create(assetFile);
         return assetFile.getId();
-    }
-
-    private void updateAccessLog(Long accessLogId, Long assetFileId) {
-        if (accessLogId != null && assetFileId != null) {
-            // fetch data thread of Access Log ID and insert asset file ID according its access log ID
-            AccessLog accessLog = this.accessLogRepository.findById(accessLogId).get();
-            if (accessLog != null) {
-                accessLog.setUploadFileId(assetFileId);
-                this.accessLogService.update(accessLogId, accessLog);
-            }
-
-            // remove thread if it's done
-            AccessLogInterceptor.accessLogId.remove();
-        }
     }
 }
