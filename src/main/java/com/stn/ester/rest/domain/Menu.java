@@ -19,7 +19,6 @@ import java.util.Set;
 @OnDeleteSetParentNull({
         @TableFieldPair(service = MenuService.class, tableName = "menu", fieldName = "parent_menu_id")
 })
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Menu extends AppDomain {
 
     public static final String unique_name = "menu";
@@ -51,7 +50,7 @@ public class Menu extends AppDomain {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_menu_id", insertable = false, updatable = false)
-    @JsonIgnore
+    @JsonProperty(access= JsonProperty.Access.READ_ONLY)
     @EqualsAndHashCode.Exclude
     private Menu parentMenu;
 

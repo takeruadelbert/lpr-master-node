@@ -4,11 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
-import java.io.IOException;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalFunctionHelper {
@@ -89,5 +94,13 @@ public class GlobalFunctionHelper {
             return jsonMap;
         jsonMap = mapper.readValue(jsonString, Map.class);
         return jsonMap;
+    }
+
+    public static void writeByteArraysToFile(String fileName, byte[] content) throws IOException {
+        File file = new File(fileName);
+        BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(file));
+        writer.write(content);
+        writer.flush();
+        writer.close();
     }
 }
