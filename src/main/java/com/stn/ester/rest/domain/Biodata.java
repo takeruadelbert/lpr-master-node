@@ -93,6 +93,14 @@ public class Biodata extends AppDomain {
             this.cityId = cityId;
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     @Override
     public String underscoreName() {
         return Biodata.unique_name;

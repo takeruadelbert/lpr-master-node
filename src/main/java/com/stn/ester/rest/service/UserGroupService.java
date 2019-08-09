@@ -72,4 +72,13 @@ public class UserGroupService extends AppService {
         this.accessGroupRepository.deleteAll(accessGroups);
         super.delete(id);
     }
+
+    @Transactional
+    public Object createIfNameNotExist(UserGroup userGroup, String name) {
+        UserGroup currentUserGroup=this.userGroupRepository.findByName(name);
+        if (currentUserGroup == null) {
+            return this.create(userGroup);
+        }
+        return currentUserGroup;
+    }
 }

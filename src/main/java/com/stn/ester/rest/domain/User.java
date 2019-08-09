@@ -2,13 +2,20 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static com.stn.ester.rest.security.SecurityConstants.ROLE_PREFIX;
 
 @Data
 @Entity
-public class User extends AppDomain {
+public class User extends AppDomain implements UserDetails {
 
     public static final String unique_name = "user";
 
@@ -83,8 +90,41 @@ public class User extends AppDomain {
         return username;
     }
 
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @JsonIgnore
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Collection<GrantedAuthority> authorities = new ArrayList();
+        if (this.userGroup != null)
+            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + "_" + this.userGroup.getName()));
+        return authorities;
     }
 
     public String getPassword() {
@@ -99,14 +139,28 @@ public class User extends AppDomain {
         return  email;
     }
 
-    public void setEmail(String email) {this.email = email;}
-
     public Long getUserGroupId() {
         return userGroupId;
     }
 
     public String getToken() {
         return this.token;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setUserGroupId(Long userGroupId) {
+        this.userGroupId = userGroupId;
+    }
+
+    public void setBiodata(Biodata biodata) {
+        this.biodata = biodata;
+    }
+
+    public UserGroup getUserGroup() {
+        return userGroup;
     }
 
     @Override

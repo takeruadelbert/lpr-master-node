@@ -30,6 +30,18 @@ public class Module extends AppDomain {
     @EqualsAndHashCode.Exclude
     private Set<ModuleLink> moduleLink =  new HashSet<>();
 
+    public String getAlias() {
+        return alias;
+    }
+
+    public RequestMethod getRequestMethod() {
+        return requestMethod;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String underscoreName() {
         return Module.unique_name;

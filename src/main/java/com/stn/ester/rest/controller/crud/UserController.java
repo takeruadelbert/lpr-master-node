@@ -1,10 +1,12 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.crud;
 
+import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.LoginSession;
 import com.stn.ester.rest.domain.User;
 import com.stn.ester.rest.domain.enumerate.Gender;
 import com.stn.ester.rest.exception.UnauthorizedException;
+import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.BiodataService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
-public class UserController extends AppController<UserService, User> {
+public class UserController extends CrudController<UserService, User> {
 
     private UserService userService;
     private BiodataService biodataService;
@@ -40,28 +42,17 @@ public class UserController extends AppController<UserService, User> {
         return super.service.update(id, user);
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public Map login(@RequestBody Map<String, String> payload, HttpSession session) {
-        Map<String, Object> loginToken = service.login(payload.get("username"), payload.get("password"), session);
-        return loginToken;
-    }
-
     @RequestMapping(value = "/heartbeat")
-    public Object isValid(@RequestHeader("access-token") String accessToken) {
-        LoginSession loginSession = this.userService.tokenHeartbeat(accessToken);
-        if (loginSession == null) {
-            throw new UnauthorizedException();
-        } else {
-            return loginSession;
-        }
+    public User isValid() {
+        return SessionHelper.getCurrentUser();
     }
 
-    @RequestMapping(value = "/{id}/change-password", method = RequestMethod.PUT)
-    public Object changePassword(@PathVariable Long id, @RequestBody Map<String, String> data) {
+    @RequestMapping(value = "/change-password", method = RequestMethod.PUT)
+    public Object changePassword (@RequestBody Map<String, String> data) {
         String old_password = data.get("old_password");
         String new_password = data.get("new_password");
         String retype_new_password = data.get("retype_new_password");
-        return service.changePassword(id, old_password, new_password, retype_new_password);
+        return service.changePassword(SessionHelper.getUserID(), old_password, new_password, retype_new_password);
     }
 
     @RequestMapping(value = "/change-profile-picture", method = RequestMethod.POST)
@@ -69,7 +60,7 @@ public class UserController extends AppController<UserService, User> {
         return service.changeProfilePicture(data.get("token"));
     }
 
-    @RequestMapping(value = "/gender/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/gender", method = RequestMethod.OPTIONS)
     public Map<Gender, String> getGenderList() {
         return this.biodataService.getGenderList();
     }
@@ -85,4 +76,5 @@ public class UserController extends AppController<UserService, User> {
         String confirm_password = data.get("confirm_password");
         return userService.passwordReset(token, new_password, confirm_password);
     }
+
 }

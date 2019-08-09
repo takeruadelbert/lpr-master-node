@@ -83,8 +83,28 @@ public class AccessGroup extends AppDomain {
         this.deleteable = deleteable;
     }
 
+    public boolean isViewable() {
+        return viewable;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public boolean isAddable() {
+        return addable;
+    }
+
+    public boolean isDeleteable() {
+        return deleteable;
+    }
+
     public long getMenuId() {
         return menuId;
+    }
+
+    public Menu getMenu() {
+        return menu;
     }
 
     @Override

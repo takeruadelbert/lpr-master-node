@@ -1,5 +1,10 @@
 package com.stn.ester.rest.service;
 
+import com.stn.ester.rest.RestApplication;
+import com.stn.ester.rest.dao.jpa.BiodataRepository;
+import com.stn.ester.rest.dao.jpa.LoginSessionRepository;
+import com.stn.ester.rest.dao.jpa.UserGroupRepository;
+import com.stn.ester.rest.dao.jpa.UserRepository;
 import com.stn.ester.rest.dao.jpa.*;
 import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.exception.*;
@@ -12,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,10 +31,16 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import java.beans.Transient;
+import java.util.*;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.*;
 
 @Service
-public class UserService extends AppService implements AssetFileBehaviour {
+public class UserService extends AppService implements AssetFileBehaviour, UserDetailsService {
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;
@@ -58,7 +72,10 @@ public class UserService extends AppService implements AssetFileBehaviour {
         this.userRepository = userRepository;
         this.loginSessionRepository = loginSessionRepository;
         this.userGroupRepository = userGroupRepository;
+        this.passwordResetRepository = passwordResetRepository;
         this.assetFileService = assetFileService;
+        this.passwordResetService = passwordResetService;
+        this.systemProfileRepository = systemProfileRepository;
     }
 
     @Override
@@ -159,6 +176,28 @@ public class UserService extends AppService implements AssetFileBehaviour {
         result.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
         result.put("message", "Failed to change profile picture : Invalid Token.");
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    public void addDefaultProfilePicture() {
+
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> usersOptional = userRepository.findByUsername(username);
+
+        usersOptional
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
+        return usersOptional
+                .get();
+    }
+
+    @Transactional
+    public Object createIfUsernameNotExist(User user,String username){
+        if (!this.userRepository.findByUsername(username).isPresent()){
+            return this.create(user);
+        }
+        return null;
     }
 
     public Object identifyEmail(String email, HttpServletRequest request) {

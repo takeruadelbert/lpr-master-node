@@ -1,5 +1,6 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.crud;
 
+import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.City;
 import com.stn.ester.rest.domain.enumerate.CityStatus;
 import com.stn.ester.rest.service.CityService;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/cities")
-public class CityController extends AppController<CityService, City> {
+public class CityController extends CrudController<CityService, City> {
     public CityController(CityService cityService) {
         super(cityService);
     }
@@ -22,7 +23,7 @@ public class CityController extends AppController<CityService, City> {
         return service.getCityListByState(state_id);
     }
 
-    @RequestMapping(value = "/city_status/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/city_status", method = RequestMethod.OPTIONS)
     public Map<CityStatus,String> getCityStatusList() {
         return service.getCityStatusList();
     }

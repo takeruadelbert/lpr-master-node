@@ -1,7 +1,12 @@
 package com.stn.ester.rest.controller;
 
+import com.stn.ester.rest.base.AccessAllowed;
+import com.stn.ester.rest.controller.base.CrudController;
+import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.service.AssetFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,16 +22,19 @@ public class AssetFileController {
         this.assetFileService = assetFileService;
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public Object uploadFile(@RequestParam MultipartFile[] files) {
         return assetFileService.uploadFile(files);
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/upload-encoded", method = RequestMethod.POST)
     public Object uploadEncodedFile(@RequestParam String filename, @RequestParam String files) {
         return assetFileService.uploadEncodedFile(filename, files);
     }
 
+    @AccessAllowed
     @RequestMapping(value = "/{token}", method = RequestMethod.GET)
     @NotNull
     public Object getFile(@PathVariable String token, @RequestParam(value = "dl", required = false) Integer flag_dl) {

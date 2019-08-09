@@ -31,6 +31,22 @@ public class UserGroup extends AppDomain {
         return this.accessGroups;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Collection<AccessGroup> getAccessGroups() {
+        return accessGroups;
+    }
+
     @Override
     public String underscoreName() {
         return UserGroup.unique_name;
