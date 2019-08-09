@@ -167,7 +167,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
             Optional<User> user = this.userRepository.findByEmail(email);
             if (!user.equals(Optional.empty())) {
                 String token = GlobalFunctionHelper.generateToken();
-                // Check while user have token start update data password reset if not have create new password reset.
+                // Check while user have token start to update data password reset if not have create new password reset.
                 PasswordReset passwordReset = this.passwordResetRepository.findByUserId(user.get().getId());
                 if (passwordReset != null) {
                     passwordReset.setId(passwordReset.getId());
@@ -277,7 +277,7 @@ public class UserService extends AppService implements AssetFileBehaviour {
                 throw new UnauthorizedException("User tidak ditemukan.");
             if (!new_password.equals(confirm_password))
                 throw new ConfirmNewPasswordException("Password baru dan konfirmasi password tidak sesuai.");
-            // Set is used not default if user is has been succesfully create new password.
+            // Set is used to default if user is succesfully create new password.
             passwordReset.setId(passwordReset.getId());
             passwordReset.setIsUsed(1);
             super.update(passwordReset.getId(), passwordReset);
