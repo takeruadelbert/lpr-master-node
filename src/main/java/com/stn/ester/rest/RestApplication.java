@@ -1,6 +1,7 @@
 package com.stn.ester.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stn.ester.rest.config.DatabaseConfig;
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
@@ -45,6 +46,12 @@ public class RestApplication extends SpringBootServletInitializer {
     public static Long defaultProfilePictureID;
 
     public static void main(String[] args) {
+        if(args.length > 0) {
+            String extJsonFile = args[0];
+            if(!extJsonFile.isEmpty()) {
+                DatabaseConfig.extJsonFileConfigPath = extJsonFile;
+            }
+        }
         SpringApplication.run(RestApplication.class, args);
     }
 
