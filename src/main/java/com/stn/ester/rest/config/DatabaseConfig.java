@@ -25,10 +25,10 @@ public class DatabaseConfig {
     @Bean
     public DataSource getDataSource() {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+        // read from external JSON file for configuration. Otherwise, it reads the default one from application.properties
         if (!extJsonFileConfigPath.isEmpty()) {
             Map<String, String> dataJson = readJsonFile(extJsonFileConfigPath);
             if (!dataJson.isEmpty()) {
-                String url = "", username = "", password = "";
                 for (Map.Entry<String, String> entry : dataJson.entrySet()) {
                     switch (entry.getKey()) {
                         case "url":
@@ -44,22 +44,11 @@ public class DatabaseConfig {
                             break;
                     }
                 }
-                dataSourceBuilder.url(url);
-                dataSourceBuilder.username(username);
-                dataSourceBuilder.password(password);
-                return dataSourceBuilder.build();
             } else {
                 System.out.println("Error : can't read JSON file.");
                 return null;
             }
-        } else {
-            System.out.println("USING DEFAULT CONFIG..");
-            return runDatabaseDefaultConfig();
         }
-    }
-
-    private DataSource runDatabaseDefaultConfig() {
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
         dataSourceBuilder.url(url);
         dataSourceBuilder.username(username);
         dataSourceBuilder.password(password);
