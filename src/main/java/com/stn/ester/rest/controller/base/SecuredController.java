@@ -29,14 +29,16 @@ public abstract class SecuredController implements BeanNameAware {
         return beanName;
     }
 
-    public String readCurrentUserRole() {
+    public String readCurrentUserRole(String moduleName) {
         String role = "NOACCESS";
         if (!SessionHelper.isSuperAdmin()) {
-            String currentName = getBeanName().replace("Controller", "");
+            if (moduleName.isEmpty()) {
+                moduleName = getBeanName().replace("Controller", "");
+            }
             final ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder
                     .currentRequestAttributes();
             final HttpServletRequest request = attr.getRequest();
-            role = this.accessGroupService.findAccessRole(com.stn.ester.rest.domain.enumerate.RequestMethod.valueOf(request.getMethod().toUpperCase()), currentName);
+            role = this.accessGroupService.findAccessRole(com.stn.ester.rest.domain.enumerate.RequestMethod.valueOf(request.getMethod().toUpperCase()), moduleName);
         } else {
             role = ROLE_PREFIX + "_" + ROLE_SUPERADMIN;
         }
@@ -44,7 +46,11 @@ public abstract class SecuredController implements BeanNameAware {
         return role;
     }
 
-    public String superAdminRole(){
+    public String readCurrentUserRole() {
+        return readCurrentUserRole("");
+    }
+
+    public String superAdminRole() {
         return ROLE_PREFIX + "_" + ROLE_SUPERADMIN;
     }
 }

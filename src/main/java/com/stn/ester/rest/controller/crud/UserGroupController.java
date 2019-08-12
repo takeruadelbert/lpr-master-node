@@ -5,6 +5,7 @@ import com.stn.ester.rest.domain.UserGroup;
 import com.stn.ester.rest.service.AccessGroupService;
 import com.stn.ester.rest.service.UserGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -24,11 +25,13 @@ public class UserGroupController extends CrudController<UserGroupService, UserGr
         this.accessGroupService=accessGroupService;
     }
 
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole('viewAccessGroup'))")
     @RequestMapping(value ="/{id}/access_groups", method = RequestMethod.GET)
     public Object getAccessGroup(@PathVariable long id){
         return service.getAccessGroup(id);
     }
 
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole('editAccessGroup'))")
     @RequestMapping(value ="/{id}/access_groups", method = RequestMethod.PUT)
     public Object editAccessGroup(@PathVariable long id,@RequestBody HashMap<String,Object> o){
         System.out.println(o);
