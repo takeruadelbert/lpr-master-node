@@ -1,16 +1,10 @@
 package com.stn.ester.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stn.ester.rest.config.DatabaseConfig;
-import com.stn.ester.rest.dao.jpa.AssetFileRepository;
-import com.stn.ester.rest.domain.*;
-import com.stn.ester.rest.domain.enumerate.RequestMethod;
-import com.stn.ester.rest.helper.GlobalFunctionHelper;
-import com.stn.ester.rest.service.MenuService;
-import com.stn.ester.rest.service.ModuleService;
-import com.stn.ester.rest.service.UserGroupService;
-import com.stn.ester.rest.service.UserService;
-import com.stn.ester.rest.service.AssetFileService;
+import com.stn.ester.rest.domain.Biodata;
+import com.stn.ester.rest.domain.User;
+import com.stn.ester.rest.domain.UserGroup;
+import com.stn.ester.rest.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -43,12 +37,10 @@ public class RestApplication extends SpringBootServletInitializer {
     @Autowired
     private MenuService menuService;
 
-    public static Long defaultProfilePictureID;
-
     public static void main(String[] args) {
-        if(args.length > 0) {
+        if (args.length > 0) {
             String extJsonFile = args[0];
-            if(!extJsonFile.isEmpty()) {
+            if (!extJsonFile.isEmpty()) {
                 DatabaseConfig.extJsonFileConfigPath = extJsonFile;
             }
         }
