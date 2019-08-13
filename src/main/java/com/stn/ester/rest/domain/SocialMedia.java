@@ -20,14 +20,14 @@ public class SocialMedia extends AppDomain {
 
     @JsonProperty("systemProfileId")
     @Column(name = "system_profile_id")
-    private long systemProfileId;
+    private Long systemProfileId;
 
     @NotBlank(message = "Name is mandatory.")
     @Column(nullable = false)
     private String name;
 
     private String url;
-    private Long orderingNumber;
+    private int orderingNumber;
 
     public SocialMedia() {
 
