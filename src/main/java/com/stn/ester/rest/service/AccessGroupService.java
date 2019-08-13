@@ -1,14 +1,8 @@
 package com.stn.ester.rest.service;
 
 import com.google.common.collect.Iterables;
-import com.stn.ester.rest.dao.jpa.AccessGroupRepository;
-import com.stn.ester.rest.dao.jpa.MenuRepository;
-import com.stn.ester.rest.dao.jpa.ModuleRepository;
-import com.stn.ester.rest.dao.jpa.UserGroupRepository;
-import com.stn.ester.rest.domain.AccessGroup;
-import com.stn.ester.rest.domain.Menu;
-import com.stn.ester.rest.domain.Module;
-import com.stn.ester.rest.domain.UserGroup;
+import com.stn.ester.rest.dao.jpa.*;
+import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import com.stn.ester.rest.helper.SessionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.stn.ester.rest.security.SecurityConstants.ROLE_PREFIX;
 
@@ -31,12 +22,14 @@ public class AccessGroupService extends AppService {
     UserGroupRepository userGroupRepository;
     ModuleRepository moduleRepository;
     MenuRepository menuRepository;
+    ModuleLinkRepository moduleLinkRepository;
 
     @Autowired
     public AccessGroupService(AccessGroupRepository accessGroupRepository,
                               MenuRepository menuRepository,
                               UserGroupRepository userGroupRepository,
-                              ModuleRepository moduleRepository) {
+                              ModuleRepository moduleRepository,
+                              ModuleLinkRepository moduleLinkRepository) {
         super(AccessGroup.unique_name);
         super.repositories.put(AccessGroup.unique_name, accessGroupRepository);
         super.repositories.put(Menu.unique_name, menuRepository);
@@ -45,6 +38,7 @@ public class AccessGroupService extends AppService {
         this.userGroupRepository = userGroupRepository;
         this.moduleRepository = moduleRepository;
         this.menuRepository = menuRepository;
+        this.moduleLinkRepository = moduleLinkRepository;
     }
 
     @Transactional
@@ -87,8 +81,20 @@ public class AccessGroupService extends AppService {
         return authorities;
     }
 
-    public String findAccessRole(RequestMethod requestMethod, String name) {
-        List<Module> modules = this.moduleRepository.findAllByName(name);
+    public String findAccessRole(RequestMethod requestMethod, String name, Boolean isCrud) {
+        //find module links
+        List<ModuleLink> moduleLinks = this.moduleLinkRepository.findAllByRequestMethodAndName(requestMethod, name);
+        List<Long> moduleIds = new ArrayList();
+        moduleLinks.stream().forEach((ml) -> moduleIds.add(ml.getId()));
+        //find modules
+        List<Module> modules = new ArrayList();
+        if (isCrud) {
+            System.out.println("is CRUD");
+            modules.addAll(this.moduleRepository.findAllByName(name));
+        } else {
+            modules.addAll(this.moduleRepository.findAllByRequestMethodAndName(requestMethod, name));
+        }
+        Iterables.addAll(modules, this.moduleRepository.findAllById(moduleIds));
         System.out.println("find module : " + requestMethod + " " + name);
         if (modules.isEmpty()) {
             System.out.println("module not found");
@@ -106,25 +112,26 @@ public class AccessGroupService extends AppService {
             return "NOACCESS";
         }
 
-        if (!this.hasAccess(requestMethod, Iterables.get(accessGroups, 0), modules.get(0)))
+        if (!this.hasAccess(requestMethod, Iterables.get(accessGroups, 0), modules.get(0), isCrud))
             return "NOACCESS";
         return ROLE_PREFIX + "_" + SessionHelper.getCurrentUser().getUserGroup().getName();
     }
 
-    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup, Module module) {
-        if (accessGroup.isViewable() && (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.OPTIONS))) {
-            return true;
-        }
-        if (accessGroup.isAddable() && requestMethod.equals(RequestMethod.POST)) {
-            return true;
-        }
-        if (accessGroup.isEditable() && requestMethod.equals(RequestMethod.PUT)) {
-            return true;
-        }
-        if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
-            return true;
-        }
-        if (module.getRequestMethod().equals(requestMethod)) {
+    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup, Module module, Boolean isCrud) {
+        if (isCrud) {
+            if (accessGroup.isViewable() && (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.OPTIONS))) {
+                return true;
+            }
+            if (accessGroup.isAddable() && requestMethod.equals(RequestMethod.POST)) {
+                return true;
+            }
+            if (accessGroup.isEditable() && requestMethod.equals(RequestMethod.PUT)) {
+                return true;
+            }
+            if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
+                return true;
+            }
+        } else if (accessGroup.isViewable() && module.getRequestMethod().equals(requestMethod)) {
             return true;
         }
         return false;
