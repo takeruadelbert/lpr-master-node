@@ -57,7 +57,7 @@ public class UserGroupService extends AppService {
         Iterable<Menu> menus = this.menuRepository.findAll();
         List<AccessGroup> accessGroups = new ArrayList<>();
         for (Menu menu : menus) {
-            AccessGroup accessGroup = new AccessGroup(lastInsertID, menu.getId(), true, false, false, false);
+            AccessGroup accessGroup = new AccessGroup(lastInsertID, menu.getId(), false, false, false, false);
             accessGroups.add(accessGroup);
         }
         this.accessGroupRepository.saveAll(accessGroups);
