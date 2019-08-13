@@ -47,4 +47,7 @@ public class UserGroupController extends CrudController<UserGroupService, UserGr
     public Object create(@Valid @RequestBody UserGroup userGroup) {
         return service.create(userGroup);
     }
+
+
+
 }

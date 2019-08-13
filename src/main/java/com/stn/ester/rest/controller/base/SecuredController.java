@@ -32,13 +32,15 @@ public abstract class SecuredController implements BeanNameAware {
     public String readCurrentUserRole(String moduleName) {
         String role = "NOACCESS";
         if (!SessionHelper.isSuperAdmin()) {
-            if (moduleName.isEmpty()) {
+            Boolean isCrud = false;
+            if (moduleName=="") {
                 moduleName = getBeanName().replace("Controller", "");
+                isCrud = true;
             }
             final ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder
                     .currentRequestAttributes();
             final HttpServletRequest request = attr.getRequest();
-            role = this.accessGroupService.findAccessRole(com.stn.ester.rest.domain.enumerate.RequestMethod.valueOf(request.getMethod().toUpperCase()), moduleName);
+            role = this.accessGroupService.findAccessRole(com.stn.ester.rest.domain.enumerate.RequestMethod.valueOf(request.getMethod().toUpperCase()), moduleName, isCrud);
         } else {
             role = ROLE_PREFIX + "_" + ROLE_SUPERADMIN;
         }

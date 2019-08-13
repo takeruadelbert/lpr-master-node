@@ -81,12 +81,19 @@ public class AccessGroupService extends AppService {
         return authorities;
     }
 
-    public String findAccessRole(RequestMethod requestMethod, String name) {
+    public String findAccessRole(RequestMethod requestMethod, String name, Boolean isCrud) {
+        //find module links
         List<ModuleLink> moduleLinks = this.moduleLinkRepository.findAllByRequestMethodAndName(requestMethod, name);
         List<Long> moduleIds = new ArrayList();
         moduleLinks.stream().forEach((ml) -> moduleIds.add(ml.getId()));
-        System.out.println("check module id : " + moduleIds);
-        List<Module> modules = this.moduleRepository.findAllByName(name);
+        //find modules
+        List<Module> modules = new ArrayList();
+        if (isCrud) {
+            System.out.println("is CRUD");
+            modules.addAll(this.moduleRepository.findAllByName(name));
+        } else {
+            modules.addAll(this.moduleRepository.findAllByRequestMethodAndName(requestMethod, name));
+        }
         Iterables.addAll(modules, this.moduleRepository.findAllById(moduleIds));
         System.out.println("find module : " + requestMethod + " " + name);
         if (modules.isEmpty()) {
@@ -105,25 +112,26 @@ public class AccessGroupService extends AppService {
             return "NOACCESS";
         }
 
-        if (!this.hasAccess(requestMethod, Iterables.get(accessGroups, 0), modules.get(0)))
+        if (!this.hasAccess(requestMethod, Iterables.get(accessGroups, 0), modules.get(0), isCrud))
             return "NOACCESS";
         return ROLE_PREFIX + "_" + SessionHelper.getCurrentUser().getUserGroup().getName();
     }
 
-    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup, Module module) {
-        if (accessGroup.isViewable() && (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.OPTIONS))) {
-            return true;
-        }
-        if (accessGroup.isAddable() && requestMethod.equals(RequestMethod.POST)) {
-            return true;
-        }
-        if (accessGroup.isEditable() && requestMethod.equals(RequestMethod.PUT)) {
-            return true;
-        }
-        if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
-            return true;
-        }
-        if (module.getRequestMethod().equals(requestMethod)) {
+    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup, Module module, Boolean isCrud) {
+        if (isCrud) {
+            if (accessGroup.isViewable() && (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.OPTIONS))) {
+                return true;
+            }
+            if (accessGroup.isAddable() && requestMethod.equals(RequestMethod.POST)) {
+                return true;
+            }
+            if (accessGroup.isEditable() && requestMethod.equals(RequestMethod.PUT)) {
+                return true;
+            }
+            if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
+                return true;
+            }
+        } else if (accessGroup.isViewable() && module.getRequestMethod().equals(requestMethod)) {
             return true;
         }
         return false;
