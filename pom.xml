@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
-            <!--            <scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -107,6 +107,15 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.1.3.Final</version>
         </dependency>
     </dependencies>
 
