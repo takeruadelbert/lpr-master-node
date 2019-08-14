@@ -47,7 +47,7 @@ public class AssetFileService extends AppService {
     private String assetDefault;
     @Autowired
     private ResourceLoader resourceLoader;
-    private static final String DS = File.separator;
+    private static final String DS = "/";
     public static Long defaultProfilePictureID;
     @Autowired
     private AccessLogService accessLogService;

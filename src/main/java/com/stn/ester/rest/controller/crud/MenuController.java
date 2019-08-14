@@ -1,4 +1,4 @@
-package com.stn.ester.rest.controller;
+package com.stn.ester.rest.controller.crud;
 
 import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.Menu;
