@@ -11,7 +11,6 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "system_profile", uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})})
 public class SystemProfile extends AppDomain {
     public static final String unique_name = "system_profile";
 

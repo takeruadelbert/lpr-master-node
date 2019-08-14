@@ -9,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @Entity
-@Table(name = "social_media", uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})})
 public class SocialMedia extends AppDomain {
     public static String unique_name = "social_media";
 
