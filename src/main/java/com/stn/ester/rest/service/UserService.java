@@ -159,17 +159,18 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
     }
 
     @Override
-    public Long claimFile(String token) {
+    public AssetFile claimFile(String token) {
         return this.assetFileService.moveTempDirToPermanentDir(token, this.getAssetPath());
     }
 
     public Object changeProfilePicture(String token) {
         if (!token.isEmpty()) {
             Long user_id = SessionHelper.getUserID();
-            Long asset_file_id = this.claimFile(token);
+            AssetFile assetFile = this.claimFile(token);
             User user = this.userRepository.findById(user_id).get();
             user.setId(user_id);
-            user.setAssetFileId(asset_file_id);
+            user.setAssetFileId(assetFile.getId());
+            user.setAssetFile(assetFile);
             return super.update(user_id, user);
         }
         Map<String, Object> result = new HashMap<>();
