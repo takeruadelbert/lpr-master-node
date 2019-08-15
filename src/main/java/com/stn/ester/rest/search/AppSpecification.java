@@ -5,10 +5,7 @@ import com.stn.ester.rest.exception.FilterException;
 import com.stn.ester.rest.search.util.SpecSearchCriteria;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 
 public class AppSpecification<T extends AppDomain> implements Specification<T> {
 
@@ -29,23 +26,30 @@ public class AppSpecification<T extends AppDomain> implements Specification<T> {
     @Override
     public Predicate toPredicate(final Root<T> root, final CriteriaQuery<?> query, final CriteriaBuilder builder) {
         try {
+            Path path;
+            if (criteria.getClassJoin() == null) {
+                path = root.get(criteria.getKey());
+            } else {
+                Join joinPredicate = root.join(getCriteria().getClassJoin());
+                path = joinPredicate.get(criteria.getKey());
+            }
             switch (criteria.getOperation()) {
                 case EQUALITY:
-                    return builder.equal(root.get(criteria.getKey()), criteria.getValue());
+                    return builder.equal(path, criteria.getValue());
                 case NEGATION:
-                    return builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
+                    return builder.notEqual(path, criteria.getValue());
                 case GREATER_THAN:
-                    return builder.greaterThan(root.get(criteria.getKey()), criteria.getValue().toString());
+                    return builder.greaterThan(path, criteria.getValue().toString());
                 case LESS_THAN:
-                    return builder.lessThan(root.get(criteria.getKey()), criteria.getValue().toString());
+                    return builder.lessThan(path, criteria.getValue().toString());
                 case LIKE:
-                    return builder.like(root.get(criteria.getKey()), criteria.getValue().toString());
+                    return builder.like(path, criteria.getValue().toString());
                 case STARTS_WITH:
-                    return builder.like(root.get(criteria.getKey()), criteria.getValue() + "%");
+                    return builder.like(path, criteria.getValue() + "%");
                 case ENDS_WITH:
-                    return builder.like(root.get(criteria.getKey()), "%" + criteria.getValue());
+                    return builder.like(path, "%" + criteria.getValue());
                 case CONTAINS:
-                    return builder.like(root.get(criteria.getKey()), "%" + criteria.getValue() + "%");
+                    return builder.like(path, "%" + criteria.getValue() + "%");
                 default:
                     return null;
             }

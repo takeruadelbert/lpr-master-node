@@ -1,31 +1,19 @@
 package com.stn.ester.rest.controller.base;
 
 import com.stn.ester.rest.domain.AppDomain;
-import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import com.stn.ester.rest.helper.SearchAndFilterHelper;
-import com.stn.ester.rest.helper.SessionHelper;
-import com.stn.ester.rest.search.SpecificationsBuilder;
-import com.stn.ester.rest.service.AccessGroupService;
 import com.stn.ester.rest.service.AppService;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
-import static com.stn.ester.rest.security.SecurityConstants.*;
 
 public abstract class CrudController<T extends AppService, U extends AppDomain> extends SecuredController {
 
