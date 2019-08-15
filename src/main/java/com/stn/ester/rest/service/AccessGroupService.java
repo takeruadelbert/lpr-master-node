@@ -3,6 +3,7 @@ package com.stn.ester.rest.service;
 import com.google.common.collect.Iterables;
 import com.stn.ester.rest.dao.jpa.*;
 import com.stn.ester.rest.domain.*;
+import com.stn.ester.rest.domain.Module;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import com.stn.ester.rest.helper.SessionHelper;
 import org.springframework.beans.factory.annotation.Autowired;

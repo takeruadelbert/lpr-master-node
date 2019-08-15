@@ -2,6 +2,7 @@ package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.NewsRepository;
 import com.stn.ester.rest.domain.AppDomain;
+import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.domain.News;
 import com.stn.ester.rest.domain.enumerate.NewsStatus;
 import com.stn.ester.rest.helper.DateTimeHelper;
@@ -41,7 +42,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         ((News) o).setNewsStatus(NewsStatus.SHOWED); // default option is showed.
         String token = ((News) o).getToken();
         if (token != null) {
-            ((News) o).setAssetFileId(this.claimFile(token));
+            ((News) o).setAssetFileId(this.claimFile(token).getId());
         }
         return super.create(o);
     }
@@ -52,7 +53,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         ((News) o).setAuthorId(author_id);
         String token = ((News) o).getToken();
         if (token != null) {
-            ((News) o).setAssetFileId(this.claimFile(token));
+            ((News) o).setAssetFileId(this.claimFile(token).getId());
         }
         return super.update(id, o);
     }
@@ -99,7 +100,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
     }
 
     @Override
-    public Long claimFile(String token) {
+    public AssetFile claimFile(String token) {
         return this.assetFileService.moveTempDirToPermanentDir(token, this.getAssetPath());
     }
 

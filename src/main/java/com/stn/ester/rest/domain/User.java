@@ -42,6 +42,10 @@ public class User extends AppDomain implements UserDetails {
     @JoinColumn(name = "profile_picture_id", insertable = false, updatable = false)
     private AssetFile assetFile;
 
+    public void setAssetFile(AssetFile assetFile) {
+        this.assetFile = assetFile;
+    }
+
     @JsonProperty("assetFileId")
     @Column(name = "profile_picture_id")
     private Long assetFileId;

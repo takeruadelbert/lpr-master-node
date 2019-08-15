@@ -1,7 +1,9 @@
 package com.stn.ester.rest.service.base;
 
+import com.stn.ester.rest.domain.AssetFile;
+
 public interface AssetFileBehaviour {
     String getAssetPath();
 
-    Long claimFile(String fileToken);
+    AssetFile claimFile(String fileToken);
 }

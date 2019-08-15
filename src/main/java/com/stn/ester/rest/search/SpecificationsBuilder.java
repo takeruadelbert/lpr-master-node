@@ -16,10 +16,10 @@ public class SpecificationsBuilder<T extends AppDomain> {
     }
 
     public final SpecificationsBuilder with(final String key, final String operation, final Object value, final String prefix, final String suffix) {
-        return with(null, key, operation, value, prefix, suffix);
+        return with(null, key, operation, value, prefix, suffix, null);
     }
 
-    public final SpecificationsBuilder with(final String orPredicate, final String key, final String operation, final Object value, final String prefix, final String suffix) {
+    public final SpecificationsBuilder with(final String orPredicate, final String key, final String operation, final Object value, final String prefix, final String suffix, final String joinClass) {
         SearchOperation op = SearchOperation.getSimpleOperation(operation.charAt(0));
         if (op != null) {
             if (op == SearchOperation.EQUALITY) { // the operation may be complex operation
@@ -34,9 +34,13 @@ public class SpecificationsBuilder<T extends AppDomain> {
                     op = SearchOperation.STARTS_WITH;
                 }
             }
-            params.add(new SpecSearchCriteria(orPredicate, key, op, value));
+            params.add(new SpecSearchCriteria(orPredicate, key, op, value, joinClass));
         }
         return this;
+    }
+
+    public final SpecificationsBuilder with(final String key, final String operation, final Object value, final String prefix, final String suffix, final String joinClass) {
+        return with(null, key, operation, value, prefix, suffix, joinClass);
     }
 
     public Specification<T> build() {
@@ -65,10 +69,10 @@ public class SpecificationsBuilder<T extends AppDomain> {
     }
 
     @Override
-    public String toString(){
-        String result="";
-        for(SpecSearchCriteria param:params){
-            result+=param.toString();
+    public String toString() {
+        String result = "";
+        for (SpecSearchCriteria param : params) {
+            result += param.toString();
         }
         return result;
     }
