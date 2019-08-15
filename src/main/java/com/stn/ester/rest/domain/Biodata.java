@@ -40,6 +40,10 @@ public class Biodata extends AppDomain {
     @JsonBackReference
     private User user;
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Enumerated(EnumType.STRING)
     private Gender gender;
 

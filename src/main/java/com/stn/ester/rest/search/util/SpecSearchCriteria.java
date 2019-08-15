@@ -6,6 +6,7 @@ public class SpecSearchCriteria {
     private SearchOperation operation;
     private Object value;
     private boolean orPredicate;
+    private String classJoin;
 
     public SpecSearchCriteria() {
 
@@ -24,6 +25,15 @@ public class SpecSearchCriteria {
         this.key = key;
         this.operation = operation;
         this.value = value;
+    }
+
+    public SpecSearchCriteria(final String orPredicate, final String key, final SearchOperation operation, final Object value,final String classJoin) {
+        super();
+        this.orPredicate = orPredicate != null && orPredicate.equals(SearchOperation.OR_PREDICATE_FLAG);
+        this.key = key;
+        this.operation = operation;
+        this.value = value;
+        this.classJoin=classJoin;
     }
 
     public SpecSearchCriteria(String key, String operation, String prefix, String value, String suffix) {
@@ -77,6 +87,14 @@ public class SpecSearchCriteria {
 
     public void setOrPredicate(boolean orPredicate) {
         this.orPredicate = orPredicate;
+    }
+
+    public String getClassJoin() {
+        return classJoin;
+    }
+
+    public void setClassJoin(String classJoin) {
+        this.classJoin = classJoin;
     }
 
     @Override

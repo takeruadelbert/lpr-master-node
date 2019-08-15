@@ -82,6 +82,7 @@ public class RestApplication extends SpringBootServletInitializer {
         Biodata biodata = new Biodata();
         biodata.setFirstName("STN");
         biodata.setLastName("Ester");
+        biodata.setUser(user);
         user.setBiodata(biodata);
         userService.createIfUsernameNotExist(user, username);
     }
