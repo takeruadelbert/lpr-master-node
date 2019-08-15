@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,9 +18,10 @@ public class SystemProfile extends AppDomain {
     @JoinColumn(name = "logo_id", insertable = false, updatable = false)
     private AssetFile assetFile;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "social_media_id", insertable = false, updatable = false)
-    private SocialMedia socialMedia;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @JoinColumn(name = "system_profile_id", insertable = false, updatable = false)
+    private List<SocialMedia> socialMedia;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "city_id", insertable = false, updatable = false)
