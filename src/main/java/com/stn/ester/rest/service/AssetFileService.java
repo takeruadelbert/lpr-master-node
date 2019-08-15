@@ -218,8 +218,7 @@ public class AssetFileService extends AppService {
     }
 
     @Transactional
-    public Long moveTempDirToPermanentDir(String token, String assetDir) {
-        Long result = null;
+    public AssetFile moveTempDirToPermanentDir(String token, String assetDir) {
         try {
             AssetFile file = this.assetFileRepository.findByToken(token).get();
             if (!file.equals(Optional.empty())) {
@@ -239,14 +238,13 @@ public class AssetFileService extends AppService {
                 // update path data of asset file
                 file.setId(asset_file_id);
                 file.setPath(to.replace(this.parentDirectory, ""));
-                super.update(file.getId(), file);
-                return asset_file_id;
+                return (AssetFile)super.update(file.getId(), file);
             } else {
-                return result;
+                return null;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            return result;
+            return null;
         }
     }
 

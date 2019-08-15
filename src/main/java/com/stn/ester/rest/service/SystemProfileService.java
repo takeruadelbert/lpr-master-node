@@ -2,6 +2,7 @@ package com.stn.ester.rest.service;
 
 import com.stn.ester.rest.dao.jpa.SystemProfileRepository;
 import com.stn.ester.rest.domain.AppDomain;
+import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.domain.SystemProfile;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
         // insert asset file ID if there's any file uploaded.
         String token = ((SystemProfile) object).getToken();
         if (token != null) {
-            ((SystemProfile) object).setAssetFileId(this.claimFile(token));
+            ((SystemProfile) object).setAssetFileId(this.claimFile(token).getId());
         }
         if (systemProfileRepository.existsById(id)) {
             object.setId(id);
@@ -46,7 +47,7 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
     }
 
     @Override
-    public Long claimFile(String fileToken) {
+    public AssetFile claimFile(String fileToken) {
         return this.assetFileService.moveTempDirToPermanentDir(fileToken, this.getAssetPath());
     }
 
