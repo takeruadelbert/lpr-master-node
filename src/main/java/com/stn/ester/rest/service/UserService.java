@@ -137,20 +137,27 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
 
     @Transactional
     public Object changePassword(Long userID, String oldPassword, String newPassword, String retypeNewPassword) {
-        // check if new password is same with retype one
-        if (!newPassword.equals(retypeNewPassword)) {
-            throw new ConfirmNewPasswordException();
-        }
-
+        System.out.println(userID);
         // check if old password is same with the registered one
         User user = this.userRepository.findById(userID).orElse(null);
         if (user == null || !passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new PasswordMismatchException();
         }
+        return changePassword(userID, newPassword,retypeNewPassword);
+    }
+
+    @Transactional
+    public Object changePassword(Long userID, String newPassword, String retypeNewPassword) {
+        // check if new password is same with retype one
+        if (!newPassword.equals(retypeNewPassword)) {
+            throw new ConfirmNewPasswordException();
+        }
+
+        User user = this.userRepository.findById(userID).orElse(null);
 
         user.setId(userID);
         user.setPassword(this.passwordEncoder.encode(newPassword));
-        return super.create(user);
+        return super.save(user);
     }
 
     @Override
