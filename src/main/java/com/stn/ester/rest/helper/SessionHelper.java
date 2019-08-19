@@ -25,7 +25,16 @@ public class SessionHelper {
     public static Long getUserID() {
         User user=getCurrentUser();
         if (user!=null) {
-            return getCurrentUser().getId();
+            return user.getId();
+        }else{
+            return null;
+        }
+    }
+
+    public static Long getUserGroupId(){
+        User user=getCurrentUser();
+        if (user!=null) {
+            return user.getUserGroup().getId();
         }else{
             return null;
         }

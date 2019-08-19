@@ -7,6 +7,7 @@ import com.stn.ester.rest.domain.AccessGroup;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.Menu;
 import com.stn.ester.rest.domain.UserGroup;
+import com.stn.ester.rest.security.SecurityConstants;
 import org.modelmapper.internal.util.Iterables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -57,7 +58,12 @@ public class UserGroupService extends AppService {
         Iterable<Menu> menus = this.menuRepository.findAll();
         List<AccessGroup> accessGroups = new ArrayList<>();
         for (Menu menu : menus) {
-            AccessGroup accessGroup = new AccessGroup(lastInsertID, menu.getId(), false, false, false, false);
+            AccessGroup accessGroup;
+            if (userGroup.getName().equals(SecurityConstants.ROLE_SUPERADMIN)) {
+                accessGroup = new AccessGroup(lastInsertID, menu.getId(), true, false, false, false);
+            } else {
+                accessGroup = new AccessGroup(lastInsertID, menu.getId(), false, false, false, false);
+            }
             accessGroups.add(accessGroup);
         }
         this.accessGroupRepository.saveAll(accessGroups);
@@ -75,7 +81,7 @@ public class UserGroupService extends AppService {
 
     @Transactional
     public Object createIfNameNotExist(UserGroup userGroup, String name) {
-        UserGroup currentUserGroup=this.userGroupRepository.findByName(name);
+        UserGroup currentUserGroup = this.userGroupRepository.findByName(name);
         if (currentUserGroup == null) {
             return this.create(userGroup);
         }
