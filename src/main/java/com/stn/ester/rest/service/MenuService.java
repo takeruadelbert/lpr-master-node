@@ -7,6 +7,7 @@ import com.stn.ester.rest.domain.AccessGroup;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.Menu;
 import com.stn.ester.rest.domain.UserGroup;
+import com.stn.ester.rest.exception.NotFoundException;
 import com.stn.ester.rest.security.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -137,5 +138,9 @@ public class MenuService extends AppService {
     public Object update(Long id, Menu menu) {
         menu.setId(id);
         return this.menuRepository.save(menu);
+    }
+
+    public Object checkPrivilege(Long userGroupId, Long menuId) {
+        return this.accessGroupRepository.findByMenuIdAndUserGroupId(menuId, userGroupId).orElseThrow(() -> new NotFoundException());
     }
 }

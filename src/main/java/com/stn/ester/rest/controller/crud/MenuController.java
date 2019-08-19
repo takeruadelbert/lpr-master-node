@@ -8,6 +8,7 @@ import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.MenuService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -33,6 +34,12 @@ public class MenuController extends CrudController<MenuService, Menu> {
             throw new UnauthorizedException();
         }
         return this.menuService.getByUserGroupId(user.getUserGroupId());
+    }
+
+    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequestMapping(value = "/check_privilege/{menuId}", method = RequestMethod.GET)
+    public Object checkPrivilege(@PathVariable long menuId) {
+        return this.service.checkPrivilege(SessionHelper.getUserGroupId(), menuId);
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
