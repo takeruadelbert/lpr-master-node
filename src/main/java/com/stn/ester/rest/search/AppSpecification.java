@@ -6,6 +6,8 @@ import com.stn.ester.rest.search.util.SpecSearchCriteria;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
+import java.util.Calendar;
+import java.util.Date;
 
 public class AppSpecification<T extends AppDomain> implements Specification<T> {
 
@@ -33,23 +35,30 @@ public class AppSpecification<T extends AppDomain> implements Specification<T> {
                 Join joinPredicate = root.join(getCriteria().getClassJoin());
                 path = joinPredicate.get(criteria.getKey());
             }
+            Object value;
+            if (path.getModel().getBindableJavaType().isAssignableFrom(Date.class)){
+                value=new Date(criteria.getValue().toString());
+            }else{
+                value=criteria.getValue();
+            }
+
             switch (criteria.getOperation()) {
                 case EQUALITY:
-                    return builder.equal(path, criteria.getValue());
+                    return builder.equal(path,value);
                 case NEGATION:
-                    return builder.notEqual(path, criteria.getValue());
+                    return builder.notEqual(path, value);
                 case GREATER_THAN:
-                    return builder.greaterThan(path, criteria.getValue().toString());
+                    return builder.greaterThan(path, value.toString());
                 case LESS_THAN:
-                    return builder.lessThan(path, criteria.getValue().toString());
+                    return builder.lessThan(path, value.toString());
                 case LIKE:
-                    return builder.like(path, criteria.getValue().toString());
+                    return builder.like(path, value.toString());
                 case STARTS_WITH:
-                    return builder.like(path, criteria.getValue() + "%");
+                    return builder.like(path, value + "%");
                 case ENDS_WITH:
-                    return builder.like(path, "%" + criteria.getValue());
+                    return builder.like(path, "%" + value);
                 case CONTAINS:
-                    return builder.like(path, "%" + criteria.getValue() + "%");
+                    return builder.like(path, "%" + value + "%");
                 default:
                     return null;
             }
