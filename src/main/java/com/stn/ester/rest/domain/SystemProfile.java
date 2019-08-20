@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -31,9 +32,17 @@ public class SystemProfile extends AppDomain {
     @JoinColumn(name = "country_id", insertable = false, updatable = false)
     private Country country;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "image_background_id", insertable = false, updatable = false)
+    private AssetFile imageBackground;
+
     @JsonProperty("assetFileId")
     @Column(name = "logo_id")
     private Long assetFileId;
+
+    @JsonProperty("imageBackgroundId")
+    @Column(name = "image_background_id")
+    private Long imageBackgroundId;
 
     public void setAssetFileId(Long assetFileId) {
         if (assetFileId != null)
@@ -52,6 +61,11 @@ public class SystemProfile extends AppDomain {
     private String email;
     @URL(regexp = "^(http|https).*", message = "Invalid URL Website")
     private String website;
+    private String appName;
+    private String appShortName;
+    private String companyShortName;
+    private String companyName;
+    private Date startYear;
 
     public SystemProfile() {
 
