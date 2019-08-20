@@ -10,6 +10,7 @@ import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.BiodataService;
 import com.stn.ester.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +54,14 @@ public class UserController extends CrudController<UserService, User> {
         String new_password = data.get("new_password");
         String retype_new_password = data.get("retype_new_password");
         return service.changePassword(SessionHelper.getUserID(), old_password, new_password, retype_new_password);
+    }
+
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole('changeUserPassword'))")
+    @RequestMapping(value = "/change-password/{id}", method = RequestMethod.PUT)
+    public Object changePassword (@RequestBody Map<String, String> data,@PathVariable long id) {
+        String new_password = data.get("new_password");
+        String retype_new_password = data.get("retype_new_password");
+        return service.changePassword(id, new_password, retype_new_password);
     }
 
     @RequestMapping(value = "/change-profile-picture", method = RequestMethod.POST)

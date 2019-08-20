@@ -7,6 +7,8 @@ import com.stn.ester.rest.domain.AccessGroup;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.Menu;
 import com.stn.ester.rest.domain.UserGroup;
+import com.stn.ester.rest.exception.NotFoundException;
+import com.stn.ester.rest.security.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -111,7 +113,12 @@ public class MenuService extends AppService {
         Iterable<UserGroup> userGroups = this.userGroupRepository.findAll();
         List<AccessGroup> accessGroups = new ArrayList<>();
         for (UserGroup userGroup : userGroups) {
-            AccessGroup accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, false, false, false, false);
+            AccessGroup accessGroup;
+            if (userGroup.getName().equals(SecurityConstants.ROLE_SUPERADMIN)) {
+                accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, true, false, false, false);
+            } else {
+                accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, false, false, false, false);
+            }
             accessGroups.add(accessGroup);
         }
         this.accessGroupRepository.saveAll(accessGroups);
@@ -131,5 +138,9 @@ public class MenuService extends AppService {
     public Object update(Long id, Menu menu) {
         menu.setId(id);
         return this.menuRepository.save(menu);
+    }
+
+    public Object checkPrivilege(Long userGroupId, Long menuId) {
+        return this.accessGroupRepository.findByMenuIdAndUserGroupId(menuId, userGroupId).orElseThrow(() -> new NotFoundException());
     }
 }

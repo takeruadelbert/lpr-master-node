@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.stn.ester.rest.domain.enumerate.EmployeeWorkStatus;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -24,6 +25,7 @@ public class Employee extends AppDomain {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date tmt;
 
+    @EqualsAndHashCode.Exclude
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "employee", cascade = CascadeType.ALL)
     @JsonManagedReference
     private User user;

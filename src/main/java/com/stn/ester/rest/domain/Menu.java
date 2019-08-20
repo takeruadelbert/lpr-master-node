@@ -52,6 +52,7 @@ public class Menu extends AppDomain {
     @JoinColumn(name = "parent_menu_id", insertable = false, updatable = false)
     @JsonProperty(access= JsonProperty.Access.READ_ONLY)
     @EqualsAndHashCode.Exclude
+    @JsonIgnoreProperties("subMenu")
     private Menu parentMenu;
 
     @JsonProperty("parentMenuId")
