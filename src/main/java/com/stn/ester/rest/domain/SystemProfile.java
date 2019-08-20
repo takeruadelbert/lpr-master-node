@@ -67,11 +67,11 @@ public class SystemProfile extends AppDomain {
     private String companyName;
     private Date startYear;
 
-    public SystemProfile(String address, String telephone, String name, String shortname, String header, String email, String website, Long logo_id) {
+    public SystemProfile() {
 
     }
 
-    public SystemProfile(String address, String telephone, String name, String shortname, String header, String email, String website, Long assetFileId, String appName, String appShortName, String companyShortName, String companyName, Long imageBackgroundId) {
+    public SystemProfile(String address, String telephone, String name, String shortname, String header, String email, String website, Long assetFileId) {
         this.address = address;
         this.telephone = telephone;
         this.name = name;
@@ -80,11 +80,6 @@ public class SystemProfile extends AppDomain {
         this.email = email;
         this.website = website;
         this.assetFileId = assetFileId;
-        this.appName = appName;
-        this.appShortName = appShortName;
-        this.companyShortName = companyShortName;
-        this.companyName = companyName;
-        this.imageBackgroundId = imageBackgroundId;
     }
 
     public String getToken() {
