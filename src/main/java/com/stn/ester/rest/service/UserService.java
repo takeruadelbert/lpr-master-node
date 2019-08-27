@@ -27,11 +27,19 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import javax.mail.BodyPart;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.beans.Transient;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -50,6 +58,11 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
     private PasswordResetService passwordResetService;
     private SystemProfileRepository systemProfileRepository;
     private String asset_path = "profile_picture";
+    Path root = FileSystems.getDefault().getPath("").toAbsolutePath();
+    Path filePathLogoFacebook = Paths.get(root.toString(),"src", "main", "resources", "static", "images", "facebook.png");
+    Path filePathLogoTwitter = Paths.get(root.toString(),"src", "main", "resources", "static", "images", "twitter.png");
+    Path filePathLogoLinkedin = Paths.get(root.toString(),"src", "main", "resources", "static", "images", "linkedin.png");
+    Path filePathLogoMywebsite = Paths.get(root.toString(),"src", "main", "resources", "static", "images", "my_website.png");
 
     @Value("${ester.session.login.timeout}")
     private int sessionTimeout;
@@ -250,7 +263,7 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
         if (user != null) {
             try {
                 MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
                 helper.setFrom(EmailHelper.emailFrom());
                 helper.setTo(EmailHelper.emailTo());
                 helper.setSubject(EmailHelper.emailSubject());
@@ -264,7 +277,7 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
                 context.setVariable("name", systemProfile.getName());
                 context.setVariable("website", systemProfile.getWebsite());
                 String html = templateEngine.process("email_template", context);
-                message.setContent(html, "text/html");
+                embeddedImage(html, message);
                 mailSender.send(message);
 
                 PasswordReset passwordReset = this.passwordResetRepository.findByUserId(user.get().getId());
@@ -281,6 +294,45 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
             }
         }
         return result;
+    }
+
+    private Object embeddedImage(String html, MimeMessage message) throws IOException, MessagingException {
+        MimeMultipart multipart = new MimeMultipart();
+        BodyPart messageBodyPart = new MimeBodyPart();
+        messageBodyPart.setContent(html, "text/html");
+        multipart.addBodyPart(messageBodyPart);
+
+        // Inline the embedded image part
+        MimeBodyPart imgBodyPart = new MimeBodyPart();
+        imgBodyPart.attachFile(filePathLogoFacebook.toString());
+        imgBodyPart.setContentID("<facebook>");
+        imgBodyPart.setDisposition(MimeBodyPart.INLINE);
+        imgBodyPart.setHeader("Content-Type", "image/png");
+        multipart.addBodyPart(imgBodyPart);
+
+        MimeBodyPart imgBodyPart2 = new MimeBodyPart();
+        imgBodyPart2.attachFile(filePathLogoTwitter.toString());
+        imgBodyPart2.setContentID("<twitter>");
+        imgBodyPart2.setDisposition(MimeBodyPart.INLINE);
+        imgBodyPart2.setHeader("Content-Type", "image/png");
+        multipart.addBodyPart(imgBodyPart2);
+
+        MimeBodyPart imgBodyPart3 = new MimeBodyPart();
+        imgBodyPart3.attachFile(filePathLogoLinkedin.toString());
+        imgBodyPart3.setContentID("<linkedin>");
+        imgBodyPart3.setDisposition(MimeBodyPart.INLINE);
+        imgBodyPart3.setHeader("Content-Type", "image/png");
+        multipart.addBodyPart(imgBodyPart3);
+
+        MimeBodyPart imgBodyPart4 = new MimeBodyPart();
+        imgBodyPart4.attachFile(filePathLogoMywebsite.toString());
+        imgBodyPart4.setContentID("<my_website>");
+        imgBodyPart4.setDisposition(MimeBodyPart.INLINE);
+        imgBodyPart4.setHeader("Content-Type", "image/png");
+        multipart.addBodyPart(imgBodyPart4);
+
+        message.setContent(multipart);
+        return message;
     }
 
     public Object passwordReset(String token, String new_password, String confirm_password) {
