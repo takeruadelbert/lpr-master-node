@@ -65,16 +65,20 @@ public class News extends AppDomain {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "thumbnail_id", insertable = false, updatable = false)
-    private AssetFile assetFile;
+    private AssetFile thumbnail;
 
     @Column(name = "thumbnail_id")
-    @JsonProperty("assetFileId")
+    @JsonProperty("thumbnailId")
     private Long assetFileId;
 
-    @JsonSetter("assetFileId")
+    @JsonSetter("thumbnailId")
     public void setAssetFileId(Long assetFileId) {
         if (assetFileId != null)
             this.assetFileId = assetFileId;
+    }
+
+    public void setThumbnail(AssetFile thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     @Transient

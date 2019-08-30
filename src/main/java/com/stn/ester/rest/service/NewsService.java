@@ -53,7 +53,9 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         ((News) o).setAuthorId(author_id);
         String token = ((News) o).getToken();
         if (token != null) {
-            ((News) o).setAssetFileId(this.claimFile(token).getId());
+            AssetFile thumbnail = this.claimFile(token);
+            ((News) o).setAssetFileId(thumbnail.getId());
+            ((News) o).setThumbnail(thumbnail);
         }
         return super.update(id, o);
     }

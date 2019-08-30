@@ -40,20 +40,20 @@ public class User extends AppDomain implements UserDetails {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "profile_picture_id", insertable = false, updatable = false)
-    private AssetFile assetFile;
+    private AssetFile profilePicture;
 
     public void setAssetFile(AssetFile assetFile) {
-        this.assetFile = assetFile;
+        this.profilePicture = assetFile;
     }
 
-    @JsonProperty("assetFileId")
+    @JsonProperty("profilePictureId")
     @Column(name = "profile_picture_id")
-    private Long assetFileId;
+    private Long profilePictureId;
 
-    @JsonSetter("assetFileId")
+    @JsonSetter("profilePictureId")
     public void setAssetFileId(Long assetFileId) {
         if (assetFileId != null)
-            this.assetFileId = assetFileId;
+            this.profilePictureId = assetFileId;
     }
 
     @OneToOne
