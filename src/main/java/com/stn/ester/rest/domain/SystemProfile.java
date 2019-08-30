@@ -17,7 +17,7 @@ public class SystemProfile extends AppDomain {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "logo_id", insertable = false, updatable = false)
-    private AssetFile assetFile;
+    private AssetFile logo;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
@@ -36,7 +36,7 @@ public class SystemProfile extends AppDomain {
     @JoinColumn(name = "image_background_id", insertable = false, updatable = false)
     private AssetFile imageBackground;
 
-    @JsonProperty("assetFileId")
+    @JsonProperty("logoId")
     @Column(name = "logo_id")
     private Long assetFileId;
 
@@ -47,6 +47,10 @@ public class SystemProfile extends AppDomain {
     public void setAssetFileId(Long assetFileId) {
         if (assetFileId != null)
             this.assetFileId = assetFileId;
+    }
+
+    public void setLogo(AssetFile assetFile) {
+        this.logo = assetFile;
     }
 
     @Transient
