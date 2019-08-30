@@ -43,7 +43,7 @@ public class EmployeeService extends AppService {
         ((Employee) domain).getUser().setUserGroupId(user_group_id);
 
         if (((Employee) domain).getUser().getToken() == null) {
-            ((Employee) domain).getUser().setAssetFileId(AssetFileService.defaultProfilePictureID); // set default profile picture
+            ((Employee) domain).getUser().setProfilePictureId(AssetFileService.defaultProfilePictureID); // set default profile picture
         }
 
         // append data Employee Work NewsStatus

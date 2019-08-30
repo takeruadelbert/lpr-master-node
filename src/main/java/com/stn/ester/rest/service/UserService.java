@@ -83,7 +83,7 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
     public Object create(AppDomain o) {
         // set default profile picture
         if (((User) o).getToken() == null) {
-            ((User) o).setAssetFileId(AssetFileService.defaultProfilePictureID);
+            ((User) o).setProfilePictureId(AssetFileService.defaultProfilePictureID);
         }
         ((User) o).setPassword(passwordEncoder.encode(((User) o).getPassword()));
         return super.create(o);
@@ -176,8 +176,8 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
             AssetFile assetFile = this.claimFile(token);
             User user = this.userRepository.findById(user_id).get();
             user.setId(user_id);
-            user.setAssetFileId(assetFile.getId());
-            user.setAssetFile(assetFile);
+            user.setProfilePictureId(assetFile.getId());
+            user.setProfilePicture(assetFile);
             return super.update(user_id, user);
         }
         Map<String, Object> result = new HashMap<>();

@@ -42,8 +42,8 @@ public class User extends AppDomain implements UserDetails {
     @JoinColumn(name = "profile_picture_id", insertable = false, updatable = false)
     private AssetFile profilePicture;
 
-    public void setAssetFile(AssetFile assetFile) {
-        this.profilePicture = assetFile;
+    public void setProfilePicture(AssetFile profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     @JsonProperty("profilePictureId")
@@ -51,9 +51,9 @@ public class User extends AppDomain implements UserDetails {
     private Long profilePictureId;
 
     @JsonSetter("profilePictureId")
-    public void setAssetFileId(Long assetFileId) {
-        if (assetFileId != null)
-            this.profilePictureId = assetFileId;
+    public void setProfilePictureId(Long profilePictureId) {
+        if (profilePictureId != null)
+            this.profilePictureId = profilePictureId;
     }
 
     @OneToOne
