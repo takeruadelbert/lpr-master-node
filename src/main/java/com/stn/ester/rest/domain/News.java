@@ -23,7 +23,6 @@ public class News extends AppDomain {
 
     @Column(columnDefinition = "TEXT")
     private String content;
-    private String thumbnail_path;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id", insertable = false, updatable = false)
