@@ -42,7 +42,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         ((News) o).setNewsStatus(NewsStatus.SHOWED); // default option is showed.
         String token = ((News) o).getToken();
         if (token != null) {
-            ((News) o).setAssetFileId(this.claimFile(token).getId());
+            ((News) o).setThumbnailId(this.claimFile(token).getId());
         }
         return super.create(o);
     }
@@ -54,7 +54,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         String token = ((News) o).getToken();
         if (token != null) {
             AssetFile thumbnail = this.claimFile(token);
-            ((News) o).setAssetFileId(thumbnail.getId());
+            ((News) o).setThumbnailId(thumbnail.getId());
             ((News) o).setThumbnail(thumbnail);
         }
         return super.update(id, o);

@@ -38,19 +38,19 @@ public class SystemProfile extends AppDomain {
 
     @JsonProperty("logoId")
     @Column(name = "logo_id")
-    private Long assetFileId;
+    private Long logoId;
 
     @JsonProperty("imageBackgroundId")
     @Column(name = "image_background_id")
     private Long imageBackgroundId;
 
-    public void setAssetFileId(Long assetFileId) {
-        if (assetFileId != null)
-            this.assetFileId = assetFileId;
+    public void setLogoId(Long logoId) {
+        if (logoId != null)
+            this.logoId = logoId;
     }
 
-    public void setLogo(AssetFile assetFile) {
-        this.logo = assetFile;
+    public void setLogo(AssetFile logo) {
+        this.logo = logo;
     }
 
     @Transient
@@ -75,7 +75,7 @@ public class SystemProfile extends AppDomain {
 
     }
 
-    public SystemProfile(String address, String telephone, String name, String shortname, String header, String email, String website, Long assetFileId) {
+    public SystemProfile(String address, String telephone, String name, String shortname, String header, String email, String website, Long logoId) {
         this.address = address;
         this.telephone = telephone;
         this.name = name;
@@ -83,7 +83,7 @@ public class SystemProfile extends AppDomain {
         this.header = header;
         this.email = email;
         this.website = website;
-        this.assetFileId = assetFileId;
+        this.logoId = logoId;
     }
 
     public String getToken() {

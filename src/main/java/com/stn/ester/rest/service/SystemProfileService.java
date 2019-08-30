@@ -32,7 +32,7 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
         String token = ((SystemProfile) object).getToken();
         if (token != null) {
             AssetFile assetFile = this.claimFile(token);
-            ((SystemProfile) object).setAssetFileId(assetFile.getId());
+            ((SystemProfile) object).setLogoId(assetFile.getId());
             ((SystemProfile) object).setLogo(assetFile);
         }
         if (systemProfileRepository.existsById(id)) {

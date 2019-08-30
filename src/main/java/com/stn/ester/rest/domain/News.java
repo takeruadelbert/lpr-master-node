@@ -68,12 +68,12 @@ public class News extends AppDomain {
 
     @Column(name = "thumbnail_id")
     @JsonProperty("thumbnailId")
-    private Long assetFileId;
+    private Long thumbnailId;
 
     @JsonSetter("thumbnailId")
-    public void setAssetFileId(Long assetFileId) {
-        if (assetFileId != null)
-            this.assetFileId = assetFileId;
+    public void setThumbnailId(Long thumbnailId) {
+        if (thumbnailId != null)
+            this.thumbnailId = thumbnailId;
     }
 
     public void setThumbnail(AssetFile thumbnail) {
