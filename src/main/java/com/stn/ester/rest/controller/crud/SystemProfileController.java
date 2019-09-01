@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import static com.stn.ester.rest.security.SecurityConstants.SYSTEM_PROFILE_URL;
+
 @RestController
 public class SystemProfileController extends SecuredController {
 
@@ -17,17 +19,17 @@ public class SystemProfileController extends SecuredController {
 
     @Autowired
     public SystemProfileController(SystemProfileService systemProfileService) {
-        this.service=systemProfileService;
+        this.service = systemProfileService;
     }
 
     @PreAuthorize("hasRole(#this.this.superAdminRole())")
-    @RequestMapping(value = "/system_profiles", method = RequestMethod.PUT)
+    @RequestMapping(value = SYSTEM_PROFILE_URL, method = RequestMethod.PUT)
     public Object update(@Valid @RequestBody SystemProfile systemProfile) {
         return service.updateSingleData(systemProfile);
     }
 
     @AccessAllowed
-    @RequestMapping(value = "/system_profiles", method = RequestMethod.GET)
+    @RequestMapping(value = SYSTEM_PROFILE_URL, method = RequestMethod.GET)
     public Object get() {
         return this.service.get();
     }
