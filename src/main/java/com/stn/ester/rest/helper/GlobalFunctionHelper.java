@@ -21,11 +21,12 @@ public class GlobalFunctionHelper {
     private static final String timeNow = "yyyy-MM-dd HH:mm:ss";
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+    private static final String SYMBOL = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     @Autowired
     public GlobalFunctionHelper() {
-	}
-	
+    }
+
     // Get date and time now.
     public static String getDateTimeNow() {
         String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
@@ -67,9 +68,8 @@ public class GlobalFunctionHelper {
     }
 
     public static String generateToken() {
-        byte[] randomBytes = new byte[24];
-        secureRandom.nextBytes(randomBytes);
-        return base64Encoder.encodeToString(randomBytes);
+        return secureRandom.ints(32, 0, SYMBOL.length()).mapToObj(i -> SYMBOL.charAt(i))
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
     }
 
     /*
