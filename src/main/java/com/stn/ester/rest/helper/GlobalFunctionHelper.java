@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,12 +19,12 @@ public class GlobalFunctionHelper {
 
     private static final String timeNow = "yyyy-MM-dd HH:mm:ss";
     private static final SecureRandom secureRandom = new SecureRandom();
-    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+    private static final String ALPHANUMERIC_CHAR = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     @Autowired
     public GlobalFunctionHelper() {
-	}
-	
+    }
+
     // Get date and time now.
     public static String getDateTimeNow() {
         String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
@@ -67,9 +66,8 @@ public class GlobalFunctionHelper {
     }
 
     public static String generateToken() {
-        byte[] randomBytes = new byte[24];
-        secureRandom.nextBytes(randomBytes);
-        return base64Encoder.encodeToString(randomBytes);
+        return secureRandom.ints(32, 0, ALPHANUMERIC_CHAR.length()).mapToObj(i -> ALPHANUMERIC_CHAR.charAt(i))
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
     }
 
     /*

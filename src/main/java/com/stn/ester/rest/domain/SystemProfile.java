@@ -50,7 +50,9 @@ public class SystemProfile extends AppDomain {
     }
 
     @Transient
-    private String token;
+    private String tokenLogo;
+    @Transient
+    private String tokenImageBackground;
     private String address;
     private String telephone;
     private String name;
@@ -82,8 +84,12 @@ public class SystemProfile extends AppDomain {
         this.assetFileId = assetFileId;
     }
 
-    public String getToken() {
-        return this.token;
+    public String getTokenLogo() {
+        return this.tokenLogo;
+    }
+
+    public String getTokenImageBackground() {
+        return this.tokenImageBackground;
     }
 
     public String getAddress() {
