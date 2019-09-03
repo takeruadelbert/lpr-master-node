@@ -2,6 +2,7 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import com.stn.ester.rest.domain.enumerate.CityStatus;
 import lombok.Data;
 
@@ -12,8 +13,10 @@ import javax.validation.constraints.NotBlank;
 @Entity
 public class City extends AppDomain {
     public static final String unique_name = "city";
+    private static final String COLUMN_STATE = "state_id";
+    private static final String JSON_PROPERTY_STATE = "stateId";
 
-    @NotBlank(message = "Name is mandatory.")
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false, unique = true)
     private String name;
 
@@ -23,14 +26,14 @@ public class City extends AppDomain {
     private CityStatus cityStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "state_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_STATE, insertable = false, updatable = false)
     private State state;
 
-    @JsonProperty("stateId")
-    @Column(name = "state_id")
+    @JsonProperty(JSON_PROPERTY_STATE)
+    @Column(name = COLUMN_STATE)
     private Long stateId;
 
-    @JsonSetter("stateId")
+    @JsonSetter(JSON_PROPERTY_STATE)
     public void setStateId(long stateId) {
         if (stateId != 0)
             this.stateId = stateId;

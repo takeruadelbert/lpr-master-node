@@ -3,6 +3,7 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import com.stn.ester.rest.domain.enumerate.EmployeeWorkStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,17 +17,22 @@ import java.util.Date;
 @Entity
 public class Employee extends AppDomain {
     public static String unique_name = "employee";
+    private static final String COLUMN_MAPPED_BY_EMPLOYEE = "employee";
+    private static final String COLUMN_DEPARTMENT = "department_id";
+    private static final String COLUMN_POSITION = "positionId";
+    private static final String JSON_PROPERTY_DEPARTMENT = "departmentId";
+    private static final String JSON_PROPERTY_POSITION = "positionId";
 
-    @NotBlank(message = "NIP is mandatory")
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false, unique = true)
     private String NIP;
 
-    @Column(columnDefinition = "DATE")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_DATE)
+    @DateTimeFormat(pattern = EntityConstant.FORMAT_DEFAULT_DATE)
     private Date tmt;
 
     @EqualsAndHashCode.Exclude
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "employee", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = COLUMN_MAPPED_BY_EMPLOYEE, cascade = CascadeType.ALL)
     @JsonManagedReference
     private User user;
 
@@ -34,28 +40,28 @@ public class Employee extends AppDomain {
     private EmployeeWorkStatus employeeWorkStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "department_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_DEPARTMENT, insertable = false, updatable = false)
     private Department department;
 
-    @JsonProperty("departmentId")
-    @Column(name = "department_id")
+    @JsonProperty(JSON_PROPERTY_DEPARTMENT)
+    @Column(name = COLUMN_DEPARTMENT)
     private Long departmentId;
 
-    @JsonSetter("departmentId")
+    @JsonSetter(JSON_PROPERTY_DEPARTMENT)
     public void setDepartmentId(long departmentId) {
         if (departmentId != 0)
             this.departmentId = departmentId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "position_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_POSITION, insertable = false, updatable = false)
     private Position position;
 
-    @JsonProperty("positionId")
-    @Column(name = "position_id")
+    @JsonProperty(JSON_PROPERTY_POSITION)
+    @Column(name = COLUMN_POSITION)
     private Long positionId;
 
-    @JsonSetter("positionId")
+    @JsonSetter(JSON_PROPERTY_POSITION)
     public void setPositionId(long positionId) {
         if (positionId != 0) {
             this.positionId = positionId;

@@ -3,6 +3,7 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import com.stn.ester.rest.domain.enumerate.Gender;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,8 +19,17 @@ import javax.validation.constraints.NotBlank;
 public class Biodata extends AppDomain {
 
     public static final String unique_name = "biodata";
+    private static final String COLUMN_USER = "user_id";
+    private static final String COLUMN_IDENTITY_TYPE = "identity_type_id";
+    private static final String COLUMN_COUNTRY = "country_id";
+    private static final String COLUMN_STATE = "state_id";
+    private static final String COLUMN_CITY = "city_id";
+    private static final String JSON_PROPERTY_COUNTRY = "countryId";
+    private static final String JSON_PROPERTY_STATE = "stateId";
+    private static final String JSON_PROPERTY_CITY = "cityId";
+    private static final String JSON_PROPERTY_IDENTITY_TYPE = "identityTypeId";
 
-    @NotBlank(message = "First Name is mandatory.")
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false)
     private String firstName;
 
@@ -36,7 +46,7 @@ public class Biodata extends AppDomain {
     private String phoneNumber;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = COLUMN_USER)
     @JsonBackReference
     private User user;
 
@@ -48,39 +58,39 @@ public class Biodata extends AppDomain {
     private Gender gender;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "identity_type_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_IDENTITY_TYPE, insertable = false, updatable = false)
     private IdentityType identityType;
 
-    @JsonProperty("identityTypeId")
-    @Column(name = "identity_type_id")
+    @JsonProperty(JSON_PROPERTY_IDENTITY_TYPE)
+    @Column(name = COLUMN_IDENTITY_TYPE)
     private Long identityTypeId;
 
-    @JsonSetter("identityTypeId")
+    @JsonSetter(JSON_PROPERTY_IDENTITY_TYPE)
     public void setIdentityTypeId(long identityTypeId) {
         if (identityTypeId != 0)
             this.identityTypeId = identityTypeId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "country_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_COUNTRY, insertable = false, updatable = false)
     private Country country;
 
-    @JsonProperty("countryId")
-    @Column(name = "country_id")
+    @JsonProperty(JSON_PROPERTY_COUNTRY)
+    @Column(name = COLUMN_COUNTRY)
     private Long countryId;
 
-    @JsonSetter("countryId")
+    @JsonSetter(JSON_PROPERTY_COUNTRY)
     public void setCountryId(long countryId) {
         if (countryId != 0)
             this.countryId = countryId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "state_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_STATE, insertable = false, updatable = false)
     private State state;
 
-    @JsonProperty("stateId")
-    @Column(name = "state_id")
+    @JsonProperty(JSON_PROPERTY_STATE)
+    @Column(name = COLUMN_STATE)
     private Long stateId;
 
     public void setStateId(long stateId) {
@@ -89,11 +99,11 @@ public class Biodata extends AppDomain {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "city_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_CITY, insertable = false, updatable = false)
     private City city;
 
-    @JsonProperty("cityId")
-    @Column(name = "city_id")
+    @JsonProperty(JSON_PROPERTY_CITY)
+    @Column(name = COLUMN_CITY)
     private Long cityId;
 
     public void setCityId(long cityId) {

@@ -3,47 +3,50 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 @Data
 @Entity
 public class AccessGroup extends AppDomain {
 
     public static final String unique_name="access_group";
+    private static final String COLUMN_USER_GROUP = "user_group_id";
+    private static final String COLUMN_MENU = "menu_id";
+    private static final String JSON_PROPERTY_USER_GROUP = "userGroupId";
+    private static final String JSON_PROPERTY_MENU = "menuId";
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_group_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_USER_GROUP, insertable = false, updatable = false)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private UserGroup userGroup;
 
-    @NotNull(message = "User Group is mandatory.")
-    @JsonProperty("userGroupId")
-    @Column(name = "user_group_id")
+    @NotNull(message = EntityConstant.MESSAGE_NOT_BLANK)
+    @JsonProperty(JSON_PROPERTY_USER_GROUP)
+    @Column(name = COLUMN_USER_GROUP)
     private long userGroupId;
 
-    @JsonSetter("userGroupId")
+    @JsonSetter(JSON_PROPERTY_USER_GROUP)
     public void setUserGroupId(long userGroupId) {
         if (userGroupId != 0)
             this.userGroupId = userGroupId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "menu_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_MENU, insertable = false, updatable = false)
     private Menu menu;
 
-    @NotNull(message = "Menu is mandatory.")
-    @JsonProperty("menuId")
-    @Column(name = "menu_id")
+    @NotNull(message = EntityConstant.MESSAGE_NOT_BLANK)
+    @JsonProperty(JSON_PROPERTY_MENU)
+    @Column(name = COLUMN_MENU)
     private long menuId;
 
-    @JsonSetter("menuId")
+    @JsonSetter(JSON_PROPERTY_MENU)
     public void setMenuId(long menuId) {
         if (menuId != 0)
             this.menuId = menuId;

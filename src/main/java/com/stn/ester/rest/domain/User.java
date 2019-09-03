@@ -1,6 +1,7 @@
 package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.*;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,65 +19,71 @@ import static com.stn.ester.rest.security.SecurityConstants.ROLE_PREFIX;
 public class User extends AppDomain implements UserDetails {
 
     public static final String unique_name = "user";
+    private static final String COLUMN_PROFILE_PICTURE_ID = "profile_picture_id";
+    private static final String COLUMN_MAPPED_USER = "user";
+    private static final String COLUMN_EMPLOYEE_ID = "employee_id";
+    private static final String COLUMN_USER_GROUP_ID = "user_group_id";
+    private static final String JSON_PROPERTY_USER_GROUP = "userGroupId";
+    private static final String JSON_PROPERTY_PROFILE_PICTURE = "profilePictureId";
 
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Username must be Alphanumeric.", groups = {New.class, Existing.class})
-    @NotBlank(groups = New.class, message = "Username is mandatory.")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = EntityConstant.MESSAGE_ALPHANUMERIC_ONLY, groups = {New.class, Existing.class})
+    @NotBlank(groups = New.class, message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Email(message = "Invalid Email Format.", groups = {New.class, Existing.class})
-    @NotBlank(groups = {New.class, Existing.class}, message = "Email is mandatory.")
+    @Email(message = EntityConstant.MESSAGE_INVALID_FORMAT, groups = {New.class, Existing.class})
+    @NotBlank(groups = {New.class, Existing.class}, message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(unique = true)
     private String email;
 
-    @NotBlank(groups = New.class, message = "Password is mandatory.")
+    @NotBlank(groups = New.class, message = EntityConstant.MESSAGE_NOT_BLANK)
     @Null(groups = Existing.class)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = COLUMN_MAPPED_USER, cascade = CascadeType.ALL)
     @JsonManagedReference
     private Biodata biodata;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "profile_picture_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_PROFILE_PICTURE_ID, insertable = false, updatable = false)
     private AssetFile profilePicture;
 
     public void setProfilePicture(AssetFile profilePicture) {
         this.profilePicture = profilePicture;
     }
 
-    @JsonProperty("profilePictureId")
-    @Column(name = "profile_picture_id")
+    @JsonProperty(JSON_PROPERTY_PROFILE_PICTURE)
+    @Column(name = COLUMN_PROFILE_PICTURE_ID)
     private Long profilePictureId;
 
-    @JsonSetter("profilePictureId")
+    @JsonSetter(JSON_PROPERTY_PROFILE_PICTURE)
     public void setProfilePictureId(Long profilePictureId) {
         if (profilePictureId != null)
             this.profilePictureId = profilePictureId;
     }
 
     @OneToOne
-    @JoinColumn(name = "employee_id")
+    @JoinColumn(name = COLUMN_EMPLOYEE_ID)
     @JsonBackReference
     private Employee employee;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = COLUMN_MAPPED_USER, cascade = CascadeType.ALL)
     @JsonManagedReference
     private PasswordReset passwordReset;
 
     //contoh belongsto(unidirection manytoone)
     //start
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_group_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_USER_GROUP_ID, insertable = false, updatable = false)
     private UserGroup userGroup;
 
-    @NotNull(groups = {New.class, Existing.class}, message = "User Group is mandatory.")
-    @JsonProperty("userGroupId")
-    @Column(name = "user_group_id")
+    @NotNull(groups = {New.class, Existing.class}, message = EntityConstant.MESSAGE_NOT_BLANK)
+    @JsonProperty(JSON_PROPERTY_USER_GROUP)
+    @Column(name = COLUMN_USER_GROUP_ID)
     private Long userGroupId;
 
-    @JsonSetter("userGroupId")
+    @JsonSetter(JSON_PROPERTY_USER_GROUP)
     public void setUserGroupId(long userGroupId) {
         if (userGroupId != 0)
             this.userGroupId = userGroupId;
@@ -86,9 +93,13 @@ public class User extends AppDomain implements UserDetails {
     @Transient
     private String token;
 
-    public long getId() {return id;}
+    public long getId() {
+        return id;
+    }
 
-    public void setId() {this.id = id;}
+    public void setId() {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
@@ -140,7 +151,7 @@ public class User extends AppDomain implements UserDetails {
     }
 
     public String getEmail() {
-        return  email;
+        return email;
     }
 
     public Long getUserGroupId() {

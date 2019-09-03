@@ -1,6 +1,8 @@
 package com.stn.ester.rest.domain;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.stn.ester.rest.base.OnDeleteSetParentNull;
 import com.stn.ester.rest.base.TableFieldPair;
 import com.stn.ester.rest.service.MenuService;
@@ -8,8 +10,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,24 +22,29 @@ import java.util.Set;
 public class Menu extends AppDomain {
 
     public static final String unique_name = "menu";
+    private static final String COLUMN_MODULE = "module_id";
+    private static final String COLUMN_PARENT_MENU = "parent_menu_id";
+    private static final String JSON_PROPERTY_MODULE = "moduleId";
+    private static final String JSON_PROPERTY_PARENT_MENU = "parentMenuId";
+    private static final String JSON_IGNORE_PROPERTIES_FIELD = "subMenu";
 
     private long id;
     private String label;
     private int orderingNumber;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "module_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_MODULE, insertable = false, updatable = false)
     private Module module;
 
-    @JsonProperty("moduleId")
-    @Column(name = "module_id")
+    @JsonProperty(JSON_PROPERTY_MODULE)
+    @Column(name = COLUMN_MODULE)
     private Long moduleId;
 
     public Menu() {
 
     }
 
-    @JsonSetter("moduleId")
+    @JsonSetter(JSON_PROPERTY_MODULE)
     public void setModuleId(Long moduleId) {
         this.moduleId = moduleId;
     }
@@ -49,17 +54,17 @@ public class Menu extends AppDomain {
     private Set<Menu> subMenu = new HashSet<Menu>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "parent_menu_id", insertable = false, updatable = false)
-    @JsonProperty(access= JsonProperty.Access.READ_ONLY)
+    @JoinColumn(name = COLUMN_PARENT_MENU, insertable = false, updatable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @EqualsAndHashCode.Exclude
-    @JsonIgnoreProperties("subMenu")
+    @JsonIgnoreProperties(JSON_IGNORE_PROPERTIES_FIELD)
     private Menu parentMenu;
 
-    @JsonProperty("parentMenuId")
-    @Column(name = "parent_menu_id")
+    @JsonProperty(JSON_PROPERTY_PARENT_MENU)
+    @Column(name = COLUMN_PARENT_MENU)
     private Long parentMenuId;
 
-    @JsonSetter("parentMenuId")
+    @JsonSetter(JSON_PROPERTY_PARENT_MENU)
     public void setParentMenuId(Long parentMenuId) {
         this.parentMenuId = parentMenuId;
     }

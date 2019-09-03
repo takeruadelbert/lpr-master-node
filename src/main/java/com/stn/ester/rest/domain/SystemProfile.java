@@ -2,6 +2,7 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -14,34 +15,46 @@ import java.util.List;
 @Entity
 public class SystemProfile extends AppDomain {
     public static final String unique_name = "system_profile";
+    private static final String COLUMN_LOGO = "logo_id";
+    private static final String COLUMN_IMAGE_BACKGROUND = "image_background_id";
+    private static final String COLUMN_SYSTEM_PROFILE = "system_profile_id";
+    private static final String COLUMN_COUNTRY = "country_id";
+    private static final String COLUMN_STATE = "state_id";
+    private static final String COLUMN_CITY = "city_id";
+    private static final String JSON_PROPERTY_LOGO = "logoId";
+    private static final String JSON_PROPERTY_IMAGE_BACKGROUND = "imageBackgroundId";
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "logo_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_LOGO, insertable = false, updatable = false)
     private AssetFile logo;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
-    @JoinColumn(name = "system_profile_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_SYSTEM_PROFILE, insertable = false, updatable = false)
     private List<SocialMedia> socialMedia;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "city_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_CITY, insertable = false, updatable = false)
     private City city;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "country_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_STATE, insertable = false, updatable = false)
+    private State state;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = COLUMN_COUNTRY, insertable = false, updatable = false)
     private Country country;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "image_background_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_IMAGE_BACKGROUND, insertable = false, updatable = false)
     private AssetFile imageBackground;
 
-    @JsonProperty("logoId")
-    @Column(name = "logo_id")
+    @JsonProperty(JSON_PROPERTY_LOGO)
+    @Column(name = COLUMN_LOGO)
     private Long logoId;
 
-    @JsonProperty("imageBackgroundId")
-    @Column(name = "image_background_id")
+    @JsonProperty(JSON_PROPERTY_IMAGE_BACKGROUND)
+    @Column(name = COLUMN_IMAGE_BACKGROUND)
     private Long imageBackgroundId;
 
     public void setLogoId(Long logoId) {
@@ -59,11 +72,11 @@ public class SystemProfile extends AppDomain {
     private String telephone;
     private String name;
     private String shortname;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_TEXT)
     private String header;
-    @Email(message = "Invalid Email Format.")
+    @Email(message = EntityConstant.MESSAGE_INVALID_FORMAT)
     private String email;
-    @URL(regexp = "^(http|https).*", message = "Invalid URL Website")
+    @URL(regexp = "^(http|https).*", message = EntityConstant.MESSAGE_INVALID_FORMAT)
     private String website;
     private String appName;
     private String appShortName;

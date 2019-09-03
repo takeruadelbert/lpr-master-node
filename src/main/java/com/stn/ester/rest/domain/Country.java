@@ -1,5 +1,6 @@
 package com.stn.ester.rest.domain;
 
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -13,7 +14,7 @@ public class Country extends AppDomain {
 
     private String iso;
 
-    @NotBlank(message = "Name is mandatory.")
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false, unique = true)
     private String name;
 
