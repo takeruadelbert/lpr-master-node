@@ -36,28 +36,30 @@ public class NewsService extends AppService implements AssetFileBehaviour {
 
     @Transactional
     @Override
-    public Object create(AppDomain o) {
+    public Object create(AppDomain appDomain) {
+        News news = ((News) appDomain);
         long author_id = SessionHelper.getUserID();
-        ((News) o).setAuthorId(author_id);
-        ((News) o).setNewsStatus(NewsStatus.SHOWED); // default option is showed.
-        String token = ((News) o).getToken();
+        news.setAuthorId(author_id);
+        news.setNewsStatus(NewsStatus.SHOWED); // default option is showed.
+        String token = news.getToken();
         if (token != null) {
-            ((News) o).setThumbnailId(this.claimFile(token).getId());
+            news.setThumbnailId(this.claimFile(token).getId());
         }
-        return super.create(o);
+        return super.create(news);
     }
 
     @Override
-    public Object update(Long id, AppDomain o) {
+    public Object update(Long id, AppDomain appDomain) {
+        News news = ((News) appDomain);
         long author_id = SessionHelper.getUserID();
-        ((News) o).setAuthorId(author_id);
-        String token = ((News) o).getToken();
+        news.setAuthorId(author_id);
+        String token = news.getToken();
         if (token != null) {
             AssetFile thumbnail = this.claimFile(token);
-            ((News) o).setThumbnailId(thumbnail.getId());
-            ((News) o).setThumbnail(thumbnail);
+            news.setThumbnailId(thumbnail.getId());
+            news.setThumbnail(thumbnail);
         }
-        return super.update(id, o);
+        return super.update(id, news);
     }
 
     public Page<News> dashboard(Integer page, Integer size, Pageable pageable) throws Exception {

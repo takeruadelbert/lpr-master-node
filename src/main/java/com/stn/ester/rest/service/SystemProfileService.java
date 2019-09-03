@@ -27,19 +27,20 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
     @Transactional
     public Object updateSingleData(AppDomain object) {
         Long id = Long.valueOf(1);
+        SystemProfile systemProfile = ((SystemProfile) object);
 
         // insert asset file ID if there's any file uploaded.
-        String token = ((SystemProfile) object).getToken();
+        String token = systemProfile.getToken();
         if (token != null) {
             AssetFile assetFile = this.claimFile(token);
-            ((SystemProfile) object).setLogoId(assetFile.getId());
-            ((SystemProfile) object).setLogo(assetFile);
+            systemProfile.setLogoId(assetFile.getId());
+            systemProfile.setLogo(assetFile);
         }
         if (systemProfileRepository.existsById(id)) {
-            object.setId(id);
-            return super.update(id, object);
+            systemProfile.setId(id);
+            return super.update(id, systemProfile);
         } else {
-            return super.create(object);
+            return super.create(systemProfile);
         }
     }
 
