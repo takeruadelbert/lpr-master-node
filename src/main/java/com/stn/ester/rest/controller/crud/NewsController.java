@@ -7,6 +7,7 @@ import com.stn.ester.rest.service.NewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,16 +31,19 @@ public class NewsController extends CrudController<NewsService, News> {
         return service.update(id, news);
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/dashboard", method = RequestMethod.GET)
     public Page<News> dashboard(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUM) Integer page, @RequestParam(name = "size", defaultValue = "2") Integer size) throws Exception {
         return service.dashboard(page, size, PageRequest.of(page, size));
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/status", method = RequestMethod.OPTIONS)
     public Map<NewsStatus, String> getStatusList() {
         return service.getStatusList();
     }
 
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole('changeNewsStatus'))")
     @RequestMapping(value = "/{id}/status/change", method = RequestMethod.PUT)
     public Object changeNewsStatus(@PathVariable Long id, @RequestBody Map<String, String> data) {
         String dataNewsStatus = data.get("status");
