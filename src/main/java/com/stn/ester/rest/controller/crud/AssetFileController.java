@@ -1,12 +1,9 @@
 package com.stn.ester.rest.controller.crud;
 
 import com.stn.ester.rest.base.AccessAllowed;
-import com.stn.ester.rest.controller.base.CrudController;
-import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.service.AssetFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

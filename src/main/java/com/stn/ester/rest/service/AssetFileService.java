@@ -316,4 +316,22 @@ public class AssetFileService extends AppService {
             AccessLogInterceptor.accessLogId.remove();
         }
     }
+
+    public byte[] getFile(String token) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        AssetFile assetFile = this.assetFileRepository.findByToken(token).get();
+        if(assetFile != null) {
+            int isDefault = assetFile.getIsDefault();
+            String path = DS + assetFile.getPath();
+            String filename = isDefault == 1 ? path : this.parentDirectory + path;
+            try {
+                InputStream inputStream = isDefault == 1 ? getClass().getResourceAsStream(filename) : new FileInputStream(filename);
+                byte[] buffer = IOUtils.toByteArray(inputStream);
+                byteArrayOutputStream.write(buffer, 0, buffer.length);
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        return byteArrayOutputStream.toByteArray();
+    }
 }
