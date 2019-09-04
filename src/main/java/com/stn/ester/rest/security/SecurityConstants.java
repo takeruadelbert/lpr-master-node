@@ -14,5 +14,5 @@ public class SecurityConstants {
     public static final String ROLE_PREFIX = "ROLE";
     public static final String VALIDATOR_URL_MESSAGE = "Invalid URL.";
     public static final String NOT_BLANK_URL_MESSAGE = "Url is mandatory.";
-    public static final String SYSTEM_PROFILE_ID_COLUMN = "system_profile_id";
+    public static final String COLUMN_SYSTEM_PROFILE_ID = "system_profile_id";
 }

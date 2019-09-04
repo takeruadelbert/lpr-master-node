@@ -16,12 +16,12 @@ public class SocialMedia extends AppDomain {
     public static String unique_name = "social_media";
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = SYSTEM_PROFILE_ID_COLUMN, insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_SYSTEM_PROFILE_ID, insertable = false, updatable = false)
     @JsonBackReference
     private SystemProfile systemProfile;
 
     @JsonProperty("systemProfileId")
-    @Column(name = SYSTEM_PROFILE_ID_COLUMN)
+    @Column(name = COLUMN_SYSTEM_PROFILE_ID)
     private Long systemProfileId;
 
     @URL(message = VALIDATOR_URL_MESSAGE)
