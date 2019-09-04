@@ -36,7 +36,7 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
         // insert image background ID if there's any file uploaded.
         String tokenImageBackground = ((SystemProfile) object).getTokenImageBackground();
         if (tokenImageBackground != null) {
-            ((SystemProfile) object).setAssetFileId(this.claimFile(tokenImageBackground).getId());
+            ((SystemProfile) object).setImageBackgroundId(this.claimFile(tokenImageBackground).getId());
         }
         if (systemProfileRepository.existsById(id)) {
             object.setId(id);
