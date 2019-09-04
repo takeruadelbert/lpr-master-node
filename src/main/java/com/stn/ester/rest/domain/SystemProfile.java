@@ -15,10 +15,11 @@ import java.util.Set;
 @Data
 @Entity
 public class SystemProfile extends AppDomain {
+    public static final String COLUMN_LOGO_ID = "logo_id";
     public static final String unique_name = "system_profile";
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "logo_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_LOGO_ID, insertable = false, updatable = false)
     private AssetFile assetFile;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "systemProfile" ,cascade = CascadeType.ALL)
