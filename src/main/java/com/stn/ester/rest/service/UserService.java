@@ -255,11 +255,11 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
                 Context context = new Context();
                 String linkResetPassword = EmailHelper.createLinkResetPassword(token, request);
                 SystemProfile systemProfile = this.systemProfileRepository.findById(1L).get();
-                context.setVariable(ConstantHelper.VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_USERNAME, user.get().getUsername());
-                context.setVariable(ConstantHelper.VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_ACTION, linkResetPassword);
-                context.setVariable(ConstantHelper.VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_ADDRESS, systemProfile.getAddress());
-                context.setVariable(ConstantHelper.VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_NAME, systemProfile.getName());
-                context.setVariable(ConstantHelper.VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_WEBSITE, systemProfile.getWebsite());
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_USERNAME, user.get().getUsername());
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_ACTION, linkResetPassword);
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_ADDRESS, systemProfile.getAddress());
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_NAME, systemProfile.getName());
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_WEBSITE, systemProfile.getWebsite());
                 String htmlFile = templateEngine.process(ConstantHelper.TEMPLATE_MAIL_FILE, context);
                 EmailHelper.embeddedImageOnTemplateMail(htmlFile, message);
                 mailSender.send(message);
@@ -321,7 +321,7 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
                 throw new UnauthorizedException("User tidak ditemukan.");
             if (!new_password.equals(confirm_password))
                 throw new ConfirmNewPasswordException("Password baru dan konfirmasi password tidak sesuai.");
-            // Set is used not to be default if user is has been create new password.
+            // Set is used not to be default if user has been create new password.
             passwordReset.setId(passwordReset.getId());
             passwordReset.setIsUsed(1);
             super.update(passwordReset.getId(), passwordReset);

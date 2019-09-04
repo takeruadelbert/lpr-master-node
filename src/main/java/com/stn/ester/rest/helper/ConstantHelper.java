@@ -17,11 +17,11 @@ public class ConstantHelper {
     public static final String CONTENT_HTML = "text/html";
     public static final String CONTENT_TYPE_IMAGE_PNG = "image/png";
     public static final String CONTENT_TYPE = "Content-Type";
-    public static final String VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_USERNAME = "username";
-    public static final String VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_ACTION = "url_action";
-    public static final String VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_ADDRESS = "address";
-    public static final String VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_NAME = "name";
-    public static final String VARIABLE_SETTER_THYMELEAF_TEMPLATE_MAIL_WEBSITE = "website";
+    public static final String CONTEXT_VARIABLE_USERNAME = "username";
+    public static final String CONTEXT_VARIABLE_ACTION = "url_action";
+    public static final String CONTEXT_VARIABLE_ADDRESS = "address";
+    public static final String CONTEXT_VARIABLE_NAME = "name";
+    public static final String CONTEXT_VARIABLE_WEBSITE = "website";
     public static final String TEMPLATE_MAIL_FILE = "email_template";
     public static final String ENCODING_UTF_8 = "utf-8";
 }

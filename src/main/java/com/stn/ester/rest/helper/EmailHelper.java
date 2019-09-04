@@ -48,13 +48,13 @@ public class EmailHelper {
         messageBodyPart.setContent(htmlFile, ConstantHelper.CONTENT_HTML);
         multipart.addBodyPart(messageBodyPart);
 
-        // inline the image to MimeBodyPart, and each MimeBodyPart only have maks one img, so create one MimeBodyPart again if want to add new image/logo
+        // inline the image to MimeBodyPart, and each MimeBodyPart only have maximum one img, so create one MimeBodyPart again if you want to add new image/logo
         MimeBodyPart imgBody = new MimeBodyPart();
         MimeBodyPart imgBody2 = new MimeBodyPart();
         MimeBodyPart imgBody3 = new MimeBodyPart();
         MimeBodyPart imgBody4 = new MimeBodyPart();
 
-        // put here all source images, logos, and icon to get path file
+        // put here all source image, logo, and icon to get path file
         List<Path> imgPath = new ArrayList<Path>();
         imgPath.addAll(Arrays.asList(ConstantHelper.FILE_PATH_ICON_FACEBOOK, ConstantHelper.FILE_PATH_ICON_TWITTER, ConstantHelper.FILE_PATH_ICON_LINKEDIN, ConstantHelper.FILE_PATH_ICON_MY_WEBSITE));
 
