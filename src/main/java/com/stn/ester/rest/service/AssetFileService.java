@@ -1,5 +1,6 @@
 package com.stn.ester.rest.service;
 
+import com.stn.ester.rest.config.InterceptorConfig;
 import com.stn.ester.rest.dao.jpa.AccessLogRepository;
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import com.stn.ester.rest.dao.jpa.SystemProfileRepository;
@@ -304,7 +305,7 @@ public class AssetFileService extends AppService {
     }
 
     private void updateAccessLog(Long accessLogId, Long assetFileId) {
-        if (accessLogId != null && assetFileId != null) {
+        if ((accessLogId != null && assetFileId != null) && InterceptorConfig.accessLogEnabled) {
             // fetch data thread of Access Log ID and insert asset file ID according its access log ID
             AccessLog accessLog = this.accessLogRepository.findById(accessLogId).get();
             if (accessLog != null) {
