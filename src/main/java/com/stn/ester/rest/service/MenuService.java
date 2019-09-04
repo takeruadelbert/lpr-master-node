@@ -116,7 +116,7 @@ public class MenuService extends AppService {
         for (UserGroup userGroup : userGroups) {
             AccessGroup accessGroup;
             if (userGroup.getName().equals(SecurityConstants.ROLE_SUPERADMIN)) {
-                accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, true, false, false, false);
+                accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, true, true, true, true);
             } else {
                 accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, false, false, false, false);
             }
