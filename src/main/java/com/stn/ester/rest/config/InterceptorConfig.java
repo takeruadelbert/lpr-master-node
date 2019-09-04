@@ -21,14 +21,14 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Autowired
     private AccessLogInterceptor accessLogInterceptor;
 
-    @Value("${ACCESS_LOG}")
-    private Integer ACCESS_LOG;
+    @Value("${ester.logging.access.enabled}")
+    private boolean accessLogEnabled;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor);
         registry.addInterceptor(disabledPageInterceptor);
-        if (ACCESS_LOG == 1)
+        if (accessLogEnabled)
             registry.addInterceptor(accessLogInterceptor);
     }
 }
