@@ -3,12 +3,14 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -19,10 +21,10 @@ public class SystemProfile extends AppDomain {
     @JoinColumn(name = "logo_id", insertable = false, updatable = false)
     private AssetFile assetFile;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "systemProfile" ,cascade = CascadeType.ALL)
     @JsonManagedReference
-    @JoinColumn(name = "system_profile_id", insertable = false, updatable = false)
-    private List<SocialMedia> socialMedia;
+    @EqualsAndHashCode.Exclude
+    private Set<SocialMedia> socialMedia =  new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "city_id", insertable = false, updatable = false)
