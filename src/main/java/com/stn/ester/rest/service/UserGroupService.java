@@ -60,7 +60,7 @@ public class UserGroupService extends AppService {
         for (Menu menu : menus) {
             AccessGroup accessGroup;
             if (userGroup.getName().equals(SecurityConstants.ROLE_SUPERADMIN)) {
-                accessGroup = new AccessGroup(lastInsertID, menu.getId(), true, false, false, false);
+                accessGroup = new AccessGroup(lastInsertID, menu.getId(), true, true, true, true);
             } else {
                 accessGroup = new AccessGroup(lastInsertID, menu.getId(), false, false, false, false);
             }

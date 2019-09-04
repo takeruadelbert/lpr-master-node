@@ -5,6 +5,7 @@ import com.stn.ester.rest.domain.Employee;
 import com.stn.ester.rest.domain.enumerate.EmployeeWorkStatus;
 import com.stn.ester.rest.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,6 +27,7 @@ public class EmployeeController extends CrudController<EmployeeService, Employee
         return service.create(employee);
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/work_status",method = RequestMethod.OPTIONS)
     public Map<EmployeeWorkStatus, String> getEmployeeWorkStatusList() {
         return service.getEmployeeWorkStatusList();

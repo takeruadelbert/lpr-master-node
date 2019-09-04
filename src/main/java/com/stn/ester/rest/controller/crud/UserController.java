@@ -43,6 +43,7 @@ public class UserController extends CrudController<UserService, User> {
         return super.service.update(id, user);
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/heartbeat")
     public User isValid() {
         return SessionHelper.getCurrentUser();
@@ -64,11 +65,13 @@ public class UserController extends CrudController<UserService, User> {
         return service.changePassword(id, new_password, retype_new_password);
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/change-profile-picture", method = RequestMethod.POST)
     public Object changeProfilePicture(@RequestBody Map<String, String> data) {
         return service.changeProfilePicture(data.get("token"));
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/gender", method = RequestMethod.OPTIONS)
     public Map<Gender, String> getGenderList() {
         return this.biodataService.getGenderList();

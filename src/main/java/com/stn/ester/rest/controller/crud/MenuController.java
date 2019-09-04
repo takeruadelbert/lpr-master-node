@@ -27,6 +27,7 @@ public class MenuController extends CrudController<MenuService, Menu> {
         this.menuService = menuService;
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/navbar", method = RequestMethod.GET)
     public Object getAccessGroup() {
         User user = SessionHelper.getCurrentUser();
@@ -42,16 +43,19 @@ public class MenuController extends CrudController<MenuService, Menu> {
         return this.service.checkPrivilege(SessionHelper.getUserGroupId(), menuId);
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public Object viewMenuSubMenu() {
         return this.menuService.getAllMenuSubmenu();
     }
 
+    @Override
     @RequestMapping(value = "", method = RequestMethod.POST)
     public Object create(@Valid @RequestBody Menu menu) {
         return service.create(menu);
     }
 
+    @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public Object update(@PathVariable long id, @Valid @RequestBody Menu menu) {
         return menuService.update(id, menu);
