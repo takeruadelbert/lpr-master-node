@@ -230,7 +230,8 @@ public class AssetFileService extends AppService {
                 GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + path);
 
                 String from = this.parentDirectory + file.getPath();
-                String to = from.replace("temp", this.assetRootPath + DS + assetDir);
+                String targetFileName = this.assetRootPath + DS + assetDir + DS + file.getName() + '.' + file.getExtension();
+                String to = this.parentDirectory + DS + targetFileName;
                 // move file from folder "temp"
                 Files.copy(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
                 Files.delete(Paths.get(from));
@@ -238,8 +239,8 @@ public class AssetFileService extends AppService {
 
                 // update path data of asset file
                 file.setId(asset_file_id);
-                file.setPath(to.replace(this.parentDirectory, ""));
-                return (AssetFile)super.update(file.getId(), file);
+                file.setPath(targetFileName);
+                return (AssetFile) super.update(file.getId(), file);
             } else {
                 return null;
             }
