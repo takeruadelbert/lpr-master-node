@@ -3,6 +3,7 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -21,11 +22,11 @@ public class SocialMedia extends AppDomain {
     @Column(name = "system_profile_id")
     private Long systemProfileId;
 
-    @NotBlank(message = "Name is mandatory.")
+    @URL(message = "Invalid URL.")
+    @NotBlank(message = "Url is mandatory.")
     @Column(nullable = false)
-    private String name;
-
     private String url;
+
     private int orderingNumber;
 
     public SocialMedia() {
