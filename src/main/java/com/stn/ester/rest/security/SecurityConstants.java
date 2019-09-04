@@ -12,4 +12,7 @@ public class SecurityConstants {
     public static final String ROLE_SUPERADMIN = "SUPERADMIN";
     public static final String AUTHORITY_PREFIX = "ACCESS";
     public static final String ROLE_PREFIX = "ROLE";
+    public static final String VALIDATOR_URL_MESSAGE = "Invalid URL.";
+    public static final String NOT_BLANK_URL_MESSAGE = "Url is mandatory.";
+    public static final String SYSTEM_PROFILE_ID_COLUMN = "system_profile_id";
 }
