@@ -22,7 +22,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
     private AccessLogInterceptor accessLogInterceptor;
 
     @Value("${ester.logging.access.enabled}")
-    private boolean accessLogEnabled;
+    public static boolean accessLogEnabled;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
