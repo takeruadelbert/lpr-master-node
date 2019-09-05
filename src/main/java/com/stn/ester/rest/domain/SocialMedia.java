@@ -3,29 +3,36 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.URL;
 
 @Data
 @Entity
 public class SocialMedia extends AppDomain {
+    private static final String VALIDATOR_URL_MESSAGE = "Invalid URL.";
+    private static final String NOT_BLANK_URL_MESSAGE = "Url is mandatory.";
+    private static final String COLUMN_SYSTEM_PROFILE_ID = "system_profile_id";
+    private static final String JSON_PROPERTY_SYSTEM_PROFILE_ID = "systemProfileId";
     public static String unique_name = "social_media";
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "system_profile_id", insertable = false, updatable = false)
     @JsonBackReference
+    @EqualsAndHashCode.Exclude
     private SystemProfile systemProfile;
 
-    @JsonProperty("systemProfileId")
-    @Column(name = "system_profile_id")
+    @JsonProperty(JSON_PROPERTY_SYSTEM_PROFILE_ID)
+    @Column(name = COLUMN_SYSTEM_PROFILE_ID)
     private Long systemProfileId;
 
-    @NotBlank(message = "Name is mandatory.")
+    @URL(message = VALIDATOR_URL_MESSAGE)
+    @NotBlank(message = NOT_BLANK_URL_MESSAGE)
     @Column(nullable = false)
-    private String name;
-
     private String url;
+
     private int orderingNumber;
 
     public SocialMedia() {
