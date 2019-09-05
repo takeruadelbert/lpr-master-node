@@ -249,7 +249,7 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true, ConstantHelper.ENCODING_UTF_8);
                 helper.setFrom(EmailHelper.emailFrom());
-                helper.setTo(EmailHelper.emailTo());
+                helper.setTo(EmailHelper.emailTo(user.get().getEmail()));
                 helper.setSubject(EmailHelper.emailSubject());
 
                 Context context = new Context();

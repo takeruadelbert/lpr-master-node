@@ -23,8 +23,8 @@ public class EmailHelper {
         return emailFrom;
     }
 
-    public static String emailTo() {
-        String emailTo = EMAIL_TO;
+    public static String emailTo(String userEmail) {
+        String emailTo = userEmail;
         return emailTo;
     }
 
