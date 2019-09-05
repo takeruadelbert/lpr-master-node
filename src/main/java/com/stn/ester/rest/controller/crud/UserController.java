@@ -1,5 +1,6 @@
 package com.stn.ester.rest.controller.crud;
 
+import com.stn.ester.rest.base.AccessAllowed;
 import com.stn.ester.rest.controller.base.CrudController;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.LoginSession;
@@ -77,11 +78,13 @@ public class UserController extends CrudController<UserService, User> {
         return this.biodataService.getGenderList();
     }
 
+    @AccessAllowed
     @RequestMapping(value = "/identify-email", method = RequestMethod.POST)
     public Object identifyEmail(@Valid @RequestBody Map<String, String> payload, HttpServletRequest request) {
         return userService.identifyEmail(payload.get("email"), request);
     }
 
+    @AccessAllowed
     @RequestMapping(value = "/password-reset/{token}", method = RequestMethod.PUT)
     public Object passwordReset(@PathVariable String token, @Valid @RequestBody(required = false) Map<String, String> data) {
         String new_password = data.get("new_password");
