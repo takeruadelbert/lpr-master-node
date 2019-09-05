@@ -3,6 +3,7 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
@@ -17,9 +18,10 @@ public class SocialMedia extends AppDomain {
     private static final String JSON_PROPERTY_SYSTEM_PROFILE_ID = "systemProfileId";
     public static String unique_name = "social_media";
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = COLUMN_SYSTEM_PROFILE_ID, insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "system_profile_id", insertable = false, updatable = false)
     @JsonBackReference
+    @EqualsAndHashCode.Exclude
     private SystemProfile systemProfile;
 
     @JsonProperty(JSON_PROPERTY_SYSTEM_PROFILE_ID)
