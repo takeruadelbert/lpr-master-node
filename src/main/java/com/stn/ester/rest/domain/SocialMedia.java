@@ -8,11 +8,13 @@ import org.hibernate.validator.constraints.URL;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
-import static com.stn.ester.rest.security.SecurityConstants.*;
-
 @Data
 @Entity
 public class SocialMedia extends AppDomain {
+    private static final String VALIDATOR_URL_MESSAGE = "Invalid URL.";
+    private static final String NOT_BLANK_URL_MESSAGE = "Url is mandatory.";
+    private static final String COLUMN_SYSTEM_PROFILE_ID = "system_profile_id";
+    private static final String JSON_PROPERTY_SYSTEM_PROFILE_ID = "systemProfileId";
     public static String unique_name = "social_media";
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -20,7 +22,7 @@ public class SocialMedia extends AppDomain {
     @JsonBackReference
     private SystemProfile systemProfile;
 
-    @JsonProperty("systemProfileId")
+    @JsonProperty(JSON_PROPERTY_SYSTEM_PROFILE_ID)
     @Column(name = COLUMN_SYSTEM_PROFILE_ID)
     private Long systemProfileId;
 
