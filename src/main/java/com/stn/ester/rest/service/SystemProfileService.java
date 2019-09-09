@@ -8,7 +8,11 @@ import com.stn.ester.rest.service.base.AssetFileBehaviour;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
 import javax.transaction.Transactional;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 @Service
 public class SystemProfileService extends AppService implements AssetFileBehaviour {
@@ -58,5 +62,15 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
 
     public SystemProfile get() {
         return this.systemProfileRepository.findById(1L).get();
+    }
+
+    public BufferedImage getLogoImage(String token) throws IOException {
+        BufferedImage bufferedImage = null;
+        if (token.isEmpty()) {
+            byte[] data = this.assetFileService.getFile(token);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+            bufferedImage = ImageIO.read(byteArrayInputStream);
+        }
+        return bufferedImage;
     }
 }
