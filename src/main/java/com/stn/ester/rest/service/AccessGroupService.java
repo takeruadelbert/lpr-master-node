@@ -90,26 +90,21 @@ public class AccessGroupService extends AppService {
         //find modules
         List<Module> modules = new ArrayList();
         if (isCrud) {
-            System.out.println("is CRUD");
             modules.addAll(this.moduleRepository.findAllByName(name));
         } else {
             modules.addAll(this.moduleRepository.findAllByRequestMethodAndName(requestMethod, name));
         }
         Iterables.addAll(modules, this.moduleRepository.findAllById(moduleIds));
-        System.out.println("find module : " + requestMethod + " " + name);
         if (modules.isEmpty()) {
-            System.out.println("module not found");
             return "NOACCESS";
         }
         List<Menu> menus = this.menuRepository.findAllByModuleId(modules.get(0).getId());
         if (menus.isEmpty()) {
-            System.out.println("menu not found");
             return "NOACCESS";
         }
         Long userGroupId = SessionHelper.getCurrentUser().getUserGroupId();
         Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByMenuIdAndUserGroupId(menus.get(0).getId(), userGroupId);
         if (accessGroups.isEmpty()) {
-            System.out.println("access group not found");
             return "NOACCESS";
         }
         if (!this.hasAccess(requestMethod, Iterables.get(accessGroups, 0), modules.get(0), isCrud))
