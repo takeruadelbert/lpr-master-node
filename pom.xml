@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.stn.ester</groupId>
-    <artifactId>rest</artifactId>
+    <artifactId>estercore</artifactId>
     <version>0.0.02b</version>
     <name>rest</name>
     <description>STN</description>
