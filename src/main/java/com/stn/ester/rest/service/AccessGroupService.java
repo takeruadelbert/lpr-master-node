@@ -86,7 +86,7 @@ public class AccessGroupService extends AppService {
         //find module links
         List<ModuleLink> moduleLinks = this.moduleLinkRepository.findAllByRequestMethodAndName(requestMethod, name);
         List<Long> moduleIds = new ArrayList();
-        moduleLinks.stream().forEach((ml) -> moduleIds.add(ml.getId()));
+        moduleLinks.stream().forEach((ml) -> moduleIds.add(ml.getModule().getId()));
         //find modules
         List<Module> modules = new ArrayList();
         if (isCrud) {
@@ -112,7 +112,6 @@ public class AccessGroupService extends AppService {
             System.out.println("access group not found");
             return "NOACCESS";
         }
-
         if (!this.hasAccess(requestMethod, Iterables.get(accessGroups, 0), modules.get(0), isCrud))
             return "NOACCESS";
         return ROLE_PREFIX + "_" + SessionHelper.getCurrentUser().getUserGroup().getName();
