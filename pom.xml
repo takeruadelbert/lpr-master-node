@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.stn.ester</groupId>
     <artifactId>estercore</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.02b</version>
     <name>rest</name>
     <description>STN</description>
     <packaging>war</packaging>
