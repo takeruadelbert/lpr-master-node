@@ -55,10 +55,4 @@ public class MenuController extends CrudController<MenuService, Menu> {
         return service.create(menu);
     }
 
-    @Override
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public Object update(@PathVariable long id, @Valid @RequestBody Menu menu) {
-        return menuService.update(id, menu);
-    }
-
 }
