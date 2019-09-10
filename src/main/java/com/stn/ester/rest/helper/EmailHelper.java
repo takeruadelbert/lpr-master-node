@@ -16,7 +16,7 @@ public class EmailHelper {
     private static final String EMAIL_FROM = "mailtest.stn@gmail.com";
     private static final String EMAIL_TO = "sample.sendmail1@gmail.com";
     private static final String EMAIL_SUBJECT = "Konfirmasi Reset Password";
-    private static final String REQUEST_URL_PASSWORD_RESET = "users/password-reset";
+    private static final String REQUEST_URL_PASSWORD_RESET = "users/password_reset";
 
     public static String emailFrom() {
         String emailFrom = EMAIL_FROM;

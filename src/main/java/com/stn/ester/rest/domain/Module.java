@@ -25,7 +25,7 @@ public class Module extends AppDomain {
     @Enumerated(EnumType.STRING)
     private RequestMethod requestMethod;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "module" ,cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "module" ,cascade = CascadeType.ALL)
     @JsonManagedReference
     @EqualsAndHashCode.Exclude
     private Set<ModuleLink> moduleLink =  new HashSet<>();

@@ -2,6 +2,7 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,10 +24,11 @@ public class ModuleLink extends AppDomain {
     @Enumerated(EnumType.STRING)
     private RequestMethod requestMethod;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     @JsonBackReference
     @EqualsAndHashCode.Exclude
+    @JsonIgnoreProperties("moduleLink")
     private Module module;
 
     @JsonIgnore
