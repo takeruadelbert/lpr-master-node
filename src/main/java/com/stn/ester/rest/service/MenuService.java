@@ -135,12 +135,6 @@ public class MenuService extends AppService {
         super.delete(id);
     }
 
-    @Transactional
-    public Object update(Long id, Menu menu) {
-        menu.setId(id);
-        return this.menuRepository.save(menu);
-    }
-
     public Object checkPrivilege(Long userGroupId, Long menuId) {
         return this.accessGroupRepository.findByMenuIdAndUserGroupId(menuId, userGroupId).orElseThrow(() -> new NotFoundException());
     }

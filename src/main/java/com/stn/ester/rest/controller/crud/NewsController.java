@@ -27,7 +27,7 @@ public class NewsController extends CrudController<NewsService, News> {
     }
 
     @Override
-    public Object update(@PathVariable long id, @Valid @RequestBody News news) {
+    public Object update(@PathVariable long id, @Valid @RequestBody News news, @RequestBody Map<String, Object> requestBody) {
         return service.update(id, news);
     }
 

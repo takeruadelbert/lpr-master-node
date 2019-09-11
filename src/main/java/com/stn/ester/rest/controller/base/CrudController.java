@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public abstract class CrudController<T extends AppService, U extends AppDomain> extends SecuredController {
 
@@ -53,8 +54,8 @@ public abstract class CrudController<T extends AppService, U extends AppDomain> 
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public Object update(@PathVariable long id, @Valid @RequestBody U domain) {
-        return service.update(id, domain);
+    public Object update(@PathVariable long id, @Valid @RequestBody U domain, @RequestBody Map<String, Object> requestBody) {
+        return service.update(id, domain, requestBody);
     }
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
