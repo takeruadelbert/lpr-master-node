@@ -7,6 +7,7 @@ import com.stn.ester.rest.domain.AccessGroup;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.Menu;
 import com.stn.ester.rest.domain.UserGroup;
+import com.stn.ester.rest.security.SecurityConstants;
 import com.stn.ester.rest.exception.NotFoundException;
 import com.stn.ester.rest.security.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +116,7 @@ public class MenuService extends AppService {
         for (UserGroup userGroup : userGroups) {
             AccessGroup accessGroup;
             if (userGroup.getName().equals(SecurityConstants.ROLE_SUPERADMIN)) {
-                accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, true, false, false, false);
+                accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, true, true, true, true);
             } else {
                 accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, false, false, false, false);
             }
@@ -132,12 +133,6 @@ public class MenuService extends AppService {
         this.accessGroupRepository.deleteAll(accessGroups);
 
         super.delete(id);
-    }
-
-    @Transactional
-    public Object update(Long id, Menu menu) {
-        menu.setId(id);
-        return this.menuRepository.save(menu);
     }
 
     public Object checkPrivilege(Long userGroupId, Long menuId) {

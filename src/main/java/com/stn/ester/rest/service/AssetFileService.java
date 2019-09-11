@@ -1,5 +1,6 @@
 package com.stn.ester.rest.service;
 
+import com.stn.ester.rest.config.InterceptorConfig;
 import com.stn.ester.rest.dao.jpa.AccessLogRepository;
 import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import com.stn.ester.rest.dao.jpa.SystemProfileRepository;
@@ -229,7 +230,8 @@ public class AssetFileService extends AppService {
                 GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + path);
 
                 String from = this.parentDirectory + file.getPath();
-                String to = from.replace("temp", this.assetRootPath + DS + assetDir);
+                String targetFileName = this.assetRootPath + DS + assetDir + DS + file.getName() + '.' + file.getExtension();
+                String to = this.parentDirectory + DS + targetFileName;
                 // move file from folder "temp"
                 Files.copy(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
                 Files.delete(Paths.get(from));
@@ -237,8 +239,8 @@ public class AssetFileService extends AppService {
 
                 // update path data of asset file
                 file.setId(asset_file_id);
-                file.setPath(to.replace(this.parentDirectory, ""));
-                return (AssetFile)super.update(file.getId(), file);
+                file.setPath(targetFileName);
+                return (AssetFile) super.update(file.getId(), file);
             } else {
                 return null;
             }
@@ -304,7 +306,7 @@ public class AssetFileService extends AppService {
     }
 
     private void updateAccessLog(Long accessLogId, Long assetFileId) {
-        if (accessLogId != null && assetFileId != null) {
+        if ((accessLogId != null && assetFileId != null) && InterceptorConfig.accessLogEnabled) {
             // fetch data thread of Access Log ID and insert asset file ID according its access log ID
             AccessLog accessLog = this.accessLogRepository.findById(accessLogId).get();
             if (accessLog != null) {
@@ -315,5 +317,23 @@ public class AssetFileService extends AppService {
             // remove thread if it's done
             AccessLogInterceptor.accessLogId.remove();
         }
+    }
+
+    public byte[] getFile(String token) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        AssetFile assetFile = this.assetFileRepository.findByToken(token).get();
+        if(assetFile != null) {
+            int isDefault = assetFile.getIsDefault();
+            String path = DS + assetFile.getPath();
+            String filename = isDefault == 1 ? path : this.parentDirectory + path;
+            try {
+                InputStream inputStream = isDefault == 1 ? getClass().getResourceAsStream(filename) : new FileInputStream(filename);
+                byte[] buffer = IOUtils.toByteArray(inputStream);
+                byteArrayOutputStream.write(buffer, 0, buffer.length);
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 }

@@ -8,10 +8,7 @@ import com.stn.ester.rest.dao.jpa.UserRepository;
 import com.stn.ester.rest.dao.jpa.*;
 import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.exception.*;
-import com.stn.ester.rest.helper.DateTimeHelper;
-import com.stn.ester.rest.helper.EmailHelper;
-import com.stn.ester.rest.helper.GlobalFunctionHelper;
-import com.stn.ester.rest.helper.SessionHelper;
+import com.stn.ester.rest.helper.*;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -250,21 +247,21 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
         if (user != null) {
             try {
                 MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, ConstantHelper.ENCODING_UTF_8);
                 helper.setFrom(EmailHelper.emailFrom());
-                helper.setTo(EmailHelper.emailTo());
+                helper.setTo(EmailHelper.emailTo(user.get().getEmail()));
                 helper.setSubject(EmailHelper.emailSubject());
 
                 Context context = new Context();
                 String linkResetPassword = EmailHelper.createLinkResetPassword(token, request);
                 SystemProfile systemProfile = this.systemProfileRepository.findById(1L).get();
-                context.setVariable("username", user.get().getUsername());
-                context.setVariable("url_action", linkResetPassword);
-                context.setVariable("address", systemProfile.getAddress());
-                context.setVariable("name", systemProfile.getName());
-                context.setVariable("website", systemProfile.getWebsite());
-                String html = templateEngine.process("email_template", context);
-                message.setContent(html, "text/html");
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_USERNAME, user.get().getUsername());
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_ACTION, linkResetPassword);
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_ADDRESS, systemProfile.getAddress());
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_NAME, systemProfile.getName());
+                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_WEBSITE, systemProfile.getWebsite());
+                String htmlFile = templateEngine.process(ConstantHelper.TEMPLATE_MAIL_FILE, context);
+                EmailHelper.embeddedImageOnTemplateMail(htmlFile, message);
                 mailSender.send(message);
 
                 PasswordReset passwordReset = this.passwordResetRepository.findByUserId(user.get().getId());
@@ -324,7 +321,7 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
                 throw new UnauthorizedException("User tidak ditemukan.");
             if (!new_password.equals(confirm_password))
                 throw new ConfirmNewPasswordException("Password baru dan konfirmasi password tidak sesuai.");
-            // Set is used to default if user is succesfully create new password.
+            // Set is used not to be default if user has been create new password.
             passwordReset.setId(passwordReset.getId());
             passwordReset.setIsUsed(1);
             super.update(passwordReset.getId(), passwordReset);

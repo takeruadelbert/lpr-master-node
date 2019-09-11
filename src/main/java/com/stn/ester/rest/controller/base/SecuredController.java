@@ -44,7 +44,6 @@ public abstract class SecuredController implements BeanNameAware {
         } else {
             role = ROLE_PREFIX + "_" + ROLE_SUPERADMIN;
         }
-        System.out.println("Current role : " + role);
         return role;
     }
 
