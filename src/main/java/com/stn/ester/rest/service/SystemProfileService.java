@@ -21,6 +21,8 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
     private AssetFileService assetFileService;
     private AssetFileRepository assetFileRepository;
     private String asset_path = "system_profile";
+    private final String logoType = "logo";
+    private final String backgroundImageType = "bg-image";
 
     @Autowired
     public SystemProfileService(SystemProfileRepository systemProfileRepository, AssetFileService assetFileService, AssetFileRepository assetFileRepository) {
@@ -68,18 +70,18 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
     }
 
     public BufferedImage getLogoImage() throws IOException {
-        return getDataSystemProfile("logo");
+        return getDataSystemProfile(logoType);
     }
 
     public BufferedImage getBackgroundImage() throws IOException {
-        return getDataSystemProfile("background-image");
+        return getDataSystemProfile(backgroundImageType);
     }
 
     private BufferedImage getDataSystemProfile(String type) throws IOException {
         BufferedImage bufferedImage = null;
         SystemProfile systemProfile = this.systemProfileRepository.findFirstByIdIsNotNull();
         if (systemProfile != null) {
-            Long assetFileId = type.toLowerCase() == "logo" ? systemProfile.getAssetFileId() : systemProfile.getImageBackgroundId();
+            Long assetFileId = type.equals(logoType) ? systemProfile.getAssetFileId() : systemProfile.getImageBackgroundId();
             if (assetFileId != null) {
                 AssetFile assetFile = this.assetFileRepository.findById(assetFileId).get();
                 if (assetFile != null) {
