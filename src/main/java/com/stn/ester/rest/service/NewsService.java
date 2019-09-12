@@ -41,7 +41,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         ((News) o).setAuthorId(author_id);
         ((News) o).setNewsStatus(NewsStatus.SHOWED); // default option is showed.
         String token = ((News) o).getToken();
-        if (token != null) {
+        if (!token.isEmpty()) {
             ((News) o).setAssetFileId(this.claimFile(token).getId());
         }
         return super.create(o);
@@ -52,7 +52,7 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         long author_id = SessionHelper.getUserID();
         ((News) o).setAuthorId(author_id);
         String token = ((News) o).getToken();
-        if (token != null) {
+        if (!token.isEmpty()) {
             ((News) o).setAssetFileId(this.claimFile(token).getId());
         }
         return super.update(id, o);
