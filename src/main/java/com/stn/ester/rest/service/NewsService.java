@@ -39,26 +39,29 @@ public class NewsService extends AppService implements AssetFileBehaviour {
 
     @Transactional
     @Override
-    public Object create(AppDomain o) {
-        long author_id = SessionHelper.getUserID();
-        ((News) o).setAuthorId(author_id);
-        ((News) o).setNewsStatus(NewsStatus.SHOWED); // default option is showed.
-        String token = ((News) o).getToken();
-        if (token != null) {
-            ((News) o).setAssetFileId(this.claimFile(token).getId());
-        }
-        return super.create(o);
+    public Object create(AppDomain domain) {
+        News news = setDataNews(domain);
+        news.setNewsStatus(NewsStatus.SHOWED);
+        return super.create(news);
     }
 
     @Override
-    public Object update(Long id, AppDomain o) {
-        long author_id = SessionHelper.getUserID();
-        ((News) o).setAuthorId(author_id);
-        String token = ((News) o).getToken();
-        if (token != null) {
-            ((News) o).setAssetFileId(this.claimFile(token).getId());
+    public Object update(Long id, AppDomain domain) {
+        News news = setDataNews(domain);
+        return super.update(id, news);
+    }
+
+    private News setDataNews(AppDomain domain) {
+        Long author_id = SessionHelper.getUserID();
+        News news = ((News) domain);
+        news.setAuthorId(author_id);
+        String token = news.getToken();
+        if (token != null && !token.isEmpty()) {
+            AssetFile assetFile = claimFile(token);
+            news.setAssetFileId(assetFile.getId());
+            news.setAssetFile(assetFile);
         }
-        return super.update(id, o);
+        return news;
     }
 
     public Page<News> dashboard(Integer page, Integer size, Pageable pageable) throws Exception {
