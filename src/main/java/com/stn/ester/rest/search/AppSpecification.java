@@ -1,6 +1,7 @@
 package com.stn.ester.rest.search;
 
 import com.stn.ester.rest.domain.AppDomain;
+import com.stn.ester.rest.domain.enumerate.NewsStatus;
 import com.stn.ester.rest.exception.FilterException;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.search.util.SpecSearchCriteria;
@@ -42,6 +43,8 @@ public class AppSpecification<T extends AppDomain> implements Specification<T> {
                 value = DateTimeHelper.convertToDate(criteria.getValue().toString());
             } else if (LocalDateTime.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
                 value = DateTimeHelper.convertToDateTime(criteria.getValue().toString());
+            } else if (Enum.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
+                value=Enum.valueOf(path.getModel().getBindableJavaType(),criteria.getValue().toString());
             } else {
                 value = criteria.getValue();
             }
