@@ -1,5 +1,6 @@
 package com.stn.ester.rest.service;
 
+import com.stn.ester.rest.dao.jpa.AssetFileRepository;
 import com.stn.ester.rest.dao.jpa.SystemProfileRepository;
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.AssetFile;
@@ -18,14 +19,16 @@ import java.io.IOException;
 public class SystemProfileService extends AppService implements AssetFileBehaviour {
     private SystemProfileRepository systemProfileRepository;
     private AssetFileService assetFileService;
+    private AssetFileRepository assetFileRepository;
     private String asset_path = "system_profile";
 
     @Autowired
-    public SystemProfileService(SystemProfileRepository systemProfileRepository, AssetFileService assetFileService) {
+    public SystemProfileService(SystemProfileRepository systemProfileRepository, AssetFileService assetFileService, AssetFileRepository assetFileRepository) {
         super(SystemProfile.unique_name);
         super.repositories.put(SystemProfile.unique_name, systemProfileRepository);
         this.systemProfileRepository = systemProfileRepository;
         this.assetFileService = assetFileService;
+        this.assetFileRepository = assetFileRepository;
     }
 
     @Transactional
@@ -64,12 +67,30 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
         return this.systemProfileRepository.findById(1L).get();
     }
 
-    public BufferedImage getLogoImage(String token) throws IOException {
+    public BufferedImage getLogoImage() throws IOException {
+        return getDataSystemProfile("logo");
+    }
+
+    public BufferedImage getBackgroundImage() throws IOException {
+        return getDataSystemProfile("background-image");
+    }
+
+    private BufferedImage getDataSystemProfile(String type) throws IOException {
         BufferedImage bufferedImage = null;
-        if (token.isEmpty()) {
-            byte[] data = this.assetFileService.getFile(token);
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
-            bufferedImage = ImageIO.read(byteArrayInputStream);
+        SystemProfile systemProfile = this.systemProfileRepository.findFirstByIdIsNotNull();
+        if (systemProfile != null) {
+            Long assetFileId = type.toLowerCase() == "logo" ? systemProfile.getAssetFileId() : systemProfile.getImageBackgroundId();
+            if (assetFileId != null) {
+                AssetFile assetFile = this.assetFileRepository.findById(assetFileId).get();
+                if (assetFile != null) {
+                    String token = assetFile.getToken();
+                    if (token != null && !token.isEmpty()) {
+                        byte[] data = this.assetFileService.getFile(token);
+                        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+                        bufferedImage = ImageIO.read(byteArrayInputStream);
+                    }
+                }
+            }
         }
         return bufferedImage;
     }
