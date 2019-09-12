@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @MappedSuperclass
@@ -20,12 +21,12 @@ public abstract class AppDomain {
     @CreatedDate
     @CreationTimestamp
     @JsonIgnore
-    Date createdDate;
+    LocalDateTime createdDate;
 
     @LastModifiedDate
     @UpdateTimestamp
     @JsonIgnore
-    Date lastModifiedDate;
+    LocalDateTime lastModifiedDate;
 
     @JsonIgnore
     @Transient
@@ -52,19 +53,19 @@ public abstract class AppDomain {
         isPreparedForUpdate = preparedForUpdate;
     }
 
-    public Date getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Date getLastModifiedDate() {
+    public LocalDateTime getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Date lastModifiedDate) {
+    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

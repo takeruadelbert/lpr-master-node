@@ -7,11 +7,9 @@ import com.stn.ester.rest.search.util.SpecSearchCriteria;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 public class AppSpecification<T extends AppDomain> implements Specification<T> {
 
@@ -40,8 +38,10 @@ public class AppSpecification<T extends AppDomain> implements Specification<T> {
                 path = joinPredicate.get(criteria.getKey());
             }
             Object value;
-            if (Date.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
-                value = DateTimeHelper.getDateTime(criteria.getValue().toString());
+            if (LocalDate.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
+                value = DateTimeHelper.convertToDate(criteria.getValue().toString());
+            } else if (LocalDateTime.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
+                value = DateTimeHelper.convertToDateTime(criteria.getValue().toString());
             } else {
                 value = criteria.getValue();
             }
@@ -67,9 +67,8 @@ public class AppSpecification<T extends AppDomain> implements Specification<T> {
             }
         } catch (IllegalArgumentException illegal) {
             throw new FilterException(criteria.getKey());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        } catch (DateTimeParseException e) {
+            throw new FilterException();
         }
     }
 }

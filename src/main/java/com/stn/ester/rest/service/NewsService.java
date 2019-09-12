@@ -8,6 +8,7 @@ import com.stn.ester.rest.domain.enumerate.NewsStatus;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -65,16 +68,16 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         long department_id = SessionHelper.getDepartmentID();
 
         // get current date
-        Date today = DateTimeHelper.getCurrentDate();
+        LocalDate today = LocalDate.now();
 
         if (allNews != null) {
             for (News news : allNews) {
                 // check if period date of news exists
                 if (news.getStartDate() != null && news.getExpiredDate() != null) {
                     // check if news still valid within period of date
-                    Date startDate = news.getStartDate();
-                    Date expiredDate = news.getExpiredDate();
-                    if (!startDate.after(today) && !expiredDate.before(today)) {
+                    LocalDate startDate = news.getStartDate();
+                    LocalDate expiredDate = news.getExpiredDate();
+                    if (!startDate.isAfter(today) && !expiredDate.isBefore(today)) {
                         if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
                             validNews.add(news);
                     }

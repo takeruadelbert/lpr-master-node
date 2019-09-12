@@ -3,12 +3,13 @@ package com.stn.ester.rest.helper;
 import com.stn.ester.rest.var.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 public class DateTimeHelper {
@@ -28,22 +29,19 @@ public class DateTimeHelper {
         return new SimpleDateFormat(DateTimeFormat.FORMAT_DATE).parse(getCurrentDateInString());
     }
 
-    public static Date getDate(String dateValue) throws ParseException {
-        return new SimpleDateFormat(DateTimeFormat.FORMAT_DATE).parse(dateValue);
+    public static LocalDate convertToDate(String dateValue) throws DateTimeParseException {
+        return LocalDate.parse(dateValue, DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATE));
     }
 
-    public static Date getDateTime(String dateTimeValue) throws ParseException {
-        try {
-            return new SimpleDateFormat(DateTimeFormat.FORMAT_DATETIME).parse(dateTimeValue);
-        } catch (ParseException e) {
-            return getDate(dateTimeValue + " 00:00:00");
-        }
+    public static LocalDateTime convertToDateTime(String dateTimeValue) throws DateTimeParseException{
+        return LocalDateTime.parse(dateTimeValue, DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATETIME));
     }
 
     public static String getCurrentTimeStamp() {
         return Long.toString(System.currentTimeMillis());
     }
 
+    @Deprecated
     public static Date getDateTimeNowPlusSeveralDays(int day) {
         LocalDateTime today = LocalDateTime.now(); //Today
         LocalDateTime maxDay = today.plusDays(day); //Plus several days
@@ -51,6 +49,7 @@ public class DateTimeHelper {
         return currentDatePlusSeveralDays;
     }
 
+    @Deprecated
     public static Date getDateTimeNow() {
         LocalDateTime today = LocalDateTime.now();
         Date dateTimeNow = Date.from(today.atZone(ZoneId.systemDefault()).toInstant());
