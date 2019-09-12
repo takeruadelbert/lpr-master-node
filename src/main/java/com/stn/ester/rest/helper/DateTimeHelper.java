@@ -25,15 +25,15 @@ public class DateTimeHelper {
         return simpleDateFormat.format(date);
     }
 
-    public static Date getCurrentDate() throws Exception {
-        return new SimpleDateFormat(DateTimeFormat.FORMAT_DATE).parse(getCurrentDateInString());
+    public static Date getCurrentDate() {
+        return new Date();
     }
 
     public static LocalDate convertToDate(String dateValue) throws DateTimeParseException {
         return LocalDate.parse(dateValue, DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATE));
     }
 
-    public static LocalDateTime convertToDateTime(String dateTimeValue) throws DateTimeParseException{
+    public static LocalDateTime convertToDateTime(String dateTimeValue) throws DateTimeParseException {
         return LocalDateTime.parse(dateTimeValue, DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATETIME));
     }
 
