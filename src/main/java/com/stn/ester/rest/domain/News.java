@@ -77,6 +77,10 @@ public class News extends AppDomain {
             this.assetFileId = assetFileId;
     }
 
+    public void setAssetFile(AssetFile assetFile) {
+        this.assetFile = assetFile;
+    }
+
     @Transient
     private String token;
 
