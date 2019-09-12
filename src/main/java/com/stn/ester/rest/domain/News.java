@@ -38,11 +38,11 @@ public class News extends AppDomain {
             this.authorId = authorId;
     }
 
-    @Column(columnDefinition = "DateTime")
+    @Column(columnDefinition = "Date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
 
-    @Column(columnDefinition = "DateTime")
+    @Column(columnDefinition = "Date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date expiredDate;
 

@@ -2,10 +2,14 @@ package com.stn.ester.rest.search;
 
 import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.exception.FilterException;
+import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.search.util.SpecSearchCriteria;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -36,15 +40,14 @@ public class AppSpecification<T extends AppDomain> implements Specification<T> {
                 path = joinPredicate.get(criteria.getKey());
             }
             Object value;
-            if (path.getModel().getBindableJavaType().isAssignableFrom(Date.class)){
-                value=new Date(criteria.getValue().toString());
-            }else{
-                value=criteria.getValue();
+            if (Date.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
+                value = DateTimeHelper.getDateTime(criteria.getValue().toString());
+            } else {
+                value = criteria.getValue();
             }
-
             switch (criteria.getOperation()) {
                 case EQUALITY:
-                    return builder.equal(path,value);
+                    return builder.equal(path, value);
                 case NEGATION:
                     return builder.notEqual(path, value);
                 case GREATER_THAN:
@@ -64,8 +67,9 @@ public class AppSpecification<T extends AppDomain> implements Specification<T> {
             }
         } catch (IllegalArgumentException illegal) {
             throw new FilterException(criteria.getKey());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-
-
     }
 }
