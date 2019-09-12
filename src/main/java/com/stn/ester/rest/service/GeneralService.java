@@ -1,6 +1,6 @@
 package com.stn.ester.rest.service;
 
-import com.stn.ester.rest.var.CustomFormat;
+import com.stn.ester.rest.var.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ public class GeneralService {
     public Object getStatus() {
         Map<String, Object> result = new HashMap();
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(CustomFormat.FORMAT_DATETIME);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATETIME);
         result.put(STRING_SERVER_TIME, dateTimeFormatter.format(now));
         return result;
     }

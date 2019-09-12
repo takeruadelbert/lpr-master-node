@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -38,13 +38,13 @@ public class News extends AppDomain {
             this.authorId = authorId;
     }
 
-    @Column(columnDefinition = "DateTime")
+    @Column(columnDefinition = "Date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date startDate;
+    private LocalDate startDate;
 
-    @Column(columnDefinition = "DateTime")
+    @Column(columnDefinition = "Date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date expiredDate;
+    private LocalDate expiredDate;
 
     @Enumerated(EnumType.STRING)
     private NewsStatus newsStatus;
@@ -82,14 +82,6 @@ public class News extends AppDomain {
 
     public String getToken() {
         return this.token;
-    }
-
-    public Date getStartDate() {
-        return this.startDate;
-    }
-
-    public Date getExpiredDate() {
-        return this.expiredDate;
     }
 
     public Long getDepartmentId() {
