@@ -39,7 +39,7 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
         SystemProfile systemProfile = ((SystemProfile) object);
 
         // insert asset file ID if there's any file uploaded.
-        String tokenLogo = systemProfile.getToken();
+        String tokenLogo = systemProfile.getTokenLogo();
         if (tokenLogo != null && !tokenLogo.isEmpty()) {
             AssetFile logo = this.claimFile(tokenLogo);
             systemProfile.setLogoId(logo.getId());
@@ -88,7 +88,7 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
         BufferedImage bufferedImage = null;
         SystemProfile systemProfile = this.systemProfileRepository.findFirstByIdIsNotNull();
         if (systemProfile != null) {
-            Long assetFileId = type.equals(logoType) ? systemProfile.getAssetFileId() : systemProfile.getImageBackgroundId();
+            Long assetFileId = type.equals(logoType) ? systemProfile.getLogoId() : systemProfile.getImageBackgroundId();
             if (assetFileId != null) {
                 AssetFile assetFile = this.assetFileRepository.findById(assetFileId).get();
                 if (assetFile != null) {
