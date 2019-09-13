@@ -36,22 +36,24 @@ public class EmployeeService extends AppService {
     @Override
     @Transactional
     public Object create(AppDomain domain) {
+        Employee employee = ((Employee) domain);
+
         // fetch data user group by selected position and then append it into User object.
-        long position_id = ((Employee) domain).getPositionId();
+        long position_id = employee.getPositionId();
         Position position = this.positionRepository.findById(position_id).get();
         long user_group_id = position.getUserGroupId();
-        ((Employee) domain).getUser().setUserGroupId(user_group_id);
+        employee.getUser().setUserGroupId(user_group_id);
 
-        if (((Employee) domain).getUser().getToken() == null) {
-            ((Employee) domain).getUser().setAssetFileId(AssetFileService.defaultProfilePictureID); // set default profile picture
+        if (employee.getUser().getToken() == null) {
+            employee.getUser().setProfilePictureId(AssetFileService.defaultProfilePictureID); // set default profile picture
         }
 
         // append data Employee Work NewsStatus
-        ((Employee) domain).setEmployeeWorkStatus(EmployeeWorkStatus.ACTIVE); // -> default is Active
+        employee.setEmployeeWorkStatus(EmployeeWorkStatus.ACTIVE); // -> default is Active
 
         // encode password
-        ((Employee) domain).getUser().setPassword(this.passwordEncoder.encode(this.defaultPassword));
-        return super.create(domain);
+        employee.getUser().setPassword(this.passwordEncoder.encode(this.defaultPassword));
+        return super.create(employee);
     }
 
     public Map<EmployeeWorkStatus, String> getEmployeeWorkStatusList() {

@@ -27,22 +27,29 @@ public class SystemProfileService extends AppService implements AssetFileBehavio
     @Transactional
     public Object updateSingleData(AppDomain object) {
         Long id = Long.valueOf(1);
+        SystemProfile systemProfile = ((SystemProfile) object);
 
         // insert asset file ID if there's any file uploaded.
-        String tokenLogo = ((SystemProfile) object).getTokenLogo();
-        if (!tokenLogo.isEmpty()) {
-            ((SystemProfile) object).setAssetFileId(this.claimFile(tokenLogo).getId());
+        String tokenLogo = systemProfile.getToken();
+        if (tokenLogo != null && !tokenLogo.isEmpty()) {
+            AssetFile logo = this.claimFile(tokenLogo);
+            systemProfile.setLogoId(logo.getId());
+            systemProfile.setLogo(logo);
         }
+
         // insert image background ID if there's any file uploaded.
-        String tokenImageBackground = ((SystemProfile) object).getTokenImageBackground();
-        if (!tokenImageBackground.isEmpty()) {
-            ((SystemProfile) object).setImageBackgroundId(this.claimFile(tokenImageBackground).getId());
+        String tokenImageBackground = systemProfile.getTokenImageBackground();
+        if (tokenImageBackground != null && !tokenImageBackground.isEmpty()) {
+            AssetFile imageBackground = this.claimFile(tokenImageBackground);
+            systemProfile.setImageBackgroundId(imageBackground.getId());
+            systemProfile.setImageBackground(imageBackground);
         }
+
         if (systemProfileRepository.existsById(id)) {
-            object.setId(id);
-            return super.update(id, object);
+            systemProfile.setId(id);
+            return super.update(id, systemProfile);
         } else {
-            return super.create(object);
+            return super.create(systemProfile);
         }
     }
 

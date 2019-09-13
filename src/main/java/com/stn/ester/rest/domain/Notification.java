@@ -2,6 +2,7 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -10,24 +11,26 @@ import javax.persistence.*;
 @Entity
 public class Notification extends AppDomain {
     public static final String unique_name = "notification";
+    private static final String COLUMN_RECEIVER = "receiver_id";
+    private static final String JSON_PROPERTY_RECEIVER = "receiverId";
 
     private String message;
     private String url;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "receiver_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_RECEIVER, insertable = false, updatable = false)
     private User receiver;
 
-    @Column(name = "receiver_id")
-    @JsonProperty("receiverId")
+    @Column(name = COLUMN_RECEIVER)
+    @JsonProperty(JSON_PROPERTY_RECEIVER)
     private Long receiverId;
 
-    @JsonSetter("receiverId")
+    @JsonSetter(JSON_PROPERTY_RECEIVER)
     public void setReceiverId(Long receiverId) {
         this.receiverId = receiverId;
     }
 
-    @Column(columnDefinition = "tinyint default 0")
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFAULT_INIT_ZERO, nullable = false)
     private int hasSeen;
 
     public Notification() {

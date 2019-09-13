@@ -2,6 +2,7 @@ package com.stn.ester.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import com.stn.ester.rest.domain.enumerate.NewsStatus;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,67 +15,77 @@ import java.time.LocalDate;
 @Entity
 public class News extends AppDomain {
     public static String unique_name = "news";
-    @NotBlank(message = "Title is mandatory.")
+    private static final String COLUMN_AUTHOR = "author_id";
+    private static final String COLUMN_DEPARTMENT = "department_id";
+    private static final String COLUMN_THUMBNAIL = "thumbnail_id";
+    private static final String JSON_PROPERTY_AUTHOR = "authorId";
+    private static final String JSON_PROPERTY_DEPARTMENT = "departmentId";
+    private static final String JSON_PROPERTY_THUMBNAIL = "thumbnailId";
+
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_TEXT)
     private String synopsis;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_TEXT)
     private String content;
-    private String thumbnail_path;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "author_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_AUTHOR, insertable = false, updatable = false)
     private User author;
 
-    @Column(name = "author_id", nullable = false)
+    @Column(name = COLUMN_AUTHOR, nullable = false)
     private Long authorId;
 
-    @JsonSetter("authorId")
+    @JsonSetter(JSON_PROPERTY_AUTHOR)
     public void setAuthorId(long authorId) {
         if (authorId != 0)
             this.authorId = authorId;
     }
 
-    @Column(columnDefinition = "Date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate startDate;
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_DATETIME)
+    @DateTimeFormat(pattern = EntityConstant.FORMAT_DEFAULT_DATE)
+    private Date startDate;
 
-    @Column(columnDefinition = "Date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate expiredDate;
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_DATETIME)
+    @DateTimeFormat(pattern = EntityConstant.FORMAT_DEFAULT_DATE)
+    private Date expiredDate;
 
     @Enumerated(EnumType.STRING)
     private NewsStatus newsStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "department_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_DEPARTMENT, insertable = false, updatable = false)
     private Department department;
 
-    @Column(name = "department_id")
-    @JsonProperty("departmentId")
+    @Column(name = COLUMN_DEPARTMENT)
+    @JsonProperty(JSON_PROPERTY_DEPARTMENT)
     private Long departmentId;
 
-    @JsonSetter("departmentId")
+    @JsonSetter(JSON_PROPERTY_DEPARTMENT)
     public void setDepartmentId(Long departmentId) {
         if (departmentId != 0)
             this.departmentId = departmentId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "thumbnail_id", insertable = false, updatable = false)
-    private AssetFile assetFile;
+    @JoinColumn(name = COLUMN_THUMBNAIL, insertable = false, updatable = false)
+    private AssetFile thumbnail;
 
-    @Column(name = "thumbnail_id")
-    @JsonProperty("assetFileId")
-    private Long assetFileId;
+    @Column(name = COLUMN_THUMBNAIL)
+    @JsonProperty(JSON_PROPERTY_THUMBNAIL)
+    private Long thumbnailId;
 
-    @JsonSetter("assetFileId")
-    public void setAssetFileId(Long assetFileId) {
-        if (assetFileId != null)
-            this.assetFileId = assetFileId;
+    @JsonSetter(JSON_PROPERTY_THUMBNAIL)
+    public void setThumbnailId(Long thumbnailId) {
+        if (thumbnailId != null)
+            this.thumbnailId = thumbnailId;
+    }
+
+    public void setThumbnail(AssetFile thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     @Transient
