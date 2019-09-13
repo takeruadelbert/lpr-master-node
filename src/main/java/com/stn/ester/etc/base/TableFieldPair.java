@@ -12,8 +12,6 @@ import java.lang.annotation.Target;
 public @interface TableFieldPair {
     Class<? extends CrudService> service();
 
-    String tableName();
-
     String fieldName();
 
 

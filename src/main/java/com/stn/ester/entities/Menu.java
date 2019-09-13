@@ -18,7 +18,7 @@ import java.util.Set;
 @Data
 @Entity
 @OnDeleteSetParentNull({
-        @TableFieldPair(service = MenuService.class, tableName = "menu", fieldName = "parent_menu_id")
+        @TableFieldPair(service = MenuService.class, fieldName = "parent_menu_id")
 })
 public class Menu extends BaseEntity {
 

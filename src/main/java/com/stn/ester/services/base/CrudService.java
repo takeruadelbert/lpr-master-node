@@ -157,13 +157,13 @@ public abstract class CrudService<T extends BaseEntity, U extends AppRepository<
                 if (CrudService.class.isAssignableFrom(tableFieldPair.service())) {
                     String serviceName = tableFieldPair.service().getSimpleName();
                     serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
-                    context.getBean(serviceName, tableFieldPair.service()).setParentNull(parentId, tableFieldPair.tableName(), tableFieldPair.fieldName());
+                    context.getBean(serviceName, tableFieldPair.service()).setParentNull(parentId, tableFieldPair.fieldName());
                 }
             }
         }
     }
 
-    protected void setParentNull(Long parentId, String tableName, String fieldName) {
+    protected void setParentNull(Long parentId, String fieldName) {
         String lowerCamelCase = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, fieldName);
         SpecSearchCriteria searchByParentId = new SpecSearchCriteria(null, lowerCamelCase, SearchOperation.EQUALITY, parentId);
         AppSpecification spec = new AppSpecification(searchByParentId);
