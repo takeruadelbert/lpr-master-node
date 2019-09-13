@@ -5,10 +5,8 @@ import com.stn.ester.rest.domain.AppDomain;
 import com.stn.ester.rest.domain.AssetFile;
 import com.stn.ester.rest.domain.News;
 import com.stn.ester.rest.domain.enumerate.NewsStatus;
-import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,8 +18,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class NewsService extends AppService implements AssetFileBehaviour {

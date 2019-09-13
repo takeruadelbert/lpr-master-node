@@ -47,11 +47,11 @@ public class News extends AppDomain {
 
     @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_DATETIME)
     @DateTimeFormat(pattern = EntityConstant.FORMAT_DEFAULT_DATE)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_DATETIME)
     @DateTimeFormat(pattern = EntityConstant.FORMAT_DEFAULT_DATE)
-    private Date expiredDate;
+    private LocalDate expiredDate;
 
     @Enumerated(EnumType.STRING)
     private NewsStatus newsStatus;
