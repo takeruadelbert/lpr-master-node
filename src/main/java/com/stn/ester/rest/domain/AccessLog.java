@@ -11,8 +11,14 @@ import javax.persistence.*;
 @Entity
 public class AccessLog extends AppDomain {
     public static final String unique_name = "access_log";
+    private static final String COLUMN_IP_ADDRESS = "ip_address";
+    private static final String COLUMN_REQUEST_BODY = "request_body";
+    private static final String COLUMN_USER = "user_id";
+    private static final String COLUMN_UPLOAD_FILE = "upload_file_id";
+    private static final String JSON_PROPERTY_USER = "userId";
+    private static final String JSON_PROPERTY_UPLOAD_FILE = "uploadFileId";
 
-    @Column(name = "ip_address", nullable = false)
+    @Column(name = COLUMN_IP_ADDRESS, nullable = false)
     private String IPAddress;
 
     @Column(nullable = false)
@@ -22,28 +28,28 @@ public class AccessLog extends AppDomain {
     @Column(nullable = false)
     private RequestMethod requestMethod;
 
-    @Column(name = "request_body", length = 9999)
+    @Column(name = COLUMN_REQUEST_BODY, length = 9999)
     private String requestBody;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_USER, nullable = false, insertable = false, updatable = false)
     private User user;
 
-    @Column(name = "user_id")
-    @JsonProperty("userId")
+    @Column(name = COLUMN_USER)
+    @JsonProperty(JSON_PROPERTY_USER)
     private Long userId;
 
-    @JsonSetter("userId")
+    @JsonSetter(JSON_PROPERTY_USER)
     public void setUserId(Long userId) {
         this.userId = userId;
     }
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "upload_file_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_UPLOAD_FILE, insertable = false, updatable = false)
     private AssetFile uploadFile;
 
-    @JsonProperty("uploadFileId")
-    @Column(name = "upload_file_id")
+    @JsonProperty(JSON_PROPERTY_UPLOAD_FILE)
+    @Column(name = COLUMN_UPLOAD_FILE)
     private Long uploadFileId;
 
     public void setUploadFileId(Long uploadFileId) {

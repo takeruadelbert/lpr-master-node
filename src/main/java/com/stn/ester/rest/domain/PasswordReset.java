@@ -3,6 +3,7 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -12,27 +13,29 @@ import java.util.Date;
 @Entity
 public class PasswordReset extends AppDomain {
     public static final String unique_name = "password_reset";
+    private static final String COLUMN_USER = "user_id";
+    private static final String JSON_PROPERTY_USER = "userId";
 
     private String token;
 
-    @Column(columnDefinition = "tinyint default 0")
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFAULT_INIT_ZERO, nullable = false)
     private int isUsed;
     private Date expire;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_USER, insertable = false, updatable = false)
     @JsonBackReference
     private User user;
 
-    @JsonProperty("userId")
-    @Column(name = "user_id")
+    @JsonProperty(JSON_PROPERTY_USER)
+    @Column(name = COLUMN_USER)
     private Long userId;
 
     public PasswordReset() {
 
     }
 
-    @JsonSetter("userId")
+    @JsonSetter(JSON_PROPERTY_USER)
     public void setUserId(long userId) {
         if (userId != 0)
             this.userId = userId;
@@ -71,5 +74,7 @@ public class PasswordReset extends AppDomain {
     }
 
     @Override
-    public String underscoreName() {return PasswordReset.unique_name;}
+    public String underscoreName() {
+        return PasswordReset.unique_name;
+    }
 }
