@@ -1,0 +1,22 @@
+package com.stn.ester.services.crud;
+
+import com.stn.ester.entities.LoginSession;
+import com.stn.ester.repositories.jpa.LoginSessionRepository;
+import com.stn.ester.services.base.CrudService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class LoginSessionService extends CrudService {
+
+    private LoginSessionRepository loginSessionRepository;
+
+    @Autowired
+    public LoginSessionService(LoginSessionRepository loginSessionRepository) {
+        super(LoginSession.class, loginSessionRepository);
+        super.repositories.put(LoginSession.class.getName(), loginSessionRepository);
+        this.loginSessionRepository = loginSessionRepository;
+    }
+
+
+}
