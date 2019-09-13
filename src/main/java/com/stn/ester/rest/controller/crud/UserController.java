@@ -44,7 +44,7 @@ public class UserController extends CrudController<UserService, User> {
     }
 
     @Override
-    public Object update(@PathVariable long id, @Validated(AppDomain.Existing.class) @RequestBody User user) {
+    public Object update(@PathVariable long id, @Validated(AppDomain.Existing.class) @RequestBody User user, @RequestBody Map<String, Object> requestBody) {
         return super.service.update(id, user);
     }
 
@@ -55,7 +55,7 @@ public class UserController extends CrudController<UserService, User> {
     }
 
     @RequestMapping(value = "/change-password", method = RequestMethod.PUT)
-    public Object changePassword (@RequestBody Map<String, String> data) {
+    public Object changePassword(@RequestBody Map<String, String> data) {
         String old_password = data.get("old_password");
         String new_password = data.get("new_password");
         String retype_new_password = data.get("retype_new_password");
@@ -64,7 +64,7 @@ public class UserController extends CrudController<UserService, User> {
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole('changeUserPassword'))")
     @RequestMapping(value = "/change-password/{id}", method = RequestMethod.PUT)
-    public Object changePassword (@RequestBody Map<String, String> data,@PathVariable long id) {
+    public Object changePassword(@RequestBody Map<String, String> data, @PathVariable long id) {
         String new_password = data.get("new_password");
         String retype_new_password = data.get("retype_new_password");
         return service.changePassword(id, new_password, retype_new_password);

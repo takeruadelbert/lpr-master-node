@@ -1,5 +1,6 @@
 package com.stn.ester.rest.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.stn.ester.rest.base.OnDeleteSetParentNull;
 import com.stn.ester.rest.base.TableFieldPair;
@@ -35,6 +36,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AppService implements OptionBehaviour {
 
@@ -85,11 +87,15 @@ public abstract class AppService implements OptionBehaviour {
     }
 
     public Object update(Long id, AppDomain object) {
+        return update(id, object, null);
+    }
+
+    public Object update(Long id, AppDomain object, Map<String, Object> comparator) {
         AppDomain old = (AppDomain) repositories.get(baseRepoName).findById(id).get();
         if (old == null) {
             throw new ResourceNotFoundException();
         }
-        preUpdate(object, old);
+        preUpdate(object, old, comparator);
         return repositories.get(baseRepoName).save(old);
     }
 
@@ -100,10 +106,10 @@ public abstract class AppService implements OptionBehaviour {
 
     // TODO
     // check prepare for level 2 or more
-    private void preUpdate(AppDomain src, AppDomain target) {
+    private void preUpdate(AppDomain src, AppDomain target, Map<String, Object> comparator) {
         if (target.isPreparedForUpdate)
             return;
-        BeanUtils.copyProperties(src, target, UpdaterHelper.getNullPropertyNames(src));
+        BeanUtils.copyProperties(src, target, UpdaterHelper.getIgnoredProperty(src, comparator));
         target.setPreparedForUpdate(true);
         final BeanWrapper bw = new BeanWrapperImpl(target);
         java.beans.PropertyDescriptor[] pds = bw.getPropertyDescriptors();
@@ -113,7 +119,15 @@ public abstract class AppService implements OptionBehaviour {
                 AppDomain toCompare = (AppDomain) srcValue;
                 if (repositories.containsKey(toCompare.underscoreName())) {
                     AppDomain toSave = (AppDomain) repositories.get(toCompare.underscoreName()).findById(toCompare.getId()).get();
-                    preUpdate(toCompare, toSave);
+                    Map<String, Object> childComparator = null;
+                    if (comparator != null) {
+                        Object objectValue = comparator.getOrDefault(pd.getName(), null);
+                        if (objectValue != null) {
+                            ObjectMapper objectMapper = new ObjectMapper();
+                            childComparator = objectMapper.convertValue(objectValue, Map.class);
+                        }
+                    }
+                    preUpdate(toCompare, toSave, childComparator);
                     bw.setPropertyValue(pd.getName(), toSave);
                 }
             }
@@ -196,9 +210,9 @@ public abstract class AppService implements OptionBehaviour {
                                         TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class).value();
                                         for (TableFieldPair tableFieldPair : tableFieldPairs) {
                                             if (AppService.class.isAssignableFrom(tableFieldPair.service())) {
-                                                String serviceName=tableFieldPair.service().getSimpleName();
-                                                serviceName=CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL,serviceName);
-                                                context.getBean(serviceName,tableFieldPair.service()).setParentNull(parentId,tableFieldPair.tableName(),tableFieldPair.fieldName());
+                                                String serviceName = tableFieldPair.service().getSimpleName();
+                                                serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
+                                                context.getBean(serviceName, tableFieldPair.service()).setParentNull(parentId, tableFieldPair.tableName(), tableFieldPair.fieldName());
                                             }
                                         }
                                     }
@@ -212,12 +226,12 @@ public abstract class AppService implements OptionBehaviour {
     }
 
     protected void setParentNull(Long parentId, String tableName, String fieldName) {
-        String lowerCamelCase=CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,fieldName);
-        SpecSearchCriteria searchByParentId=new SpecSearchCriteria(null,lowerCamelCase, SearchOperation.EQUALITY,parentId);
-        AppSpecification spec=new AppSpecification(searchByParentId);
-        Iterable<AppDomain> entities=repositories.get(baseRepoName).findAll(spec);
-        for(AppDomain entity:entities){
-            entity.setAttribute(lowerCamelCase,null);
+        String lowerCamelCase = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, fieldName);
+        SpecSearchCriteria searchByParentId = new SpecSearchCriteria(null, lowerCamelCase, SearchOperation.EQUALITY, parentId);
+        AppSpecification spec = new AppSpecification(searchByParentId);
+        Iterable<AppDomain> entities = repositories.get(baseRepoName).findAll(spec);
+        for (AppDomain entity : entities) {
+            entity.setAttribute(lowerCamelCase, null);
             repositories.get(baseRepoName).save(entity);
         }
     }

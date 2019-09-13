@@ -8,6 +8,7 @@ import com.stn.ester.rest.domain.enumerate.NewsStatus;
 import com.stn.ester.rest.helper.DateTimeHelper;
 import com.stn.ester.rest.helper.SessionHelper;
 import com.stn.ester.rest.service.base.AssetFileBehaviour;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -36,26 +39,29 @@ public class NewsService extends AppService implements AssetFileBehaviour {
 
     @Transactional
     @Override
-    public Object create(AppDomain o) {
-        long author_id = SessionHelper.getUserID();
-        ((News) o).setAuthorId(author_id);
-        ((News) o).setNewsStatus(NewsStatus.SHOWED); // default option is showed.
-        String token = ((News) o).getToken();
-        if (token != null) {
-            ((News) o).setAssetFileId(this.claimFile(token).getId());
-        }
-        return super.create(o);
+    public Object create(AppDomain domain) {
+        News news = setDataNews(domain);
+        news.setNewsStatus(NewsStatus.SHOWED);
+        return super.create(news);
     }
 
     @Override
-    public Object update(Long id, AppDomain o) {
-        long author_id = SessionHelper.getUserID();
-        ((News) o).setAuthorId(author_id);
-        String token = ((News) o).getToken();
-        if (token != null) {
-            ((News) o).setAssetFileId(this.claimFile(token).getId());
+    public Object update(Long id, AppDomain domain) {
+        News news = setDataNews(domain);
+        return super.update(id, news);
+    }
+
+    private News setDataNews(AppDomain domain) {
+        Long author_id = SessionHelper.getUserID();
+        News news = ((News) domain);
+        news.setAuthorId(author_id);
+        String token = news.getToken();
+        if (token != null && !token.isEmpty()) {
+            AssetFile assetFile = claimFile(token);
+            news.setAssetFileId(assetFile.getId());
+            news.setAssetFile(assetFile);
         }
-        return super.update(id, o);
+        return news;
     }
 
     public Page<News> dashboard(Integer page, Integer size, Pageable pageable) throws Exception {
@@ -65,16 +71,16 @@ public class NewsService extends AppService implements AssetFileBehaviour {
         long department_id = SessionHelper.getDepartmentID();
 
         // get current date
-        Date today = DateTimeHelper.getCurrentDate();
+        LocalDate today = LocalDate.now();
 
         if (allNews != null) {
             for (News news : allNews) {
                 // check if period date of news exists
                 if (news.getStartDate() != null && news.getExpiredDate() != null) {
                     // check if news still valid within period of date
-                    Date startDate = news.getStartDate();
-                    Date expiredDate = news.getExpiredDate();
-                    if (!startDate.after(today) && !expiredDate.before(today)) {
+                    LocalDate startDate = news.getStartDate();
+                    LocalDate expiredDate = news.getExpiredDate();
+                    if (!startDate.isAfter(today) && !expiredDate.isBefore(today)) {
                         if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
                             validNews.add(news);
                     }
