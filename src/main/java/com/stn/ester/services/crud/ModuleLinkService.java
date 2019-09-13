@@ -11,7 +11,6 @@ public class ModuleLinkService extends CrudService {
 
     @Autowired
     public ModuleLinkService(ModuleLinkRepository moduleLinkRepository) {
-        super(ModuleLink.class, moduleLinkRepository);
-        super.repositories.put(ModuleLink.class.getName(), moduleLinkRepository);
+        super(moduleLinkRepository);
     }
 }

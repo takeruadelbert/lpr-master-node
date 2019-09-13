@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccessLogService extends CrudService {
     public AccessLogService(AccessLogRepository accessLogRepository) {
-        super(AccessGroup.class, accessLogRepository);
-        super.repositories.put(AccessLog.class.getName(), accessLogRepository);
+        super(accessLogRepository);
     }
 }

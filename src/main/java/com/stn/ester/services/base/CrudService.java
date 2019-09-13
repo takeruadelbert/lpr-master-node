@@ -2,20 +2,17 @@ package com.stn.ester.services.base;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
+import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.etc.base.OnDeleteSetParentNull;
 import com.stn.ester.etc.base.TableFieldPair;
-import com.stn.ester.helpers.ReflectionHelper;
-import com.stn.ester.repositories.jpa.base.AppRepository;
-import com.stn.ester.repositories.jpa.base.traits.RepositoryListTrait;
-import com.stn.ester.repositories.jpa.projections.IdLabelList;
-import com.stn.ester.repositories.jpa.projections.IdNameList;
-import com.stn.ester.repositories.jpa.projections.NameLabelList;
-import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.etc.exceptions.ListNotFoundException;
-import com.stn.ester.helpers.UpdaterHelper;
 import com.stn.ester.etc.search.AppSpecification;
 import com.stn.ester.etc.search.util.SearchOperation;
 import com.stn.ester.etc.search.util.SpecSearchCriteria;
+import com.stn.ester.helpers.ReflectionHelper;
+import com.stn.ester.helpers.UpdaterHelper;
+import com.stn.ester.repositories.jpa.base.AppRepository;
+import com.stn.ester.repositories.jpa.base.traits.RepositoryListTrait;
 import com.stn.ester.repositories.jpa.projections.OptionList;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
@@ -26,14 +23,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.util.ClassUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,16 +36,19 @@ public abstract class CrudService<T extends BaseEntity, U extends AppRepository<
 
     protected U currentEntityRepository;
 
+    protected ApplicationContext applicationContext;
+
     @PersistenceContext
     protected EntityManager entityManager;
 
-    @Autowired
-    private ApplicationContext context;
-
-    public CrudService(Class<T> clazz, U entityRepository) {
-        repositories = new HashMap();
-        repositories.put(clazz.getName(), entityRepository);
+    public CrudService(U entityRepository) {
         this.currentEntityRepository = entityRepository;
+    }
+
+    @Autowired
+    public final void setApplicationContext(ApplicationContext applicationContext){
+        this.applicationContext=applicationContext;
+        repositories = applicationContext.getBeansOfType(AppRepository.class);
     }
 
     public Page<T> index(Integer page, Integer size) {
@@ -131,19 +128,18 @@ public abstract class CrudService<T extends BaseEntity, U extends AppRepository<
             Object srcValue = bw.getPropertyValue(pd.getName());
             if (srcValue != null && BaseEntity.class.isAssignableFrom(srcValue.getClass())) {
                 BaseEntity toCompare = (BaseEntity) srcValue;
-                if (repositories.containsKey(toCompare.getClass().getName())) {
-                    BaseEntity toSave = (BaseEntity) repositories.get(toCompare.getClass().getName()).findById(toCompare.getId()).get();
-                    Map<String, Object> childComparator = null;
-                    if (comparator != null) {
-                        Object objectValue = comparator.getOrDefault(pd.getName(), null);
-                        if (objectValue != null) {
-                            ObjectMapper objectMapper = new ObjectMapper();
-                            childComparator = objectMapper.convertValue(objectValue, Map.class);
-                        }
+                String repositoryBeanName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, toCompare.getClass().getSimpleName()) + "Repository";
+                BaseEntity toSave = (BaseEntity) repositories.get(repositoryBeanName).findById(toCompare.getId()).get();
+                Map<String, Object> childComparator = null;
+                if (comparator != null) {
+                    Object objectValue = comparator.getOrDefault(pd.getName(), null);
+                    if (objectValue != null) {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        childComparator = objectMapper.convertValue(objectValue, Map.class);
                     }
-                    preUpdate(toCompare, toSave, childComparator);
-                    bw.setPropertyValue(pd.getName(), toSave);
                 }
+                preUpdate(toCompare, toSave, childComparator);
+                bw.setPropertyValue(pd.getName(), toSave);
             }
         }
     }
@@ -157,7 +153,7 @@ public abstract class CrudService<T extends BaseEntity, U extends AppRepository<
                 if (CrudService.class.isAssignableFrom(tableFieldPair.service())) {
                     String serviceName = tableFieldPair.service().getSimpleName();
                     serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
-                    context.getBean(serviceName, tableFieldPair.service()).setParentNull(parentId, tableFieldPair.fieldName());
+                    applicationContext.getBean(serviceName, tableFieldPair.service()).setParentNull(parentId, tableFieldPair.fieldName());
                 }
             }
         }

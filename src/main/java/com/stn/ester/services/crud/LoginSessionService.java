@@ -13,8 +13,7 @@ public class LoginSessionService extends CrudService {
 
     @Autowired
     public LoginSessionService(LoginSessionRepository loginSessionRepository) {
-        super(LoginSession.class, loginSessionRepository);
-        super.repositories.put(LoginSession.class.getName(), loginSessionRepository);
+        super(loginSessionRepository);
         this.loginSessionRepository = loginSessionRepository;
     }
 

@@ -32,8 +32,7 @@ public class NewsService extends CrudService<News, NewsRepository> implements As
 
     @Autowired
     public NewsService(NewsRepository newsRepository, AssetFileService assetFileService) {
-        super(News.class, newsRepository);
-        super.repositories.put(News.class.getName(), newsRepository);
+        super(newsRepository);
         this.newsRepository = newsRepository;
         this.assetFileService = assetFileService;
     }

@@ -27,9 +27,7 @@ public class EmployeeService extends CrudService<Employee, EmployeeRepository> {
 
     @Autowired
     public EmployeeService(EmployeeRepository employeeRepository, PositionRepository positionRepository, UserRepository userRepository) {
-        super(Employee.class, employeeRepository);
-        super.repositories.put(Employee.class.getName(), employeeRepository);
-        super.repositories.put(User.class.getName(), userRepository);
+        super(employeeRepository);
         this.positionRepository = positionRepository;
     }
 

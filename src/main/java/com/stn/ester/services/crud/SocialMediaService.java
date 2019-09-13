@@ -11,7 +11,6 @@ public class SocialMediaService extends CrudService {
 
     @Autowired
     public SocialMediaService(SocialMediaRepository socialMediaRepository) {
-        super(SocialMedia.class, socialMediaRepository);
-        super.repositories.put(SocialMedia.class.getName(), socialMediaRepository);
+        super(socialMediaRepository);
     }
 }

@@ -27,8 +27,7 @@ public class UserGroupService extends CrudService<UserGroup, UserGroupRepository
 
     @Autowired
     public UserGroupService(UserGroupRepository usergroupRepository, AccessGroupRepository accessGroupRepository, MenuRepository menuRepository) {
-        super(UserGroup.class, usergroupRepository);
-        super.repositories.put(UserGroup.class.getName(), usergroupRepository);
+        super(usergroupRepository);
         this.userGroupRepository = usergroupRepository;
         this.accessGroupRepository = accessGroupRepository;
         this.menuRepository = menuRepository;

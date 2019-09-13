@@ -27,8 +27,7 @@ public class SystemProfileService extends CrudService implements AssetFileClaimT
 
     @Autowired
     public SystemProfileService(SystemProfileRepository systemProfileRepository, AssetFileService assetFileService, AssetFileRepository assetFileRepository) {
-        super(SystemProfile.class, systemProfileRepository);
-        super.repositories.put(SystemProfile.class.getName(), systemProfileRepository);
+        super(systemProfileRepository);
         this.systemProfileRepository = systemProfileRepository;
         this.assetFileService = assetFileService;
         this.assetFileRepository = assetFileRepository;

@@ -1,9 +1,9 @@
 package com.stn;
 
-import com.stn.ester.etc.configurations.DatabaseConfig;
 import com.stn.ester.entities.Biodata;
 import com.stn.ester.entities.User;
 import com.stn.ester.entities.UserGroup;
+import com.stn.ester.etc.configurations.DatabaseConfig;
 import com.stn.ester.services.crud.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -11,13 +11,12 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class DepartmentService extends CrudService<Department, DepartmentRepository>{
+public class DepartmentService extends CrudService<Department, DepartmentRepository> {
     private DepartmentRepository departmentRepository;
 
     @Autowired
     public DepartmentService(DepartmentRepository departmentRepository) {
-        super(Department.class, departmentRepository);
-        this.departmentRepository = departmentRepository;
+        super(departmentRepository);
     }
 
     @Override

@@ -17,8 +17,7 @@ public class CityService extends CrudService {
 
     @Autowired
     public CityService(CityRepository cityRepository) {
-        super(City.class, cityRepository);
-        super.repositories.put(City.class.getName(), cityRepository);
+        super(cityRepository);
         this.cityRepository = cityRepository;
     }
 

@@ -11,7 +11,6 @@ public class PasswordResetService extends CrudService {
 
     @Autowired
     public PasswordResetService(PasswordResetRepository passwordResetRepository) {
-        super(PasswordReset.class, passwordResetRepository);
-        super.repositories.put(PasswordReset.class.getName(), passwordResetRepository);
+        super(passwordResetRepository);
     }
 }

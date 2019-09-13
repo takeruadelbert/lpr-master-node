@@ -52,10 +52,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
 
     @Autowired
     public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository, PasswordResetService passwordResetService, SystemProfileRepository systemProfileRepository) {
-        super(User.class, userRepository);
-        super.repositories.put(User.class.getName(), userRepository);
-        super.repositories.put(Biodata.class.getName(), biodataRepository);
-        super.repositories.put(UserGroup.class.getName(), userGroupRepository);
+        super(userRepository);
         this.userRepository = userRepository;
         this.loginSessionRepository = loginSessionRepository;
         this.userGroupRepository = userGroupRepository;

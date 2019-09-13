@@ -22,11 +22,7 @@ public class BiodataService extends CrudService {
 
     @Autowired
     public BiodataService(BiodataRepository biodataRepository, CountryRepository countryRepository, StateRepository stateRepository, CityRepository cityRepository) {
-        super(Biodata.class, biodataRepository);
-        super.repositories.put(Biodata.class.getName(), biodataRepository);
-        super.repositories.put(Country.class.getName(), countryRepository);
-        super.repositories.put(State.class.getName(), stateRepository);
-        super.repositories.put(City.class.getName(), cityRepository);
+        super(biodataRepository);
     }
 
     public Map<Gender, String> getGenderList() {

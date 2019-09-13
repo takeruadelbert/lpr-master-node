@@ -11,8 +11,7 @@ public class ModuleService extends CrudService {
 
     @Autowired
     public ModuleService(ModuleRepository moduleRepository) {
-        super(Module.class, moduleRepository);
-        super.repositories.put(Module.class.getName(), moduleRepository);
+        super(moduleRepository);
     }
 
 }

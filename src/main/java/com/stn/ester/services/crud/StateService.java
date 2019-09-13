@@ -13,8 +13,7 @@ public class StateService extends CrudService {
     private StateRepository stateRepository;
 
     public StateService(StateRepository stateRepository) {
-        super(State.class, stateRepository);
-        super.repositories.put(State.class.getName(), stateRepository);
+        super(stateRepository);
         this.stateRepository = stateRepository;
     }
 

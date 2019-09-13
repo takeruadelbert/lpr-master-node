@@ -26,8 +26,7 @@ public class MenuService extends CrudService<Menu, MenuRepository> {
 
     @Autowired
     public MenuService(MenuRepository menuRepository, UserGroupService userGroupService, AccessGroupRepository accessGroupRepository, UserGroupRepository userGroupRepository) {
-        super(Menu.class, menuRepository);
-        super.repositories.put(Menu.class.getName(), menuRepository);
+        super(menuRepository);
         this.menuRepository = menuRepository;
         this.userGroupService = userGroupService;
         this.accessGroupRepository = accessGroupRepository;

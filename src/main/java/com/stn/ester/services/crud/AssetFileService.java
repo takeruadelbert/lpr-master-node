@@ -58,8 +58,7 @@ public class AssetFileService extends CrudService {
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
-        super(AssetFile.class, assetFileRepository);
-        super.repositories.put(AssetFile.class.getName(), assetFileRepository);
+        super(assetFileRepository);
     }
 
     @Transactional

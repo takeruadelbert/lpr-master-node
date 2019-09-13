@@ -12,8 +12,7 @@ public class NotificationService extends CrudService {
 
     @Autowired
     public NotificationService(NotificationRepository notificationRepository) {
-        super(Notification.class, notificationRepository);
-        super.repositories.put(Notification.class.getName(), notificationRepository);
+        super(notificationRepository);
         this.notificationRepository = notificationRepository;
     }
 

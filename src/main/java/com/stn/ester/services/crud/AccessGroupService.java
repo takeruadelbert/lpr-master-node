@@ -33,12 +33,7 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
                               UserGroupRepository userGroupRepository,
                               ModuleRepository moduleRepository,
                               ModuleLinkRepository moduleLinkRepository) {
-        super(AccessGroup.class, accessGroupRepository);
-        super.repositories.put(AccessGroup.class.getName(), accessGroupRepository);
-        super.repositories.put(Menu.class.getName(), menuRepository);
-        super.repositories.put(UserGroup.class.getName(), userGroupRepository);
-        super.repositories.put(Module.class.getName(), moduleRepository);
-        super.repositories.put(ModuleLink.class.getName(), moduleLinkRepository);
+        super(accessGroupRepository);
         this.userGroupRepository = userGroupRepository;
         this.moduleRepository = moduleRepository;
         this.menuRepository = menuRepository;

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 public class CountryService extends CrudService {
 
     public CountryService(CountryRepository countryRepository) {
-        super(Country.class, countryRepository);
-        super.repositories.put(Country.class.getName(), countryRepository);
+        super(countryRepository);
     }
 }

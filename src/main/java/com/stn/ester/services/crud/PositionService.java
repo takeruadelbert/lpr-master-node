@@ -17,8 +17,7 @@ public class PositionService extends CrudService<Position, PositionRepository> {
 
     @Autowired
     public PositionService(PositionRepository positionRepository) {
-        super(Position.class, positionRepository);
-        super.repositories.put(Position.class.getName(), positionRepository);
+        super(positionRepository);
         this.positionRepository = positionRepository;
     }
 

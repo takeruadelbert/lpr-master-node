@@ -11,7 +11,6 @@ public class IdentityTypeService extends CrudService {
 
     @Autowired
     public IdentityTypeService(IdentityTypeRepository typeIdentityRepository) {
-        super(IdentityType.class, typeIdentityRepository);
-        super.repositories.put(IdentityType.class.getName(), typeIdentityRepository);
+        super(typeIdentityRepository);
     }
 }
