@@ -22,5 +22,8 @@ public interface AccessGroupRepository extends AppRepository<AccessGroup, IdList
 
     Collection<AccessGroup> findAllByMenuIdAndUserGroupId(Long menuId,Long userGroupId);
 
+    Collection<AccessGroup> findAllByMenuIdInAndUserGroupId(Collection<Long> menuIds, Long userGroupId);
+
+
     Optional<AccessGroup> findByMenuIdAndUserGroupId(Long menuId,Long userGroupId);
 }
