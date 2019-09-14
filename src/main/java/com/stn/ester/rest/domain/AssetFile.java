@@ -1,5 +1,6 @@
 package com.stn.ester.rest.domain;
 
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import com.stn.ester.rest.helper.GlobalFunctionHelper;
 import lombok.Data;
 
@@ -15,7 +16,7 @@ public class AssetFile extends AppDomain {
     private String name;
     private String extension;
     private String token;
-    @Column(columnDefinition = "tinyint default 0")
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFAULT_INIT_ZERO, nullable = false)
     private int isDefault;
 
     public AssetFile() {

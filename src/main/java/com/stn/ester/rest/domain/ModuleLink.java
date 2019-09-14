@@ -3,6 +3,7 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import com.stn.ester.rest.domain.enumerate.RequestMethod;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,21 +15,23 @@ import javax.validation.constraints.NotBlank;
 @Entity
 public class ModuleLink extends AppDomain {
 
-    public static final String unique_name="module_link";
+    public static final String unique_name = "module_link";
+    private static final String COLUMN_MODULE = "module_id";
+    private static final String JSON_IGNORE_PROPERTY_MODULE_LINK = "moduleLink";
 
-    @NotBlank(message = "Name is mandatory.")
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     private String name;
-    @NotBlank(message = "Alias is mandatory.")
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     private String alias;
 
     @Enumerated(EnumType.STRING)
     private RequestMethod requestMethod;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "module_id")
+    @JoinColumn(name = COLUMN_MODULE)
     @JsonBackReference
     @EqualsAndHashCode.Exclude
-    @JsonIgnoreProperties("moduleLink")
+    @JsonIgnoreProperties(JSON_IGNORE_PROPERTY_MODULE_LINK)
     private Module module;
 
     @JsonIgnore

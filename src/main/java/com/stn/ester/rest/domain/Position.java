@@ -3,6 +3,7 @@ package com.stn.ester.rest.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,8 +18,12 @@ import java.util.Set;
 @Entity
 public class Position extends AppDomain {
     public static String unique_name = "position";
+    private static final String COLUMN_PARENT_POSITION = "parent_position_id";
+    private static final String COLUMN_USER_GROUP = "user_group_id";
+    private static final String JSON_PROPERTY_PARENT_POSITION = "parentPositionId";
+    private static final String JSON_PROPERTY_USER_GROUP = "userGroupId";
 
-    @NotBlank(message = "Name is mandatory.")
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false, unique = true)
     private String name;
     private String label;
@@ -28,31 +33,31 @@ public class Position extends AppDomain {
     private Set<Position> subPosition = new HashSet<Position>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "parent_position_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_PARENT_POSITION, insertable = false, updatable = false)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Position parentPosition;
 
-    @JsonProperty("parentPositionId")
-    @Column(name = "parent_position_id")
+    @JsonProperty(JSON_PROPERTY_PARENT_POSITION)
+    @Column(name = COLUMN_PARENT_POSITION)
     private Long parentPositionId;
 
-    @JsonSetter("parentPositionId")
+    @JsonSetter(JSON_PROPERTY_PARENT_POSITION)
     public void setParentPositionId(long parentPositionId) {
         if (parentPositionId != 0)
             this.parentPositionId = parentPositionId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_group_id", insertable = false, updatable = false)
+    @JoinColumn(name = COLUMN_USER_GROUP, insertable = false, updatable = false)
     private UserGroup userGroup;
 
-    @NotNull(message = "User Group is mandatory.")
-    @JsonProperty("userGroupId")
-    @Column(name = "user_group_id", nullable = false)
+    @NotNull(message = EntityConstant.MESSAGE_NOT_BLANK)
+    @JsonProperty(JSON_PROPERTY_USER_GROUP)
+    @Column(name = COLUMN_USER_GROUP, nullable = false)
     private Long userGroupId;
 
-    @JsonSetter("userGroupId")
+    @JsonSetter(JSON_PROPERTY_USER_GROUP)
     public void setUserGroupId(long userGroupId) {
         if (userGroupId != 0)
             this.userGroupId = userGroupId;

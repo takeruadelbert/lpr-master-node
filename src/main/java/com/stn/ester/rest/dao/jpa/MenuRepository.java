@@ -20,5 +20,7 @@ public interface MenuRepository extends AppRepository<Menu,IdLabelList> {
 
     List<Menu> findAllByModuleId(Long moduleId);
 
+    List<Menu> findAllByModuleIdIn(Collection<Long> moduleIds);
+
     Menu findById(long id);
 }

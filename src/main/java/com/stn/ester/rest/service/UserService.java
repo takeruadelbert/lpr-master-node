@@ -1,10 +1,5 @@
 package com.stn.ester.rest.service;
 
-import com.stn.ester.rest.RestApplication;
-import com.stn.ester.rest.dao.jpa.BiodataRepository;
-import com.stn.ester.rest.dao.jpa.LoginSessionRepository;
-import com.stn.ester.rest.dao.jpa.UserGroupRepository;
-import com.stn.ester.rest.dao.jpa.UserRepository;
 import com.stn.ester.rest.dao.jpa.*;
 import com.stn.ester.rest.domain.*;
 import com.stn.ester.rest.exception.*;
@@ -14,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
@@ -28,12 +23,6 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.beans.Transient;
-import java.util.*;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import java.util.*;
 
 @Service
@@ -77,13 +66,14 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
 
     @Override
     @Transactional
-    public Object create(AppDomain o) {
+    public Object create(AppDomain appDomain) {
         // set default profile picture
-        if (((User) o).getToken() == null) {
-            ((User) o).setAssetFileId(AssetFileService.defaultProfilePictureID);
+        User user = ((User) appDomain);
+        if (user.getToken() == null) {
+            user.setProfilePictureId(AssetFileService.defaultProfilePictureID);
         }
-        ((User) o).setPassword(passwordEncoder.encode(((User) o).getPassword()));
-        return super.create(o);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return super.create(user);
     }
 
     @Override
@@ -140,7 +130,7 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
         if (user == null || !passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new PasswordMismatchException();
         }
-        return changePassword(userID, newPassword,retypeNewPassword);
+        return changePassword(userID, newPassword, retypeNewPassword);
     }
 
     @Transactional
@@ -173,8 +163,8 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
             AssetFile assetFile = this.claimFile(token);
             User user = this.userRepository.findById(user_id).get();
             user.setId(user_id);
-            user.setAssetFileId(assetFile.getId());
-            user.setAssetFile(assetFile);
+            user.setProfilePictureId(assetFile.getId());
+            user.setProfilePicture(assetFile);
             return super.update(user_id, user);
         }
         Map<String, Object> result = new HashMap<>();
@@ -198,8 +188,8 @@ public class UserService extends AppService implements AssetFileBehaviour, UserD
     }
 
     @Transactional
-    public Object createIfUsernameNotExist(User user,String username){
-        if (!this.userRepository.findByUsername(username).isPresent()){
+    public Object createIfUsernameNotExist(User user, String username) {
+        if (!this.userRepository.findByUsername(username).isPresent()) {
             return this.create(user);
         }
         return null;

@@ -1,5 +1,6 @@
 package com.stn.ester.rest.domain;
 
+import com.stn.ester.rest.domain.constant.EntityConstant;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -12,10 +13,10 @@ public class IdentityType extends AppDomain {
 
     public static final String unique_name = "identity_type";
 
-    @NotBlank(message = "Label is mandatory.")
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     public String label;
 
-    @NotBlank(message = "Name is mandatory.")
+    @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false)
     private String name;
 
