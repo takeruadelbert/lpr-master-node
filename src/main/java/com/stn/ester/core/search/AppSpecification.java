@@ -37,15 +37,15 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
                 Join joinPredicate = root.join(getCriteria().getClassJoin());
                 path = joinPredicate.get(criteria.getKey());
             }
-            Object value;
+            Comparable value;
             if (LocalDate.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
                 value = DateTimeHelper.convertToDate(criteria.getValue().toString());
             } else if (LocalDateTime.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
                 value = DateTimeHelper.convertToDateTime(criteria.getValue().toString());
             } else if (Enum.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
-                value=Enum.valueOf(path.getModel().getBindableJavaType(),criteria.getValue().toString());
+                value = Enum.valueOf(path.getModel().getBindableJavaType(), criteria.getValue().toString());
             } else {
-                value = criteria.getValue();
+                value = criteria.getValue().toString();
             }
             switch (criteria.getOperation()) {
                 case EQUALITY:
@@ -53,9 +53,13 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
                 case NEGATION:
                     return builder.notEqual(path, value);
                 case GREATER_THAN:
-                    return builder.greaterThan(path, value.toString());
+                    return builder.greaterThan(path, value);
                 case LESS_THAN:
-                    return builder.lessThan(path, value.toString());
+                    return builder.lessThan(path, value);
+                case GREATER_THAN_OR_EQUAL:
+                    return builder.greaterThanOrEqualTo(path, value);
+                case LESS_THAN_OR_EQUAL:
+                    return builder.lessThanOrEqualTo(path, value);
                 case LIKE:
                     return builder.like(path, value.toString());
                 case STARTS_WITH:
