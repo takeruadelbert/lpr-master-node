@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.stn.ester.etc.security.SecurityConstants.ROLE_PREFIX;
 
@@ -96,38 +98,41 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
         if (modules.isEmpty()) {
             return "NOACCESS";
         }
-        List<Menu> menus = menuRepository.findAllByModuleId(modules.get(0).getId());
+        List<Menu> menus = menuRepository.findAllByModuleIdIn(modules.stream().map(Module::getId).collect(Collectors.toCollection(ArrayList::new)));
         if (menus.isEmpty()) {
             return "NOACCESS";
         }
         Long userGroupId = SessionHelper.getCurrentUser().getUserGroupId();
-        Collection<AccessGroup> accessGroups = currentEntityRepository.findAllByMenuIdAndUserGroupId(menus.get(0).getId(), userGroupId);
-        if (accessGroups.isEmpty()) {
+        Collection<AccessGroup> accessGroups = currentEntityRepository.findAllByMenuIdInAndUserGroupId(menus.stream().map(Menu::getId).collect(Collectors.toCollection(ArrayList::new)), userGroupId);
+         if (accessGroups.isEmpty()) {
             return "NOACCESS";
         }
-        if (!this.hasAccess(requestMethod, Iterables.get(accessGroups, 0), modules.get(0), isCrud))
+        if (!this.hasAccess(requestMethod, accessGroups, modules.get(0), isCrud))
             return "NOACCESS";
         return ROLE_PREFIX + "_" + SessionHelper.getCurrentUser().getUserGroup().getName();
     }
 
-    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup, Module module, Boolean isCrud) {
-        if (isCrud) {
-            if (accessGroup.isViewable() && (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.OPTIONS))) {
-                return true;
+    private boolean hasAccess(RequestMethod requestMethod, Collection<AccessGroup> accessGroups, Module module, Boolean isCrud) {
+        boolean result = false;
+        for (AccessGroup accessGroup : accessGroups) {
+            if (isCrud) {
+                if (accessGroup.isViewable() && (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.OPTIONS))) {
+                    result |= true;
+                }
+                if (accessGroup.isAddable() && requestMethod.equals(RequestMethod.POST)) {
+                    result |= true;
+                }
+                if (accessGroup.isEditable() && requestMethod.equals(RequestMethod.PUT)) {
+                    result |= true;
+                }
+                if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
+                    result |= true;
+                }
+            } else if (accessGroup.isViewable() && module.getRequestMethod().equals(requestMethod)) {
+                result |= true;
             }
-            if (accessGroup.isAddable() && requestMethod.equals(RequestMethod.POST)) {
-                return true;
-            }
-            if (accessGroup.isEditable() && requestMethod.equals(RequestMethod.PUT)) {
-                return true;
-            }
-            if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
-                return true;
-            }
-        } else if (accessGroup.isViewable() && module.getRequestMethod().equals(requestMethod)) {
-            return true;
         }
-        return false;
+        return result;
     }
 
 }
