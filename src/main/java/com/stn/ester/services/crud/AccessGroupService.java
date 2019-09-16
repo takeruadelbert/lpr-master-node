@@ -104,15 +104,15 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
         }
         Long userGroupId = SessionHelper.getCurrentUser().getUserGroupId();
         Collection<AccessGroup> accessGroups = currentEntityRepository.findAllByMenuIdInAndUserGroupId(menus.stream().map(Menu::getId).collect(Collectors.toCollection(ArrayList::new)), userGroupId);
-         if (accessGroups.isEmpty()) {
+        if (accessGroups.isEmpty()) {
             return "NOACCESS";
         }
-        if (!this.hasAccess(requestMethod, accessGroups, modules.get(0), isCrud))
+        if (!this.hasAccess(requestMethod, accessGroups, name, isCrud))
             return "NOACCESS";
         return ROLE_PREFIX + "_" + SessionHelper.getCurrentUser().getUserGroup().getName();
     }
 
-    private boolean hasAccess(RequestMethod requestMethod, Collection<AccessGroup> accessGroups, Module module, Boolean isCrud) {
+    private boolean hasAccess(RequestMethod requestMethod, Collection<AccessGroup> accessGroups, String moduleName, Boolean isCrud) {
         boolean result = false;
         for (AccessGroup accessGroup : accessGroups) {
             if (isCrud) {
@@ -128,8 +128,14 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
                 if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
                     result |= true;
                 }
-            } else if (accessGroup.isViewable() && module.getRequestMethod().equals(requestMethod)) {
+            } else if (accessGroup.isViewable() && accessGroup.getMenu().getModule().getRequestMethod().equals(requestMethod)) {
                 result |= true;
+            }
+            Set<ModuleLink> moduleLinks = accessGroup.getMenu().getModule().getModuleLink();
+            for (ModuleLink moduleLink : moduleLinks) {
+                if (accessGroup.isViewable() && (moduleLink.getName().equals(moduleName) && moduleLink.getRequestMethod().equals(requestMethod))) {
+                    result |= true;
+                }
             }
         }
         return result;
