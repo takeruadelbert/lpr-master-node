@@ -1,6 +1,6 @@
 package com.stn.ester.controllers.crud;
 
-import com.stn.ester.etc.base.AccessAllowed;
+import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.services.crud.AssetFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

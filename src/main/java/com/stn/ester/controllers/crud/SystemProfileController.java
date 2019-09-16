@@ -1,6 +1,6 @@
 package com.stn.ester.controllers.crud;
 
-import com.stn.ester.etc.base.AccessAllowed;
+import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.controllers.base.SecuredController;
 import com.stn.ester.entities.SystemProfile;
 import com.stn.ester.services.crud.SystemProfileService;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.stn.ester.etc.security.SecurityConstants.SYSTEM_PROFILE_URL;
+import static com.stn.ester.core.security.SecurityConstants.SYSTEM_PROFILE_URL;
 
 @RestController
 public class SystemProfileController extends SecuredController {

@@ -1,6 +1,6 @@
 package com.stn.ester.controllers.function;
 
-import com.stn.ester.etc.base.AccessAllowed;
+import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.controllers.base.SecuredController;
 import com.stn.ester.services.GeneralService;
 import org.springframework.beans.factory.annotation.Autowired;

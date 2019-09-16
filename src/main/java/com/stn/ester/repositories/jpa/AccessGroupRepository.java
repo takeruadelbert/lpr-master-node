@@ -1,6 +1,6 @@
 package com.stn.ester.repositories.jpa;
 
-import com.stn.ester.repositories.jpa.base.AppRepository;
+import com.stn.ester.repositories.jpa.base.BaseRepository;
 import com.stn.ester.entities.AccessGroup;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Repository
-public interface AccessGroupRepository extends AppRepository<AccessGroup> {
+public interface AccessGroupRepository extends BaseRepository<AccessGroup> {
 
     Collection<AccessGroup> findAllByUserGroupId(Long userGroupId);
 

@@ -3,17 +3,17 @@ package com.stn.ester.services.base;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.stn.ester.entities.base.BaseEntity;
-import com.stn.ester.etc.base.OnDeleteSetParentNull;
-import com.stn.ester.etc.base.TableFieldPair;
-import com.stn.ester.etc.exceptions.ListNotFoundException;
-import com.stn.ester.etc.search.AppSpecification;
-import com.stn.ester.etc.search.util.SearchOperation;
-import com.stn.ester.etc.search.util.SpecSearchCriteria;
+import com.stn.ester.core.base.OnDeleteSetParentNull;
+import com.stn.ester.core.base.TableFieldPair;
+import com.stn.ester.core.exceptions.ListNotFoundException;
+import com.stn.ester.core.search.AppSpecification;
+import com.stn.ester.core.search.util.SearchOperation;
+import com.stn.ester.core.search.util.SpecSearchCriteria;
 import com.stn.ester.helpers.ReflectionHelper;
 import com.stn.ester.helpers.UpdaterHelper;
-import com.stn.ester.repositories.jpa.base.AppRepository;
+import com.stn.ester.repositories.jpa.base.BaseRepository;
 import com.stn.ester.repositories.jpa.base.traits.RepositoryListTrait;
-import com.stn.ester.repositories.jpa.projections.OptionList;
+import com.stn.ester.repositories.jpa.projections.OptionItem;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class CrudService<T extends BaseEntity, U extends AppRepository<T>> extends BaseService<T> {
+public abstract class CrudService<T extends BaseEntity, U extends BaseRepository<T>> extends BaseService<T> {
 
     protected U currentEntityRepository;
 
@@ -48,7 +48,7 @@ public abstract class CrudService<T extends BaseEntity, U extends AppRepository<
     @Autowired
     public final void setApplicationContext(ApplicationContext applicationContext){
         this.applicationContext=applicationContext;
-        repositories = applicationContext.getBeansOfType(AppRepository.class);
+        repositories = applicationContext.getBeansOfType(BaseRepository.class);
     }
 
     public Page<T> index(Integer page, Integer size) {
@@ -100,9 +100,9 @@ public abstract class CrudService<T extends BaseEntity, U extends AppRepository<
     public Object list() {
         if (currentEntityRepository instanceof RepositoryListTrait) {
             Map<String, String> result = new HashMap<>();
-            List<OptionList> list = ((RepositoryListTrait) currentEntityRepository).findAllProjectedBy();
-            for (OptionList optionList : list) {
-                result.put(optionList.getKey(), optionList.getValue());
+            List<OptionItem> list = ((RepositoryListTrait) currentEntityRepository).findAllProjectedBy();
+            for (OptionItem optionItem : list) {
+                result.put(optionItem.getKey(), optionItem.getValue());
             }
             return result;
         } else {

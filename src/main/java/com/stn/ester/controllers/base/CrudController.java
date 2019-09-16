@@ -1,7 +1,6 @@
 package com.stn.ester.controllers.base;
 
 import com.stn.ester.entities.base.BaseEntity;
-import com.stn.ester.etc.exceptions.ListNotFoundException;
 import com.stn.ester.helpers.SearchAndFilterHelper;
 import com.stn.ester.services.base.CrudService;
 import org.modelmapper.ModelMapper;

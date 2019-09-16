@@ -3,7 +3,7 @@ package com.stn.ester.controllers.crud;
 import com.stn.ester.controllers.base.CrudController;
 import com.stn.ester.entities.Menu;
 import com.stn.ester.entities.User;
-import com.stn.ester.etc.exceptions.UnauthorizedException;
+import com.stn.ester.core.exceptions.UnauthorizedException;
 import com.stn.ester.helpers.SessionHelper;
 import com.stn.ester.services.crud.MenuService;
 import com.stn.ester.services.crud.UserService;

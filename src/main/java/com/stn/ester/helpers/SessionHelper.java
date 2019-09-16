@@ -7,8 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import static com.stn.ester.etc.security.SecurityConstants.ROLE_PREFIX;
-import static com.stn.ester.etc.security.SecurityConstants.ROLE_SUPERADMIN;
+import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
+import static com.stn.ester.core.security.SecurityConstants.ROLE_SUPERADMIN;
 
 @Component
 public class SessionHelper {

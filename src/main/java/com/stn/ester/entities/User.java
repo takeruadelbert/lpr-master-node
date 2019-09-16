@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static com.stn.ester.etc.security.SecurityConstants.ROLE_PREFIX;
+import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
 
 @Data
 @Entity

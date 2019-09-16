@@ -1,8 +1,8 @@
 package com.stn.ester.repositories.jpa;
 
-import com.stn.ester.repositories.jpa.base.AppRepository;
+import com.stn.ester.repositories.jpa.base.BaseRepository;
 import com.stn.ester.repositories.jpa.base.traits.RepositoryListTrait;
-import com.stn.ester.repositories.jpa.projections.IdLabelList;
+import com.stn.ester.repositories.jpa.projections.IdLabelOption;
 import com.stn.ester.entities.Menu;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface MenuRepository extends AppRepository<Menu>, RepositoryListTrait<IdLabelList> {
+public interface MenuRepository extends BaseRepository<Menu>, RepositoryListTrait<IdLabelOption> {
 
     List<Menu> findAllByParentMenuId(Long parentMenuId);
 

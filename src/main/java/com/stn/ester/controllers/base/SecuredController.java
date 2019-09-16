@@ -9,8 +9,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static com.stn.ester.etc.security.SecurityConstants.ROLE_PREFIX;
-import static com.stn.ester.etc.security.SecurityConstants.ROLE_SUPERADMIN;
+import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
+import static com.stn.ester.core.security.SecurityConstants.ROLE_SUPERADMIN;
 
 public abstract class SecuredController implements BeanNameAware {
 

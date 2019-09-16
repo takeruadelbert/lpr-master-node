@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.stn.ester.etc.security.SecurityConstants.ROLE_PREFIX;
+import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
 
 @Service
 public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepository> {

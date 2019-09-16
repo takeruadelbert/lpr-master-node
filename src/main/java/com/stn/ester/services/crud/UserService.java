@@ -1,7 +1,7 @@
 package com.stn.ester.services.crud;
 
 import com.stn.ester.entities.*;
-import com.stn.ester.etc.exceptions.*;
+import com.stn.ester.core.exceptions.*;
 import com.stn.ester.helpers.*;
 import com.stn.ester.repositories.jpa.*;
 import com.stn.ester.services.base.CrudService;

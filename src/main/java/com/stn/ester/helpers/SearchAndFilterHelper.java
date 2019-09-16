@@ -1,6 +1,6 @@
 package com.stn.ester.helpers;
 
-import com.stn.ester.etc.search.SpecificationsBuilder;
+import com.stn.ester.core.search.SpecificationsBuilder;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.io.IOException;

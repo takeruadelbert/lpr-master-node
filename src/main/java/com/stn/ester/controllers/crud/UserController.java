@@ -1,6 +1,6 @@
 package com.stn.ester.controllers.crud;
 
-import com.stn.ester.etc.base.AccessAllowed;
+import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.controllers.base.CrudController;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.User;

@@ -3,7 +3,7 @@ package com.stn;
 import com.stn.ester.entities.Biodata;
 import com.stn.ester.entities.User;
 import com.stn.ester.entities.UserGroup;
-import com.stn.ester.etc.configurations.DatabaseConfig;
+import com.stn.ester.core.configurations.DatabaseConfig;
 import com.stn.ester.services.crud.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +16,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
-import static com.stn.ester.etc.security.SecurityConstants.ROLE_SUPERADMIN;
+import static com.stn.ester.core.security.SecurityConstants.ROLE_SUPERADMIN;
 
 @SpringBootApplication(exclude = RepositoryRestMvcAutoConfiguration.class)
 public class RestApplication extends SpringBootServletInitializer {

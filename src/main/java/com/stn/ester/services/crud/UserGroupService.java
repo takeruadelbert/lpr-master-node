@@ -3,7 +3,7 @@ package com.stn.ester.services.crud;
 import com.stn.ester.entities.AccessGroup;
 import com.stn.ester.entities.Menu;
 import com.stn.ester.entities.UserGroup;
-import com.stn.ester.etc.security.SecurityConstants;
+import com.stn.ester.core.security.SecurityConstants;
 import com.stn.ester.repositories.jpa.AccessGroupRepository;
 import com.stn.ester.repositories.jpa.MenuRepository;
 import com.stn.ester.repositories.jpa.UserGroupRepository;
