@@ -6,6 +6,7 @@ import com.stn.ester.repositories.jpa.projections.IdLabelList;
 import com.stn.ester.entities.Menu;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
