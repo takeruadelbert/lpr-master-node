@@ -1,13 +1,9 @@
 package com.stn.ester.services.crud;
 
-import com.stn.ester.entities.AccessLog;
 import com.stn.ester.entities.AssetFile;
 import com.stn.ester.entities.SystemProfile;
-import com.stn.ester.core.configurations.InterceptorConfig;
-import com.stn.ester.core.interceptors.AccessLogInterceptor;
 import com.stn.ester.helpers.DateTimeHelper;
 import com.stn.ester.helpers.GlobalFunctionHelper;
-import com.stn.ester.repositories.jpa.AccessLogRepository;
 import com.stn.ester.repositories.jpa.AssetFileRepository;
 import com.stn.ester.repositories.jpa.SystemProfileRepository;
 import com.stn.ester.services.base.CrudService;
@@ -51,10 +47,6 @@ public class AssetFileService extends CrudService {
     private ResourceLoader resourceLoader;
     private static final String DS = "/";
     public static Long defaultProfilePictureID;
-    @Autowired
-    private AccessLogService accessLogService;
-    @Autowired
-    private AccessLogRepository accessLogRepository;
 
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
@@ -95,10 +87,6 @@ public class AssetFileService extends CrudService {
 
                         AssetFile assetFile = new AssetFile(pathFile, filename, ext);
                         data.add((AssetFile) super.create(assetFile));
-
-                        Long accessLogId = AccessLogInterceptor.accessLogId.get();
-                        Long assetFileId = assetFile.getId();
-                        updateAccessLog(accessLogId, assetFileId);
                     } else {
                         System.out.println("NULL");
                     }
@@ -155,10 +143,6 @@ public class AssetFileService extends CrudService {
                 // save decoded file to database
                 AssetFile assetFile = new AssetFile(path, name, ext);
                 super.create(assetFile);
-
-                Long accessLogId = AccessLogInterceptor.accessLogId.get();
-                Long assetFileId = assetFile.getId();
-                updateAccessLog(accessLogId, assetFileId);
 
                 result.put("data", assetFile);
                 result.put("status", HttpStatus.OK.value());
@@ -303,20 +287,6 @@ public class AssetFileService extends CrudService {
         assetFile.setAssetFileToDefault();
         super.create(assetFile);
         return assetFile.getId();
-    }
-
-    private void updateAccessLog(Long accessLogId, Long assetFileId) {
-        if ((accessLogId != null && assetFileId != null) && InterceptorConfig.accessLogEnabled) {
-            // fetch data thread of Access Log ID and insert asset file ID according its access log ID
-            AccessLog accessLog = this.accessLogRepository.findById(accessLogId).get();
-            if (accessLog != null) {
-                accessLog.setUploadFileId(assetFileId);
-                this.accessLogService.update(accessLogId, accessLog);
-            }
-
-            // remove thread if it's done
-            AccessLogInterceptor.accessLogId.remove();
-        }
     }
 
     public byte[] getFile(String token) {
