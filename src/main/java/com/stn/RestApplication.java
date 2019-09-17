@@ -1,12 +1,16 @@
 package com.stn;
 
+import com.stn.ester.core.configurations.DatabaseConfig;
 import com.stn.ester.entities.Biodata;
 import com.stn.ester.entities.User;
 import com.stn.ester.entities.UserGroup;
-import com.stn.ester.core.configurations.DatabaseConfig;
 import com.stn.ester.services.crud.*;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -99,5 +103,17 @@ public class RestApplication extends SpringBootServletInitializer {
     @Bean
     public Queue queue() {
         return new Queue(queueName, true);
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
+        return rabbitTemplate;
+    }
+
+    @Bean
+    public MessageConverter producerJackson2MessageConverter() {
+        return new Jackson2JsonMessageConverter();
     }
 }
