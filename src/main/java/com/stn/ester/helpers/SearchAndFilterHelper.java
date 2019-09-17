@@ -1,6 +1,7 @@
 package com.stn.ester.helpers;
 
 import com.stn.ester.core.search.SpecificationsBuilder;
+import com.stn.ester.core.search.util.SearchOperation;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.io.IOException;
@@ -23,10 +24,19 @@ public class SearchAndFilterHelper {
             if (Map.class.isAssignableFrom(entry.getValue().getClass())) {
                 SearchAndFilterHelper.loopSpecToSpecBuilder(specificationsBuilder, (Map<String, Object>) entry.getValue(), entry.getKey());
             } else {
-                String operation = entry.getKey().substring(0, 1);
-                String key = entry.getKey().substring(1);
+                SearchOperation operation = SearchOperation.getOperation(entry.getKey());
+                String key = getKey(entry.getKey(), operation);
                 specificationsBuilder.with(key, operation, entry.getValue().toString(), null, null, className);
             }
         }
+    }
+
+    private static String getKey(String searchField, SearchOperation searchOperation) {
+        String key = "";
+        if (searchOperation != null) {
+            String searchOperationSymbol = SearchOperation.OPERATION_SYMBOL_MAP.get(searchOperation);
+            key = searchField.substring(searchOperationSymbol.length());
+        }
+        return key;
     }
 }
