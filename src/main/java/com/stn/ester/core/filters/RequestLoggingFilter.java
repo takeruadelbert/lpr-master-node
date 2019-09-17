@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.google.gson.Gson;
-import com.stn.RestApplication;
 import com.stn.ester.core.configurations.AccessLog.AccessLogQueueSender;
 import com.stn.ester.core.filters.wrapper.RequestWrapper;
 import com.stn.ester.entities.AccessLog;
@@ -12,6 +11,11 @@ import com.stn.ester.entities.enumerate.RequestMethod;
 import com.stn.ester.helpers.SessionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,10 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class RequestLoggingFilter extends OncePerRequestFilter {
-    @Value("${ester.logging.access.enabled}")
-    private boolean accessLogEnabled;
-
     private Gson gson = new Gson();
     private ObjectMapper mapper = new ObjectMapper();
     private static String WHITESPACE = " ";
@@ -39,9 +41,15 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             RequestMethod.POST + WHITESPACE + "/asset_files/upload",
             RequestMethod.POST + WHITESPACE + "/asset_files/upload-encoded"
     );
+    private boolean accessLogEnabled;
 
     @Autowired
     private AccessLogQueueSender accessLogQueueSender;
+
+    @Autowired
+    public RequestLoggingFilter(@Value("${ester.logging.access.enabled}") boolean accessLogEnabled) {
+        this.accessLogEnabled = accessLogEnabled;
+    }
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -56,13 +64,13 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         RequestWrapper requestWrapper = new RequestWrapper(request);
         ServletRequest copiedRequest = requestWrapper;
 
-        String IPAdress_client = request.getHeader("X-FORWARDED-FOR");
+        String IPAddressClient = request.getHeader("X-FORWARDED-FOR");
         String queryParam = request.getQueryString();
         String URI = queryParam == null ? request.getRequestURI() : request.getRequestURI() + "?" + queryParam;
         String request_method = request.getMethod();
         Long user_id = SessionHelper.getUserID();
-        if (IPAdress_client == null || "".equals(IPAdress_client)) {
-            IPAdress_client = request.getRemoteAddr();
+        if (IPAddressClient == null || "".equals(IPAddressClient)) {
+            IPAddressClient = request.getRemoteAddr();
         }
         RequestMethod requestMethod = RequestMethod.valueOf(request_method);
         String requestBody = null;
@@ -77,10 +85,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
                 requestBody = null;
             }
         }
-        System.out.println("access log is enabled : " + RestApplication.accessLogEnabled);
         if (accessLogEnabled) {
             try {
-                AccessLog accessLog = new AccessLog(IPAdress_client, URI, requestMethod, user_id, requestBody);
+                AccessLog accessLog = new AccessLog(IPAddressClient, URI, requestMethod, user_id, requestBody);
                 accessLogQueueSender.send(accessLog);
                 System.out.println("Message has successfully been sent to Queue.");
             } catch (Exception ex) {

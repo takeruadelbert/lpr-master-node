@@ -28,9 +28,6 @@ public class RestApplication extends SpringBootServletInitializer {
     @Value("${ester.server.timezone}")
     private String timezone;
 
-    @Value("${ester.logging.access.enabled}")
-    public static boolean accessLogEnabled;
-
     @Value("${queue.access-log.name}")
     private String queueName;
 
@@ -56,7 +53,6 @@ public class RestApplication extends SpringBootServletInitializer {
                 DatabaseConfig.extJsonFileConfigPath = extJsonFile;
             }
         }
-        System.out.println("enabled = " + accessLogEnabled);
         SpringApplication.run(RestApplication.class, args);
     }
 
