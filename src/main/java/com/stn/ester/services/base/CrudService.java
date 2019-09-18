@@ -46,8 +46,8 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
     }
 
     @Autowired
-    public final void setApplicationContext(ApplicationContext applicationContext){
-        this.applicationContext=applicationContext;
+    public final void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
         repositories = applicationContext.getBeansOfType(BaseRepository.class);
     }
 
@@ -145,7 +145,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
     }
 
     private void onDeleteSetParentNull(Long parentId) {
-        Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterface(currentEntityRepository.getClass(), BaseEntity.class);
+        Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterface(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
         Annotation onDeleteSetParentNullAnnotation = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class);
         if (onDeleteSetParentNullAnnotation != null) {
             TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class).value();

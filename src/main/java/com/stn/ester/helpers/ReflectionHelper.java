@@ -7,10 +7,10 @@ import java.lang.reflect.Type;
 
 public class ReflectionHelper {
 
-    public static Class getActualTypeArgumentFromGenericInterface(Class thisClass, Class toCheck) {
+    public static Class getActualTypeArgumentFromGenericInterface(Class thisClass, Class toCheck, Class fromInterface) {
         Class[] interfazes = thisClass.getInterfaces();
         for (Class interfaze : interfazes) {
-            if (BaseRepository.class.isAssignableFrom(interfaze)) {
+            if (fromInterface.isAssignableFrom(interfaze)) {
                 Type[] genericInterfaces = interfaze.getGenericInterfaces();
                 for (Type genericInterface : genericInterfaces) {
                     if (genericInterface instanceof ParameterizedType) {
