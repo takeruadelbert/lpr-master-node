@@ -1,14 +1,16 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.core.exceptions.NotFoundException;
+import com.stn.ester.core.security.SecurityConstants;
+import com.stn.ester.dto.MenuSimpleDTO;
 import com.stn.ester.entities.AccessGroup;
 import com.stn.ester.entities.Menu;
 import com.stn.ester.entities.UserGroup;
-import com.stn.ester.core.exceptions.NotFoundException;
-import com.stn.ester.core.security.SecurityConstants;
 import com.stn.ester.repositories.jpa.AccessGroupRepository;
 import com.stn.ester.repositories.jpa.MenuRepository;
 import com.stn.ester.repositories.jpa.UserGroupRepository;
 import com.stn.ester.services.base.CrudService;
+import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-public class MenuService extends CrudService<Menu, MenuRepository> {
+public class MenuService extends CrudService<Menu, MenuRepository> implements SimpleSearchTrait<Menu, MenuSimpleDTO, MenuRepository> {
 
     private MenuRepository menuRepository;
     private UserGroupService userGroupService;
@@ -135,5 +137,18 @@ public class MenuService extends CrudService<Menu, MenuRepository> {
 
     public Object checkPrivilege(Long userGroupId, Long menuId) {
         return this.accessGroupRepository.findByMenuIdAndUserGroupId(menuId, userGroupId).orElseThrow(() -> new NotFoundException());
+    }
+
+    @Override
+    public Collection<String> getSimpleSearchKeys() {
+        List<String> keys = new ArrayList<>();
+        keys.add("label");
+        keys.add("module.name");
+        return keys;
+    }
+
+    @Override
+    public MenuRepository getRepository() {
+        return currentEntityRepository;
     }
 }

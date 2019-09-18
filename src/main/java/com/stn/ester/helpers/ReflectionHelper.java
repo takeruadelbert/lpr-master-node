@@ -1,7 +1,5 @@
 package com.stn.ester.helpers;
 
-import com.stn.ester.repositories.jpa.base.BaseRepository;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -25,6 +23,26 @@ public class ReflectionHelper {
                         }
                     }
                 }
+            }
+        }
+        return null;
+    }
+
+    public static Class getActualTypeArgumentFromGenericInterface(Class thisClass, Class toCheck, Class fromInterface) {
+        Type[] interfazes = thisClass.getGenericInterfaces();
+        Class[] clazzs = thisClass.getInterfaces();
+        for (int i = 0; i < interfazes.length; i++) {
+            if (fromInterface.isAssignableFrom(clazzs[i]) && interfazes[i] instanceof ParameterizedType) {
+                Type[] actualTypeArguments = ((ParameterizedType) interfazes[i]).getActualTypeArguments();
+                for (Type actualTypeArgument : actualTypeArguments) {
+                    if (actualTypeArgument instanceof Class) {
+                        Class<?> clazz = (Class<?>) actualTypeArgument;
+                        if (toCheck.isAssignableFrom(clazz)) {
+                            return clazz;
+                        }
+                    }
+                }
+
             }
         }
         return null;
