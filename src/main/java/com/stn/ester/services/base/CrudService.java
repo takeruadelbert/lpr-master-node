@@ -145,7 +145,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
     }
 
     private void onDeleteSetParentNull(Long parentId) {
-        Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterface(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
+        Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
         Annotation onDeleteSetParentNullAnnotation = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class);
         if (onDeleteSetParentNullAnnotation != null) {
             TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class).value();
