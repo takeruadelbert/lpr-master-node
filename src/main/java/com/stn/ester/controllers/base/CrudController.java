@@ -1,8 +1,10 @@
 package com.stn.ester.controllers.base;
 
+import com.stn.ester.core.exceptions.NotFoundException;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.helpers.SearchAndFilterHelper;
 import com.stn.ester.services.base.CrudService;
+import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Map;
 
 public abstract class CrudController<T extends CrudService, U extends BaseEntity> extends SecuredController {
@@ -70,5 +73,14 @@ public abstract class CrudController<T extends CrudService, U extends BaseEntity
         return service.list();
     }
 
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
+    @RequestMapping(value = "simplesearch", method = RequestMethod.OPTIONS)
+    public Collection simpleSearch(@RequestParam(name = "keyword") String keyword) {
+        if (service instanceof SimpleSearchTrait) {
+            return ((SimpleSearchTrait) service).simpleSearch(keyword);
+        } else {
+            throw new NotFoundException("Simple search not found");
+        }
+    }
 
 }

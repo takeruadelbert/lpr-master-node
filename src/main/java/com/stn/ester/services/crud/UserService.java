@@ -1,13 +1,18 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.dto.UserSimpleDTO;
 import com.stn.ester.entities.*;
 import com.stn.ester.core.exceptions.*;
 import com.stn.ester.helpers.*;
 import com.stn.ester.repositories.jpa.*;
+import com.stn.ester.repositories.jpa.base.BaseRepository;
 import com.stn.ester.services.base.CrudService;
 import com.stn.ester.services.base.traits.AssetFileClaimTrait;
+import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,7 +32,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService {
+public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService, SimpleSearchTrait<User, UserSimpleDTO, UserRepository> {
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;
@@ -320,5 +325,20 @@ public class UserService extends CrudService<User, UserRepository> implements As
             super.update(passwordReset.getId(), user);
         }
         return user;
+    }
+
+    @Override
+    public Collection<String> getSimpleSearchKeys() {
+        List<String> keys = new ArrayList<>();
+        keys.add("username");
+        keys.add("email");
+        keys.add("biodata.firstName");
+        keys.add("biodata.lastName");
+        return keys;
+    }
+
+    @Override
+    public UserRepository getRepository() {
+        return currentEntityRepository;
     }
 }
