@@ -155,6 +155,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
         return this.assetFileService.moveTempDirToPermanentDir(token, this.getAssetPath());
     }
 
+    @Transactional
     public Object changeProfilePicture(String token) {
         if (!token.isEmpty()) {
             Long user_id = SessionHelper.getUserID();
