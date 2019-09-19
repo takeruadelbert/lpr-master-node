@@ -15,7 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public interface SimpleSearchTrait<U extends BaseEntity, T extends EntityDTO<U>, X extends BaseRepository<U>> extends RepositoryAware<U, X> {
+public interface SimpleSearchTrait<U extends BaseEntity, T extends EntityDTO<U>, X extends BaseRepository<U>> extends RepositoryAware<X> {
 
     String MESSAGE_NO_SUCH_METHOD = "No constructor of %s that accepts %s";
 
