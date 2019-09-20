@@ -1,10 +1,16 @@
 package com.stn;
 
+import com.stn.ester.core.configurations.DatabaseConfig;
 import com.stn.ester.entities.Biodata;
 import com.stn.ester.entities.User;
 import com.stn.ester.entities.UserGroup;
-import com.stn.ester.core.configurations.DatabaseConfig;
 import com.stn.ester.services.crud.*;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -12,6 +18,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.rest.RepositoryRestMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
@@ -19,10 +27,16 @@ import java.util.TimeZone;
 import static com.stn.ester.core.security.SecurityConstants.ROLE_SUPERADMIN;
 
 @SpringBootApplication(exclude = RepositoryRestMvcAutoConfiguration.class)
+@EnableRabbit
+@EnableAsync
 public class RestApplication extends SpringBootServletInitializer {
 
     @Value("${ester.server.timezone}")
     private String timezone;
+
+    @Value("${queue.access-log.name}")
+    private String queueName;
+
     @Autowired
     private AssetFileService assetFileService;
 
@@ -86,5 +100,22 @@ public class RestApplication extends SpringBootServletInitializer {
         biodata.setUser(user);
         user.setBiodata(biodata);
         userService.createIfUsernameNotExist(user, username);
+    }
+
+    @Bean
+    public Queue queue() {
+        return new Queue(queueName, true);
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
+        return rabbitTemplate;
+    }
+
+    @Bean
+    public MessageConverter producerJackson2MessageConverter() {
+        return new Jackson2JsonMessageConverter();
     }
 }
