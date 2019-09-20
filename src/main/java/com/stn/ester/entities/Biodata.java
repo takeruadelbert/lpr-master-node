@@ -118,4 +118,8 @@ public class Biodata extends BaseEntity {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    public String getFullname() {
+        return String.format("%s %s", this.firstName, this.lastName == null ? "" : this.lastName).trim();
+    }
 }

@@ -30,47 +30,61 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
     @Override
     public Predicate toPredicate(final Root<T> root, final CriteriaQuery<?> query, final CriteriaBuilder builder) {
         try {
-            Path path;
-            if (criteria.getClassJoin() == null) {
-                path = root.get(criteria.getKey());
-            } else {
-                Join joinPredicate = root.join(getCriteria().getClassJoin());
-                path = joinPredicate.get(criteria.getKey());
-            }
-            Object value;
-            if (LocalDate.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
-                value = DateTimeHelper.convertToDate(criteria.getValue().toString());
-            } else if (LocalDateTime.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
-                value = DateTimeHelper.convertToDateTime(criteria.getValue().toString());
-            } else if (Enum.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
-                value=Enum.valueOf(path.getModel().getBindableJavaType(),criteria.getValue().toString());
-            } else {
-                value = criteria.getValue();
-            }
-            switch (criteria.getOperation()) {
-                case EQUALITY:
-                    return builder.equal(path, value);
-                case NEGATION:
-                    return builder.notEqual(path, value);
-                case GREATER_THAN:
-                    return builder.greaterThan(path, value.toString());
-                case LESS_THAN:
-                    return builder.lessThan(path, value.toString());
-                case LIKE:
-                    return builder.like(path, value.toString());
-                case STARTS_WITH:
-                    return builder.like(path, value + "%");
-                case ENDS_WITH:
-                    return builder.like(path, "%" + value);
-                case CONTAINS:
-                    return builder.like(path, "%" + value + "%");
-                default:
-                    return null;
-            }
+            Path path = getPathOrJoinedPath(root);
+            Comparable value = parseValue(path);
+            return createPredicate(builder, path, value);
         } catch (IllegalArgumentException illegal) {
             throw new FilterException(criteria.getKey());
         } catch (DateTimeParseException e) {
             throw new FilterException();
+        }
+    }
+
+    private Path getPathOrJoinedPath(Root<T> root) {
+        if (criteria.getClassJoin() == null) {
+            return root.get(criteria.getKey());
+        } else {
+            Join joinPredicate = root.join(getCriteria().getClassJoin());
+            return joinPredicate.get(criteria.getKey());
+        }
+    }
+
+    private Comparable parseValue(Path path) {
+        if (LocalDate.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
+            return DateTimeHelper.convertToDate(criteria.getValue().toString());
+        } else if (LocalDateTime.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
+            return DateTimeHelper.convertToDateTime(criteria.getValue().toString());
+        } else if (Enum.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
+            return Enum.valueOf(path.getModel().getBindableJavaType(), criteria.getValue().toString());
+        } else {
+            return criteria.getValue().toString();
+        }
+    }
+
+    private Predicate createPredicate(CriteriaBuilder builder, Path path, Comparable value) {
+        switch (criteria.getOperation()) {
+            case EQUALITY:
+                return builder.equal(path, value);
+            case NEGATION:
+                return builder.notEqual(path, value);
+            case GREATER_THAN:
+                return builder.greaterThan(path, value);
+            case LESS_THAN:
+                return builder.lessThan(path, value);
+            case GREATER_THAN_OR_EQUAL:
+                return builder.greaterThanOrEqualTo(path, value);
+            case LESS_THAN_OR_EQUAL:
+                return builder.lessThanOrEqualTo(path, value);
+            case LIKE:
+                return builder.like(path, value.toString());
+            case STARTS_WITH:
+                return builder.like(path, value + "%");
+            case ENDS_WITH:
+                return builder.like(path, "%" + value);
+            case CONTAINS:
+                return builder.like(path, "%" + value + "%");
+            default:
+                return null;
         }
     }
 }

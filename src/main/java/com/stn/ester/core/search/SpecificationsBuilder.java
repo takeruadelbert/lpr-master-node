@@ -15,12 +15,12 @@ public class SpecificationsBuilder<T extends BaseEntity> {
         params = new ArrayList<>();
     }
 
-    public final SpecificationsBuilder with(final String key, final String operation, final Object value, final String prefix, final String suffix) {
-        return with(null, key, operation, value, prefix, suffix, null);
+    public final SpecificationsBuilder with(final String key, final SearchOperation op, final Object value, final String prefix, final String suffix) {
+        return with(null, key, op, value, prefix, suffix, null);
     }
 
-    public final SpecificationsBuilder with(final String orPredicate, final String key, final String operation, final Object value, final String prefix, final String suffix, final String joinClass) {
-        SearchOperation op = SearchOperation.getSimpleOperation(operation.charAt(0));
+    public final SpecificationsBuilder with(final String orPredicate, final String key, final SearchOperation operation, final Object value, final String prefix, final String suffix, final String joinClass) {
+        SearchOperation op = operation;
         if (op != null) {
             if (op == SearchOperation.EQUALITY) { // the operation may be complex operation
                 final boolean startWithAsterisk = prefix != null && prefix.contains(SearchOperation.ZERO_OR_MORE_REGEX);
@@ -39,8 +39,8 @@ public class SpecificationsBuilder<T extends BaseEntity> {
         return this;
     }
 
-    public final SpecificationsBuilder with(final String key, final String operation, final Object value, final String prefix, final String suffix, final String joinClass) {
-        return with(null, key, operation, value, prefix, suffix, joinClass);
+    public final SpecificationsBuilder with(final String key, final SearchOperation op, final Object value, final String prefix, final String suffix, final String joinClass) {
+        return with(null, key, op, value, prefix, suffix, joinClass);
     }
 
     public Specification<T> build() {
