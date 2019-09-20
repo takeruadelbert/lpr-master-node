@@ -1,18 +1,15 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.core.exceptions.*;
 import com.stn.ester.dto.UserSimpleDTO;
 import com.stn.ester.entities.*;
-import com.stn.ester.core.exceptions.*;
 import com.stn.ester.helpers.*;
 import com.stn.ester.repositories.jpa.*;
-import com.stn.ester.repositories.jpa.base.BaseRepository;
 import com.stn.ester.services.base.CrudService;
 import com.stn.ester.services.base.traits.AssetFileClaimTrait;
 import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -147,7 +144,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
 
         user.setId(userID);
         user.setPassword(this.passwordEncoder.encode(newPassword));
-        return super.save(user);
+        return super.update(userID, user);
     }
 
     @Override

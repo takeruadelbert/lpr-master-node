@@ -59,19 +59,6 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         return currentEntityRepository.findAll(spec, PageRequest.of(page, size));
     }
 
-    @Transactional
-    public T create(T o) {
-        T saved = currentEntityRepository.save(o);
-        entityManager.refresh(saved);
-        return saved;
-    }
-
-    @Transactional
-    public T save(T o) {
-        T saved = currentEntityRepository.save(o);
-        return saved;
-    }
-
     public T get(Long id) {
         if (currentEntityRepository.existsById(id)) {
             return currentEntityRepository.findById(id).get();
@@ -80,6 +67,14 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         }
     }
 
+    @Transactional
+    public T create(T o) {
+        T saved = currentEntityRepository.save(o);
+        entityManager.refresh(saved);
+        return saved;
+    }
+
+    @Transactional
     public T update(Long id, T object) {
         return update(id, object, null);
     }
