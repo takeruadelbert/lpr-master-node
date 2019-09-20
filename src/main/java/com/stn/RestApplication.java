@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.data.rest.RepositoryRestMvcAutoCon
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
@@ -27,6 +28,7 @@ import static com.stn.ester.core.security.SecurityConstants.ROLE_SUPERADMIN;
 
 @SpringBootApplication(exclude = RepositoryRestMvcAutoConfiguration.class)
 @EnableRabbit
+@EnableAsync
 public class RestApplication extends SpringBootServletInitializer {
 
     @Value("${ester.server.timezone}")

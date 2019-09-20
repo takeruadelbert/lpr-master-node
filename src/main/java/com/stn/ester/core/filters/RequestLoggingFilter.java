@@ -11,6 +11,7 @@ import com.stn.ester.entities.enumerate.RequestMethod;
 import com.stn.ester.helpers.SessionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -75,23 +76,24 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             // get request body
             try {
                 mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
-                Map<String, Object> jsonMap = mapper.readValue(copiedRequest.getInputStream(), Map.class);
+                Map jsonMap = mapper.readValue(copiedRequest.getInputStream(), Map.class);
                 requestBody = this.gson.toJson(jsonMap);
             } catch (MismatchedInputException ex) {
                 requestBody = null;
             }
         }
-        if (accessLogEnabled) {
-            try {
-                AccessLog accessLog = new AccessLog(IPAddressClient, URI, requestMethod, user_id, requestBody);
-                accessLogQueueSender.send(accessLog);
-                System.out.println("Message has successfully been sent to Queue.");
-            } catch (Exception ex) {
-                System.out.println("Fail to send message to Queue : " + ex.getMessage());
-            }
-        }
+
+        AccessLog accessLog = new AccessLog(IPAddressClient, URI, requestMethod, user_id, requestBody);
+        doAccessLog(accessLog);
 
         chain.doFilter(copiedRequest, response);
+    }
+
+    @Async
+    public void doAccessLog(AccessLog accessLog) {
+        if (accessLogEnabled) {
+            accessLogQueueSender.send(accessLog);
+        }
     }
 
     private boolean isExcludedFromList(HttpServletRequest request) {
