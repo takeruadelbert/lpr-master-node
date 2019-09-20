@@ -1,20 +1,37 @@
 package com.stn.ester.helpers;
 
+import com.stn.ester.core.search.AppSpecification;
 import com.stn.ester.core.search.SpecificationsBuilder;
 import com.stn.ester.core.search.util.SearchOperation;
+import com.stn.ester.core.search.util.SpecSearchCriteria;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 public class SearchAndFilterHelper {
 
+    //input as string jsonobject
     public static Specification resolveSpecification(String searchParameters) {
         SpecificationsBuilder builder = new SpecificationsBuilder<>();
         try {
             SearchAndFilterHelper.loopSpecToSpecBuilder(builder, GlobalFunctionHelper.jsonStringToMap(searchParameters), null);
         } catch (IOException ex) {
             System.out.println(ex);
+        }
+        return builder.build();
+    }
+
+    public static Specification resolveSpecificationSingleKeyword(Collection<String> keys, String keyword) {
+        SpecificationsBuilder builder = new SpecificationsBuilder<>();
+        for (String key : keys) {
+            String[] explodedKey = key.split("\\.");
+            if (explodedKey.length == 1) {
+                builder.with(new AppSpecification(new SpecSearchCriteria(SearchOperation.OR_PREDICATE_FLAG, key, SearchOperation.CONTAINS, keyword)));
+            } else if (explodedKey.length == 2) {
+                builder.with(new AppSpecification(new SpecSearchCriteria(SearchOperation.OR_PREDICATE_FLAG, explodedKey[1], SearchOperation.CONTAINS, keyword, explodedKey[0])));
+            }
         }
         return builder.build();
     }
