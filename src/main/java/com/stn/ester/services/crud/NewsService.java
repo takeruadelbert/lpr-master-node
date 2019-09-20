@@ -45,6 +45,7 @@ public class NewsService extends CrudService<News, NewsRepository> implements As
         return super.create(news);
     }
 
+    @Transactional
     @Override
     public News update(Long id, News domain) {
         News news = setDataNews(domain);
