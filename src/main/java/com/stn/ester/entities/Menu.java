@@ -63,6 +63,8 @@ public class Menu extends BaseEntity {
     @Column(name = COLUMN_PARENT_MENU)
     private Long parentMenuId;
 
+    private String materialUiIcon;
+
     @JsonSetter(JSON_PROPERTY_PARENT_MENU)
     public void setParentMenuId(Long parentMenuId) {
         this.parentMenuId = parentMenuId;
