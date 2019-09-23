@@ -4,22 +4,19 @@ import com.stn.ester.entities.AssetFile;
 import com.stn.ester.entities.News;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.enumerate.NewsStatus;
+import com.stn.ester.helpers.DateTimeHelper;
+import com.stn.ester.helpers.SearchAndFilterHelper;
 import com.stn.ester.helpers.SessionHelper;
 import com.stn.ester.repositories.jpa.NewsRepository;
 import com.stn.ester.services.base.CrudService;
 import com.stn.ester.services.base.traits.AssetFileClaimTrait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,40 +62,16 @@ public class NewsService extends CrudService<News, NewsRepository> implements As
         return news;
     }
 
-    public Page<News> dashboard(Integer page, Integer size, Pageable pageable) throws Exception {
-        List<News> validNews = new ArrayList<>();
-        Iterable<News> allNews = this.newsRepository.findAll();
-
-        long department_id = SessionHelper.getDepartmentID();
-
-        // get current date
-        LocalDate today = LocalDate.now();
-
-        if (allNews != null) {
-            for (News news : allNews) {
-                // check if period date of news exists
-                if (news.getStartDate() != null && news.getExpiredDate() != null) {
-                    // check if news still valid within period of date
-                    LocalDate startDate = news.getStartDate();
-                    LocalDate expiredDate = news.getExpiredDate();
-                    if (!startDate.isAfter(today) && !expiredDate.isBefore(today)) {
-                        if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
-                            validNews.add(news);
-                    }
-                } else {
-                    // otherwise just get all news status id 1 -> showing
-                    if (news.getNewsStatus() == NewsStatus.SHOWED) {
-                        if (news.getDepartmentId() == null || news.getDepartmentId() == department_id)
-                            validNews.add(news);
-                    }
-                }
-            }
+    public Page<News> dashboard(Integer page, Integer size) throws Exception {
+        Long departmentId = SessionHelper.getDepartmentID();
+        Map<String, Object> searchKeyValue = new HashMap<>();
+        searchKeyValue.put("<:startDate", DateTimeHelper.getCurrentLocalDate());
+        searchKeyValue.put(">:expiredDate", DateTimeHelper.getCurrentLocalDate());
+        searchKeyValue.put(":newsStatus", NewsStatus.SHOWED);
+        if (departmentId != null) {
+            searchKeyValue.put(":departmentId", departmentId);
         }
-        int start = (int) pageable.getOffset();
-        int end = (start + pageable.getPageSize()) > validNews.size() ? validNews.size() : (start + pageable.getPageSize());
-        List<News> temp = start <= end ? validNews.subList(start, end) : new ArrayList<>();
-        Page<News> newsDashboard = new PageImpl<>(temp, PageRequest.of(page, size), validNews.size());
-        return newsDashboard;
+        return super.index(page, size, SearchAndFilterHelper.resolveSpecification(searchKeyValue));
     }
 
     @Override

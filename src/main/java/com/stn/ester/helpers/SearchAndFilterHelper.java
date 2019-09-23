@@ -23,6 +23,12 @@ public class SearchAndFilterHelper {
         return builder.build();
     }
 
+    public static Specification resolveSpecification(Map<String, Object> searchMap) {
+        SpecificationsBuilder builder = new SpecificationsBuilder<>();
+        SearchAndFilterHelper.loopSpecToSpecBuilder(builder, searchMap, null);
+        return builder.build();
+    }
+
     public static Specification resolveSpecificationSingleKeyword(Collection<String> keys, String keyword) {
         SpecificationsBuilder builder = new SpecificationsBuilder<>();
         for (String key : keys) {

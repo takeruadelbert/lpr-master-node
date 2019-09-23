@@ -28,6 +28,14 @@ public class DateTimeHelper {
         return new Date();
     }
 
+    public static LocalDate getCurrentLocalDate() {
+        return LocalDate.now();
+    }
+
+    public static LocalDateTime getCurrentLocalDateTime() {
+        return LocalDateTime.now();
+    }
+
     public static LocalDate convertToDate(String dateValue) throws DateTimeParseException {
         return LocalDate.parse(dateValue, DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATE));
     }
