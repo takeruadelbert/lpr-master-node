@@ -67,7 +67,7 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
         Collection<AccessGroup> accessGroups = currentEntityRepository.findAllByUserGroupId(userGroupId);
         for (AccessGroup accessGroup : accessGroups) {
             Menu menu = accessGroup.getMenu();
-            Module module = menu.getModule();
+            com.stn.ester.entities.Module module = menu.getModule();
             if (module != null) {
                 if (accessGroup.isViewable())
                     authorities.add(new SimpleGrantedAuthority("ACCESS_" + module.getRequestMethod() + "_" + module.getName()));
@@ -88,7 +88,7 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
         List<Long> moduleIds = new ArrayList();
         moduleLinks.stream().forEach((ml) -> moduleIds.add(ml.getModule().getId()));
         //find modules
-        List<Module> modules = new ArrayList();
+        List<com.stn.ester.entities.Module> modules = new ArrayList();
         if (isCrud) {
             modules.addAll(moduleRepository.findAllByName(name));
         } else {
@@ -98,7 +98,7 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
         if (modules.isEmpty()) {
             return "NOACCESS";
         }
-        List<Menu> menus = menuRepository.findAllByModuleIdIn(modules.stream().map(Module::getId).collect(Collectors.toCollection(ArrayList::new)));
+        List<Menu> menus = menuRepository.findAllByModuleIdIn(modules.stream().map(com.stn.ester.entities.Module::getId).collect(Collectors.toCollection(ArrayList::new)));
         if (menus.isEmpty()) {
             return "NOACCESS";
         }
