@@ -139,6 +139,7 @@ public class AssetFileService extends CrudService {
                 FileOutputStream fileOutputStream = new FileOutputStream(pathfile);
                 byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
                 fileOutputStream.write(fileByteArray);
+                fileOutputStream.close();
 
                 // save decoded file to database
                 AssetFile assetFile = new AssetFile(path, name, ext);
