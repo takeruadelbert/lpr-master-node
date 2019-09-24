@@ -1,0 +1,68 @@
+pipeline{
+    agent any
+    triggers {
+            bitbucketPush()
+        }
+	stages{
+		stage('Preparation'){
+			steps{
+				git branch:'development',
+					credentialsId: 'bitbucket-suryawono',
+					url: 'https://suryawono@bitbucket.org/suryateknologi/ester.git'
+			}
+		}
+		stage('Build') {
+			steps{
+				sh 'mvn -Dmaven.test.skip=true clean package'
+			}
+		}
+		stage('Starting Server'){
+		    steps{
+		        sh 'JENKINS_NODE_COOKIE=dontKillMe'
+				sh 'nohup java -jar target/*.war > log.out &'
+		    }
+		}
+		stage('Waiting...'){
+		    steps{
+		        timeout(1){
+		            waitUntil{
+		                script{
+		                    def r = sh script: 'wget -q localhost:${ESTER_PORT}/status -O -| grep server', returnStatus:true
+		                    return (r==0)
+		                 }
+		            }
+		        }
+		    }
+		}
+		stage('Test-defaultdata'){
+			steps{
+				sh 'newman run https://www.getpostman.com/collections/82b1a91062809aee4ea0 --env-var "host=localhost:${ESTER_PORT}" --export-environment ester-env-newman.json'
+			}
+		}
+		stage('Test-general'){
+			steps{
+				sh 'newman run https://www.getpostman.com/collections/c9b3cf692db5c30b483f -e ester-env-newman.json --export-environment ester-env-newman.json'
+			}
+		}
+		stage('Test-security'){
+			steps{
+				sh 'newman run https://www.getpostman.com/collections/c3d11423f83c0fc8100f -e ester-env-newman.json --export-environment ester-env-newman.json'
+			}
+		}
+		stage('Results') {
+			steps{
+				archiveArtifacts 'target/*.war'
+			}
+		}
+	}
+	environment{
+	    ENVIRONMENT='development'
+	    DB_MS='mysql'
+	    DB_HOST='127.0.0.1'
+	    DB_PORT='3306'
+	    DB_NAME='ester-staging-test'
+	    DB_USERNAME='developer'
+	    DB_PASSWORD='stndeveloper'
+	    ESTER_PORT='4003'
+	}
+}
