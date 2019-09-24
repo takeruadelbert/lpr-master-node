@@ -1,0 +1,35 @@
+def BUILD_JOB_NAME='ester-test-build'
+
+pipeline{
+    agent any
+    triggers{
+        upstream(upstreamProjects:"${BUILD_JOB_NAME}",threshold:hudson.model.Result.SUCCESS)
+    }
+    stages{
+        stage("Copying artifact"){
+            steps{
+                copyArtifacts(projectName: "${BUILD_JOB_NAME}")
+                sh "mv target/*.war app.war"
+                sh "rm -rf target"
+            }
+        }
+        stage("Stopping server"){
+            steps{
+                sh "(cd /home/stn-server/Documents/ester/v2/ && docker-compose down)"
+            }
+        }
+        stage("Deploy"){
+            steps{
+                sh "cp app.war ${STAGING_HOME}app.war"
+            }
+        }
+        stage("Starting server"){
+            steps{
+                sh "(cd /home/stn-server/Documents/ester/v2/ && docker-compose up -d)"
+            }
+        }
+    }
+    environment{
+        STAGING_HOME='/home/stn-server/Documents/ester/v2/'
+    }
+}
