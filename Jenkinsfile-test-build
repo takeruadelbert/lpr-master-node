@@ -1,3 +1,13 @@
+def SLACK_FLOWSTAGE_STAGING='STAGING'
+def SLACK_STEP_BUILD='BUILD'
+def SLACK_STEP_DEPLOY='DEPLOY'
+def SLACK_ICON_FAIL=':x:'
+def SLACK_ICON_SUCCESS=':heavy_check_mark:'
+def SLACK_ICON_ABORT=':black_circle:'
+def SLACK_MSG_FAIL='FAIL'
+def SLACK_MSG_SUCCESS='SUCCEED'
+def SLACK_MSG_ABORT='ABORTED'
+
 pipeline{
     agent any
     triggers {
@@ -6,6 +16,7 @@ pipeline{
 	stages{
 		stage('Preparation'){
 			steps{
+                slackSend (color: "#0f91f5",message: "[${SLACK_STEP_BUILD}] Started - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
 				git branch:'development',
 					credentialsId: 'bitbucket-suryawono',
 					url: 'https://suryawono@bitbucket.org/suryateknologi/ester.git'
@@ -54,6 +65,17 @@ pipeline{
 				archiveArtifacts 'target/*.war'
 			}
 		}
+	}
+	post{
+	    failure{
+	        slackSend (color: "#FF0000",message: "[${SLACK_STEP_BUILD}][${SLACK_MSG_FAIL}]${SLACK_ICON_FAIL} Failed - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+	    }
+	    success{
+	        slackSend (color: "#00FF00",message: "[${SLACK_STEP_BUILD}][${SLACK_MSG_SUCCESS}]${SLACK_ICON_SUCCESS} Succeed - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+	    }
+        aborted{
+            slackSend (color: "#bdc3c7",message: "[${SLACK_STEP_BUILD}][${SLACK_MSG_ABORT}]${SLACK_ICON_ABORT} Aborted - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+        }
 	}
 	environment{
 	    ENVIRONMENT='development'
