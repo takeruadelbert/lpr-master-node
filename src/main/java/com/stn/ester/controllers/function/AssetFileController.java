@@ -1,4 +1,4 @@
-package com.stn.ester.controllers.crud;
+package com.stn.ester.controllers.function;
 
 import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.services.crud.AssetFileService;
@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
+import java.net.URL;
 
 @RestController
 @RequestMapping("/asset_files")
@@ -29,6 +30,12 @@ public class AssetFileController {
     @RequestMapping(value = "/upload-encoded", method = RequestMethod.POST)
     public Object uploadEncodedFile(@RequestParam String filename, @RequestParam String files) {
         return assetFileService.uploadEncodedFile(filename, files);
+    }
+
+    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequestMapping(value = "/upload-url", method = RequestMethod.POST)
+    public Object uploadViaUrl(@RequestParam URL url) {
+        return assetFileService.uploadViaUrl(url);
     }
 
     @AccessAllowed

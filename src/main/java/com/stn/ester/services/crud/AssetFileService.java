@@ -7,6 +7,7 @@ import com.stn.ester.helpers.GlobalFunctionHelper;
 import com.stn.ester.repositories.jpa.AssetFileRepository;
 import com.stn.ester.repositories.jpa.SystemProfileRepository;
 import com.stn.ester.services.base.CrudService;
+import lombok.Data;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,7 @@ public class AssetFileService extends CrudService {
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
         super(assetFileRepository);
+        GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
     }
 
     @Transactional
@@ -61,32 +63,13 @@ public class AssetFileService extends CrudService {
             if (files.length != 0) {
                 for (MultipartFile file : files) {
                     if (!file.isEmpty()) {
-                        String filename = GlobalFunctionHelper.getNameFile(file.getOriginalFilename());
-                        String ext = GlobalFunctionHelper.getExtensionFile(file.getOriginalFilename());
+                        FileAttribute fileAttribute = new FileAttribute(file.getOriginalFilename());
 
-                        // replace all whitespace characters to none
-                        filename = filename.replaceAll(" ", "");
-                        Optional<AssetFile> temp = this.assetFileRepository.findByNameAndExtension(filename, ext);
-
-                        /*
-                         check if uploaded file(s) already exist in database or with the same name.
-                         If so, added suffix timestamp (milliseconds) from uploaded file.
-                         */
-                        if (!temp.equals(Optional.empty())) {
-                            filename += DateTimeHelper.getCurrentTimeStamp();
-                        }
-
-                        // store file into asset using FileOutputStream
-                        String pathFile = DS + this.assetTempPath + DS + filename + "." + ext;
-
-                        GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
-
-                        FileOutputStream fileOutputStream = new FileOutputStream(this.parentDirectory + DS + pathFile);
+                        FileOutputStream fileOutputStream = new FileOutputStream(fileAttribute.getFileAbsolutePath());
                         fileOutputStream.write(file.getBytes());
                         fileOutputStream.close();
 
-                        AssetFile assetFile = new AssetFile(pathFile, filename, ext);
-                        data.add((AssetFile) super.create(assetFile));
+                        data.add((AssetFile) super.create(fileAttribute.asAssetFile()));
                     } else {
                         System.out.println("NULL");
                     }
@@ -116,36 +99,15 @@ public class AssetFileService extends CrudService {
 
         // decode it first
         if (!encoded_file.isEmpty()) {
-            List<MultipartFile> decoded_files = new ArrayList<>();
             try {
-                GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
+                FileAttribute fileAttribute = new FileAttribute(filename);
 
-                String name = GlobalFunctionHelper.getNameFile(filename);
-                String ext = GlobalFunctionHelper.getExtensionFile(filename);
-
-                // check if uploaded file is already exists
-                Optional<AssetFile> file = this.assetFileRepository.findByNameAndExtension(name, ext);
-
-                /*
-                 check if uploaded file(s) already exist in database or with the same name.
-                 If so, added suffix timestamp (milliseconds) from uploaded file.
-                 */
-                if (!file.equals(Optional.empty())) {
-                    name += DateTimeHelper.getCurrentTimeStamp();
-                    filename = name + DateTimeHelper.getCurrentTimeStamp() + "." + ext;
-                }
-                String path = DS + this.assetTempPath + DS + filename;
-                String pathfile = this.parentDirectory + DS + this.assetTempPath + DS + filename;
-                FileOutputStream fileOutputStream = new FileOutputStream(pathfile);
+                FileOutputStream fileOutputStream = new FileOutputStream(fileAttribute.getFileAbsolutePath());
                 byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
                 fileOutputStream.write(fileByteArray);
                 fileOutputStream.close();
 
-                // save decoded file to database
-                AssetFile assetFile = new AssetFile(path, name, ext);
-                super.create(assetFile);
-
-                result.put("data", assetFile);
+                result.put("data", super.create(fileAttribute.asAssetFile()));
                 result.put("status", HttpStatus.OK.value());
                 result.put("message", "Encoded file has successfully been uploaded.");
                 return new ResponseEntity<>(result, HttpStatus.OK);
@@ -158,6 +120,33 @@ public class AssetFileService extends CrudService {
         result.put("status", HttpStatus.UNPROCESSABLE_ENTITY);
         result.put("message", "Invalid File.");
         return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @Transactional
+    public Object uploadViaUrl(URL url) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            FileAttribute fileAttribute = new FileAttribute(url);
+
+            BufferedInputStream in = new BufferedInputStream(url.openStream());
+            FileOutputStream fileOutputStream = new FileOutputStream(fileAttribute.getFileAbsolutePath());
+            byte dataBuffer[] = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                fileOutputStream.write(dataBuffer, 0, bytesRead);
+            }
+            fileOutputStream.close();
+
+            result.put("data", super.create(fileAttribute.asAssetFile()));
+            result.put("status", HttpStatus.OK.value());
+            result.put("message", "Encoded file has successfully been uploaded.");
+        } catch (IOException ex) {
+            result.put("status", HttpStatus.UNPROCESSABLE_ENTITY);
+            result.put("message", ex.getMessage());
+            return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
+        } finally {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
     }
 
     public Object getFile(String token, boolean is_download) {
@@ -306,5 +295,47 @@ public class AssetFileService extends CrudService {
             }
         }
         return byteArrayOutputStream.toByteArray();
+    }
+
+    @Data
+    private class FileAttribute {
+        String name;
+        String ext;
+
+        public FileAttribute(String filename) {
+            name = com.google.common.io.Files.getNameWithoutExtension(filename).trim();
+            ext = com.google.common.io.Files.getFileExtension(filename);
+            appendFilenameIfExist();
+        }
+
+        public FileAttribute(URL url) {
+            name = com.google.common.io.Files.getNameWithoutExtension(url.getFile());
+            ext = com.google.common.io.Files.getFileExtension(url.getFile());
+            appendFilenameIfExist();
+        }
+
+        public String getFullname() {
+            return name + "." + ext;
+        }
+
+        public String getFileTargetPath() {
+            return DS + assetTempPath + DS + name + "." + ext;
+        }
+
+        public String getFileAbsolutePath() {
+            return parentDirectory + DS + this.getFileTargetPath();
+        }
+
+        private void appendFilenameIfExist() {
+            Optional<AssetFile> temp = assetFileRepository.findByNameAndExtension(name, ext);
+
+            if (!temp.equals(Optional.empty())) {
+                name += DateTimeHelper.getCurrentTimeStamp();
+            }
+        }
+
+        public AssetFile asAssetFile() {
+            return new AssetFile(getFileTargetPath(), getName(), getExt());
+        }
     }
 }
