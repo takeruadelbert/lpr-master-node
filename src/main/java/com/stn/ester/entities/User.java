@@ -26,6 +26,7 @@ public class User extends BaseEntity implements UserDetails {
     private static final String COLUMN_USER_GROUP_ID = "user_group_id";
     private static final String JSON_PROPERTY_USER_GROUP = "userGroupId";
     private static final String JSON_PROPERTY_PROFILE_PICTURE = "profilePictureId";
+    private static final String DEFINITION_COLUMN_USER_STATUS = "varchar(255) default 'ACTIVE'";
 
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = EntityConstant.MESSAGE_ALPHANUMERIC_ONLY, groups = {New.class, Existing.class})
     @NotBlank(groups = New.class, message = EntityConstant.MESSAGE_NOT_BLANK)
@@ -91,6 +92,7 @@ public class User extends BaseEntity implements UserDetails {
     }
     //end
 
+    @Column(columnDefinition = DEFINITION_COLUMN_USER_STATUS)
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus = UserStatus.ACTIVE;
 
