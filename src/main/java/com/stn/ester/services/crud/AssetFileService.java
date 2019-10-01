@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.io.*;
 import java.net.URL;
@@ -52,6 +53,10 @@ public class AssetFileService extends CrudService {
     @Autowired
     public AssetFileService(AssetFileRepository assetFileRepository) {
         super(assetFileRepository);
+    }
+
+    @PostConstruct
+    public void createDefaultDir() {
         GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
     }
 
@@ -77,6 +82,7 @@ public class AssetFileService extends CrudService {
                 result.put("status", HttpStatus.OK.value());
                 result.put("message", "File(s) has been uploaded successfully.");
                 result.put("data", data);
+                return new ResponseEntity<>(result, HttpStatus.OK);
             } else {
                 String message = "No File Uploaded.";
                 result.put("status", HttpStatus.UNPROCESSABLE_ENTITY);
@@ -88,8 +94,6 @@ public class AssetFileService extends CrudService {
             result.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
             result.put("message", ex.getMessage());
             return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
-        } finally {
-            return new ResponseEntity<>(result, HttpStatus.OK);
         }
     }
 
