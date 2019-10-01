@@ -1,5 +1,6 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.core.events.RegistrationEvent;
 import com.stn.ester.core.exceptions.*;
 import com.stn.ester.dto.UserSimpleDTO;
 import com.stn.ester.entities.*;
@@ -10,6 +11,7 @@ import com.stn.ester.services.base.traits.AssetFileClaimTrait;
 import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -38,6 +40,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
     private PasswordResetRepository passwordResetRepository;
     private PasswordResetService passwordResetService;
     private SystemProfileRepository systemProfileRepository;
+    private ApplicationEventPublisher eventPublisher;
     private String asset_path = "profile_picture";
 
     @Value("${ester.session.login.timeout}")
@@ -53,7 +56,17 @@ public class UserService extends CrudService<User, UserRepository> implements As
     private JavaMailSender mailSender;
 
     @Autowired
-    public UserService(UserRepository userRepository, BiodataRepository biodataRepository, LoginSessionRepository loginSessionRepository, UserGroupRepository userGroupRepository, AssetFileService assetFileService, PasswordResetRepository passwordResetRepository, PasswordResetService passwordResetService, SystemProfileRepository systemProfileRepository) {
+    public UserService(
+            UserRepository userRepository,
+            BiodataRepository biodataRepository,
+            LoginSessionRepository loginSessionRepository,
+            UserGroupRepository userGroupRepository,
+            AssetFileService assetFileService,
+            PasswordResetRepository passwordResetRepository,
+            PasswordResetService passwordResetService,
+            SystemProfileRepository systemProfileRepository,
+            ApplicationEventPublisher eventPublisher
+    ) {
         super(userRepository);
         this.userRepository = userRepository;
         this.loginSessionRepository = loginSessionRepository;
@@ -62,6 +75,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
         this.assetFileService = assetFileService;
         this.passwordResetService = passwordResetService;
         this.systemProfileRepository = systemProfileRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -72,7 +86,9 @@ public class UserService extends CrudService<User, UserRepository> implements As
             user.setProfilePictureId(AssetFileService.defaultProfilePictureID);
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return super.create(user);
+        User registeredUser = super.create(user);
+        eventPublisher.publishEvent(new RegistrationEvent(this, user));
+        return registeredUser;
     }
 
     @Override

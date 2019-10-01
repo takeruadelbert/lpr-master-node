@@ -2,8 +2,10 @@ package com.stn.ester.core.security;
 
 import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stn.ester.core.events.LoginEvent;
 import com.stn.ester.entities.User;
 import com.stn.ester.services.crud.AccessGroupService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,10 +30,16 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private AuthenticationManager authenticationManager;
     private AccessGroupService accessGroupService;
+    private ApplicationEventPublisher applicationEventPublisher;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager,AccessGroupService accessGroupService) {
+    public JWTAuthenticationFilter(
+            AuthenticationManager authenticationManager,
+            AccessGroupService accessGroupService,
+            ApplicationEventPublisher applicationEventPublisher
+    ) {
         this.authenticationManager = authenticationManager;
-        this.accessGroupService=accessGroupService;
+        this.accessGroupService = accessGroupService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -59,7 +67,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             Authentication auth) throws IOException, ServletException {
 
         User user = ((User) auth.getPrincipal());
-        Collection<GrantedAuthority> authorities=new ArrayList();
+        Collection<GrantedAuthority> authorities = new ArrayList();
         authorities.addAll(auth.getAuthorities());
         //authorities.addAll(accessGroupService.buildAccessAuthorities(user.getUserGroupId()));
         final String authoritiesString = authorities.stream()
@@ -71,6 +79,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(HMAC512(SECRET.getBytes()));
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
-        res.addHeader(EXPOSE_HEADER_STRING,HEADER_STRING);
+        res.addHeader(EXPOSE_HEADER_STRING, HEADER_STRING);
+        applicationEventPublisher.publishEvent(new LoginEvent(this, user));
     }
 }
