@@ -3,6 +3,7 @@ package com.stn.ester.entities;
 import com.fasterxml.jackson.annotation.*;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
+import com.stn.ester.entities.enumerate.UserStatus;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +26,7 @@ public class User extends BaseEntity implements UserDetails {
     private static final String COLUMN_USER_GROUP_ID = "user_group_id";
     private static final String JSON_PROPERTY_USER_GROUP = "userGroupId";
     private static final String JSON_PROPERTY_PROFILE_PICTURE = "profilePictureId";
+    private static final String DEFINITION_COLUMN_USER_STATUS = "varchar(255) default 'ACTIVE'";
 
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = EntityConstant.MESSAGE_ALPHANUMERIC_ONLY, groups = {New.class, Existing.class})
     @NotBlank(groups = New.class, message = EntityConstant.MESSAGE_NOT_BLANK)
@@ -90,6 +92,10 @@ public class User extends BaseEntity implements UserDetails {
     }
     //end
 
+    @Column(columnDefinition = DEFINITION_COLUMN_USER_STATUS)
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus = UserStatus.ACTIVE;
+
     @Transient
     private String token;
 
@@ -122,7 +128,7 @@ public class User extends BaseEntity implements UserDetails {
     @JsonIgnore
     @Override
     public boolean isEnabled() {
-        return true;
+        return userStatus.equals(UserStatus.ACTIVE);
     }
 
     public void setUsername(String username) {

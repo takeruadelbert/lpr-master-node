@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
@@ -52,11 +53,15 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
     }
 
     public Page<T> index(Integer page, Integer size) {
-        return currentEntityRepository.findAll(PageRequest.of(page, size));
+        return index(page, size, null);
     }
 
     public Page<T> index(Integer page, Integer size, Specification spec) {
-        return currentEntityRepository.findAll(spec, PageRequest.of(page, size));
+        return index(page, size, spec, Sort.by("createdDate").descending());
+    }
+
+    public Page<T> index(Integer page, Integer size, Specification spec, Sort sort) {
+        return currentEntityRepository.findAll(spec, PageRequest.of(page, size, sort));
     }
 
     public T get(Long id) {
