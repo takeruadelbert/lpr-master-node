@@ -3,6 +3,7 @@ package com.stn.ester.services.crud;
 import com.stn.ester.core.exceptions.*;
 import com.stn.ester.dto.UserSimpleDTO;
 import com.stn.ester.entities.*;
+import com.stn.ester.entities.enumerate.UserStatus;
 import com.stn.ester.helpers.*;
 import com.stn.ester.repositories.jpa.*;
 import com.stn.ester.services.base.CrudService;
@@ -322,6 +323,24 @@ public class UserService extends CrudService<User, UserRepository> implements As
             super.update(passwordReset.getId(), user);
         }
         return user;
+    }
+
+    public Map<UserStatus, String> getUserStatusList() {
+        Map<UserStatus, String> result = new HashMap<>();
+        List<UserStatus> userStatuses = UserStatus.toList();
+        for (UserStatus userStatus : userStatuses) {
+            result.put(userStatus, userStatus.getLabel());
+        }
+        return result;
+    }
+
+    public void changeUserStatus(Long userId, UserStatus userStatus) {
+        Optional<User> user = currentEntityRepository.findById(userId);
+        if (!user.isPresent()) {
+            throw new InvalidValueException("User Not Found");
+        }
+        user.get().setUserStatus(userStatus);
+        currentEntityRepository.save(user.get());
     }
 
     @Override

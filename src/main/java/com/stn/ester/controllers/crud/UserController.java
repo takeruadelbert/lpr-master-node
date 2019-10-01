@@ -1,10 +1,11 @@
 package com.stn.ester.controllers.crud;
 
-import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.controllers.base.CrudController;
-import com.stn.ester.entities.base.BaseEntity;
+import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.entities.User;
+import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.enumerate.Gender;
+import com.stn.ester.entities.enumerate.UserStatus;
 import com.stn.ester.helpers.SessionHelper;
 import com.stn.ester.services.crud.BiodataService;
 import com.stn.ester.services.crud.UserService;
@@ -20,7 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/users")
 public class UserController extends CrudController<UserService, User> {
-    private static final String REQUEST_MAPPING_IDENTIFY_EMAIL =  "/identify_email";
+    private static final String REQUEST_MAPPING_IDENTIFY_EMAIL = "/identify_email";
     private static final String REQUEST_MAPPING_PASSWORD_RESET = "/password_reset/{token}";
     private static final String PAYLOAD_EMAIL = "email";
     private static final String PAYLOAD_NEW_PASSWORD = "new_password";
@@ -51,6 +52,7 @@ public class UserController extends CrudController<UserService, User> {
         return SessionHelper.getCurrentUser();
     }
 
+    @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/change-password", method = RequestMethod.PUT)
     public Object changePassword(@RequestBody Map<String, String> data) {
         String old_password = data.get("old_password");
@@ -61,7 +63,7 @@ public class UserController extends CrudController<UserService, User> {
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole('changeUserPassword'))")
     @RequestMapping(value = "/change-password/{id}", method = RequestMethod.PUT)
-    public Object changePassword(@RequestBody Map<String, String> data, @PathVariable long id) {
+    public Object changePassword(@RequestBody Map<String, String> data, @PathVariable Long id) {
         String new_password = data.get("new_password");
         String retype_new_password = data.get("retype_new_password");
         return service.changePassword(id, new_password, retype_new_password);
@@ -77,6 +79,18 @@ public class UserController extends CrudController<UserService, User> {
     @RequestMapping(value = "/gender", method = RequestMethod.OPTIONS)
     public Map<Gender, String> getGenderList() {
         return this.biodataService.getGenderList();
+    }
+
+    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequestMapping(value = "/status", method = RequestMethod.OPTIONS)
+    public Map<UserStatus, String> getUserStatusList() {
+        return this.userService.getUserStatusList();
+    }
+
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole('changeUserStatus'))")
+    @RequestMapping(value = "/changeStatus", method = RequestMethod.PUT)
+    public void changeUserStatus(@RequestBody Map<String, String> payload) {
+        this.userService.changeUserStatus(Long.parseLong(payload.get("id")), UserStatus.getIfPresentOrThrowError(payload.get("userStatus")));
     }
 
     @AccessAllowed
