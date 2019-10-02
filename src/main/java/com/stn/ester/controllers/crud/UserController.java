@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.Map;
 
 @RestController
@@ -105,6 +106,12 @@ public class UserController extends CrudController<UserService, User> {
         String new_password = data.get(PAYLOAD_NEW_PASSWORD);
         String confirm_password = data.get(PAYLOAD_CONFIRM_PASSWORD);
         return userService.passwordReset(token, new_password, confirm_password);
+    }
+
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
+    @RequestMapping(value = "search/superadmin", method = RequestMethod.OPTIONS)
+    public Collection searchSuperAdmin(@RequestParam(name = "keyword") String keyword) {
+        return service.searchSuperAdmin(keyword);
     }
 
 }
