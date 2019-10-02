@@ -1,12 +1,18 @@
 package com.stn.ester.services.crud;
 
 import com.stn.ester.core.exceptions.*;
+import com.stn.ester.core.search.AppSpecification;
+import com.stn.ester.core.search.util.SearchOperation;
+import com.stn.ester.core.search.util.SpecSearchCriteria;
+import com.stn.ester.core.security.SecurityConstants;
+import com.stn.ester.dto.UserDTO;
 import com.stn.ester.dto.UserSimpleDTO;
 import com.stn.ester.entities.*;
 import com.stn.ester.entities.enumerate.UserStatus;
 import com.stn.ester.helpers.*;
 import com.stn.ester.repositories.jpa.*;
 import com.stn.ester.services.base.CrudService;
+import com.stn.ester.services.base.traits.AdvanceSearchTrait;
 import com.stn.ester.services.base.traits.AssetFileClaimTrait;
 import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +36,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService, SimpleSearchTrait<User, UserSimpleDTO, UserRepository> {
+public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService, SimpleSearchTrait<User, UserSimpleDTO, UserRepository>, AdvanceSearchTrait<User, UserRepository> {
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;
@@ -341,6 +347,12 @@ public class UserService extends CrudService<User, UserRepository> implements As
         }
         user.get().setUserStatus(userStatus);
         currentEntityRepository.save(user.get());
+    }
+
+    public Collection<UserDTO> searchSuperAdmin(String keyword) {
+        Collection<AppSpecification> appSpecifications = new ArrayList();
+        appSpecifications.add(new AppSpecification(new SpecSearchCriteria(null, "name", SearchOperation.EQUALITY, SecurityConstants.ROLE_SUPERADMIN, "userGroup")));
+        return advanceSearch(keyword, getSimpleSearchKeys(), appSpecifications, UserDTO.class);
     }
 
     @Override
