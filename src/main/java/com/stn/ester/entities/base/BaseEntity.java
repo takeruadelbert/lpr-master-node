@@ -1,6 +1,7 @@
 package com.stn.ester.entities.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -21,12 +22,12 @@ public abstract class BaseEntity {
 
     @CreatedDate
     @CreationTimestamp
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     protected LocalDateTime createdDate;
 
     @LastModifiedDate
     @UpdateTimestamp
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     protected LocalDateTime lastModifiedDate;
 
     @JsonIgnore
@@ -62,12 +63,12 @@ public abstract class BaseEntity {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public void setAttribute(String attributeName,Object value){
+    public void setAttribute(String attributeName, Object value) {
         try {
             Field attribute = getClass().getDeclaredField(attributeName);
             attribute.setAccessible(true);
-            attribute.set(this,value);
-        }catch(Exception ex){
+            attribute.set(this, value);
+        } catch (Exception ex) {
             System.out.println(ex);
         }
     }
