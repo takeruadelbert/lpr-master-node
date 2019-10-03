@@ -23,6 +23,9 @@ import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.io.*;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -132,13 +135,11 @@ public class AssetFileService extends CrudService {
         try {
             FileAttribute fileAttribute = new FileAttribute(url);
 
-            BufferedInputStream in = new BufferedInputStream(url.openStream());
+            ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
             FileOutputStream fileOutputStream = new FileOutputStream(fileAttribute.getFileAbsolutePath());
-            byte dataBuffer[] = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                fileOutputStream.write(dataBuffer, 0, bytesRead);
-            }
+            FileChannel fileChannel = fileOutputStream.getChannel();
+            fileOutputStream.getChannel()
+                    .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             fileOutputStream.close();
 
             result.put("data", super.create(fileAttribute.asAssetFile()));
