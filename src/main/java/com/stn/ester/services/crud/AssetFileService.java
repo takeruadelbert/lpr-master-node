@@ -3,7 +3,7 @@ package com.stn.ester.services.crud;
 import com.stn.ester.entities.AssetFile;
 import com.stn.ester.entities.SystemProfile;
 import com.stn.ester.helpers.DateTimeHelper;
-import com.stn.ester.helpers.GlobalFunctionHelper;
+import com.stn.ester.helpers.FileHelper;
 import com.stn.ester.repositories.jpa.AssetFileRepository;
 import com.stn.ester.repositories.jpa.SystemProfileRepository;
 import com.stn.ester.services.base.CrudService;
@@ -60,7 +60,7 @@ public class AssetFileService extends CrudService {
 
     @PostConstruct
     public void createDefaultDir() {
-        GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
+        FileHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
     }
 
     @Transactional
@@ -110,7 +110,7 @@ public class AssetFileService extends CrudService {
                 FileAttribute fileAttribute = new FileAttribute(filename);
 
                 FileOutputStream fileOutputStream = new FileOutputStream(fileAttribute.getFileAbsolutePath());
-                byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
+                byte[] fileByteArray = Base64.getDecoder().decode(FileHelper.getRawDataFromEncodedBase64(encoded_file));
                 fileOutputStream.write(fileByteArray);
                 fileOutputStream.close();
 
@@ -170,7 +170,7 @@ public class AssetFileService extends CrudService {
                 outputStream.write(buffer, 0, buffer.length);
                 String[] temp = path.split("/");
                 String name = temp[temp.length - 1];
-                String extension = GlobalFunctionHelper.getExtensionFile(name);
+                String extension = FileHelper.getExtensionFile(name);
                 if (is_download) {
                     headers.set("Content-Type", "application/x-javascript; charset=utf-8");
                     headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
@@ -206,7 +206,7 @@ public class AssetFileService extends CrudService {
                 String path = this.assetRootPath + DS + assetDir;
 
                 // create if the path doesn't exists
-                GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + path);
+                FileHelper.autoCreateDir(this.parentDirectory + DS + path);
 
                 String from = this.parentDirectory + file.getPath();
                 String targetFileName = this.assetRootPath + DS + assetDir + DS + file.getName() + '.' + file.getExtension();
@@ -278,7 +278,7 @@ public class AssetFileService extends CrudService {
 
     @Transactional
     public Long saveAssetFile(String filepath, String filename) {
-        AssetFile assetFile = new AssetFile(filepath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
+        AssetFile assetFile = new AssetFile(filepath, FileHelper.getNameFile(filename), FileHelper.getExtensionFile(filename));
         assetFile.setAssetFileToDefault();
         super.create(assetFile);
         return assetFile.getId();
@@ -315,7 +315,7 @@ public class AssetFileService extends CrudService {
 
         public FileAttribute(URL url) {
             name = com.google.common.io.Files.getNameWithoutExtension(url.getFile());
-            ext = com.google.common.io.Files.getFileExtension(url.getFile());
+            ext = FileHelper.removeRequestParamFromExtension(com.google.common.io.Files.getFileExtension(url.getFile()));
             appendFilenameIfExist();
         }
 
