@@ -44,6 +44,14 @@ public class DateTimeHelper {
         return LocalDateTime.parse(dateTimeValue, DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATETIME));
     }
 
+    public static String convertToDateString(LocalDate localDate) {
+        return localDate.format(DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATE));
+    }
+
+    public static String convertToDateTimeString(LocalDateTime localDateTime) {
+        return localDateTime.format(DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATETIME));
+    }
+
     public static String getCurrentTimeStamp() {
         return Long.toString(System.currentTimeMillis());
     }

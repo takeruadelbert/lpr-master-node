@@ -1,5 +1,8 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.core.search.AppSpecification;
+import com.stn.ester.core.search.util.SearchOperation;
+import com.stn.ester.core.search.util.SpecSearchCriteria;
 import com.stn.ester.entities.AssetFile;
 import com.stn.ester.entities.SystemProfile;
 import com.stn.ester.helpers.DateTimeHelper;
@@ -14,9 +17,11 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +35,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -44,6 +50,9 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
 
     @Value("${ester.asset.temp}")
     private String assetTempPath;
+
+    @Value("${ester.file.temp-file-max-age}")
+    private Integer TEMP_FILE_MAX_AGE;
 
     private String parentDirectory = new File(System.getProperty("user.dir")).getParent() != null ? new File(System.getProperty("user.dir")).getParent() : new File(System.getProperty("user.dir")).toString();
 
@@ -311,6 +320,28 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
             }
         }
         return byteArrayOutputStream.toByteArray();
+    }
+
+    @Scheduled(fixedDelay = 43_200_000, initialDelay = 1_000_000)
+    public void scheduledCleanTempFile() {
+        String dayAgo = DateTimeHelper.convertToDateTimeString(LocalDateTime.now().minusDays(TEMP_FILE_MAX_AGE));
+        AppSpecification<AssetFile> assetFileAppSpecification = new AppSpecification<>(new SpecSearchCriteria(null, "path", SearchOperation.STARTS_WITH, DS + assetTempPath));
+        AppSpecification<AssetFile> assetFileAppSpecificationAge = new AppSpecification<>(new SpecSearchCriteria(null, "createdDate", SearchOperation.LESS_THAN_OR_EQUAL, dayAgo));
+        Specification<AssetFile> assetFileAppSpecificationNullToken = (Specification<AssetFile>) (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.isNotNull(root.get("token"));
+        Collection<AssetFile> assetFiles = currentEntityRepository.findAll(Specification.where(assetFileAppSpecification).and(assetFileAppSpecificationAge).and(assetFileAppSpecificationNullToken));
+        int cleanCount = 0;
+        for (AssetFile assetFile : assetFiles) {
+            try {
+                if (Files.deleteIfExists(Paths.get(this.parentDirectory + assetFile.getPath()))) {
+                    cleanCount++;
+                    assetFile.setToken(null);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.printf("Temp File Cleaner : %d file(s) have been clean up.", cleanCount);
+        currentEntityRepository.saveAll(assetFiles);
     }
 
     @Data
