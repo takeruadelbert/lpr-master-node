@@ -7,7 +7,10 @@ import com.stn.ester.core.search.util.SpecSearchCriteria;
 import com.stn.ester.core.security.SecurityConstants;
 import com.stn.ester.dto.UserDTO;
 import com.stn.ester.dto.UserSimpleDTO;
-import com.stn.ester.entities.*;
+import com.stn.ester.entities.AssetFile;
+import com.stn.ester.entities.PasswordReset;
+import com.stn.ester.entities.SystemProfile;
+import com.stn.ester.entities.User;
 import com.stn.ester.entities.enumerate.UserStatus;
 import com.stn.ester.helpers.*;
 import com.stn.ester.repositories.jpa.*;
@@ -31,7 +34,6 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -88,47 +90,6 @@ public class UserService extends CrudService<User, UserRepository> implements As
         return super.update(id, user);
     }
 
-    public Map login(String username, String password, HttpSession session) {
-        User user = userRepository.findByUsername(username).orElse(null);
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            throw new InvalidLoginException();
-        }
-        UUID randomUUID = UUID.randomUUID();
-        String token = randomUUID.toString();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, sessionTimeout);
-        LoginSession loginSession = new LoginSession(token, calendar.getTime(), user);
-        LoginSession savedLoginSession = loginSessionRepository.save(loginSession);
-        Map o = new HashMap();
-        o.put("username", username);
-        o.put("token", token);
-
-        Map<String, Object> loginInfoSession = new HashMap();
-
-        loginInfoSession.put("token", token);
-        loginInfoSession.put("username", username);
-        loginInfoSession.put("loginSessionId", savedLoginSession.getId());
-
-        session.setAttribute("login", loginInfoSession);
-        return o;
-    }
-
-    public LoginSession isValidToken(String token) {
-        return loginSessionRepository.isTokenExist(token);
-    }
-
-    public LoginSession tokenHeartbeat(String token) {
-        LoginSession loginSession = loginSessionRepository.isTokenExist(token);
-        if (loginSession == null) {
-            return null;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, sessionTimeout);
-        loginSession.setExpire(calendar.getTime());
-        LoginSession savedLoginSession = loginSessionRepository.save(loginSession);
-        return savedLoginSession;
-    }
-
     @Transactional
     public Object changePassword(Long userID, String oldPassword, String newPassword, String retypeNewPassword) {
         System.out.println(userID);
@@ -179,10 +140,6 @@ public class UserService extends CrudService<User, UserRepository> implements As
         result.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
         result.put("message", "Failed to change profile picture : Invalid Token.");
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    public void addDefaultProfilePicture() {
-
     }
 
     @Override
