@@ -20,8 +20,19 @@ public interface AdvanceSearchTrait<U extends BaseEntity, X extends BaseReposito
     String MESSAGE_NO_SUCH_METHOD = "No constructor of %s that accepts %s";
 
     default Collection advanceSearch(String keyword, Collection<String> keys, Collection<AppSpecification> appSpecifications, Class targetClazz) {
+        return advanceSearch(keyword, keys, appSpecifications, null, targetClazz);
+    }
+
+    default Collection advanceSearch(String keyword, Collection<String> keys, Specification externalSpecification, Class targetClazz) {
+        return advanceSearch(keyword, keys, null, externalSpecification, targetClazz);
+    }
+
+    default Collection advanceSearch(String keyword, Collection<String> keys, Collection<AppSpecification> appSpecifications, Specification externalSpec, Class targetClazz) {
         Collection result = new ArrayList<>();
         Specification<U> spec = SearchAndFilterHelper.resolveSpecificationSingleKeyword(keys, keyword);
+        if (externalSpec != null) {
+            spec.and(externalSpec);
+        }
         if (appSpecifications != null) {
             spec = SearchAndFilterHelper.joinSpecification(spec, appSpecifications);
         }
