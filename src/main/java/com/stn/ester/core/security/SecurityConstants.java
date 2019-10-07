@@ -1,8 +1,12 @@
 package com.stn.ester.core.security;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class SecurityConstants {
     public static final String SECRET = "SecretKeyToGenJWTs";
-    public static final long EXPIRATION_TIME = 864_000_000; // 10 days
+    public static Long EXPIRATION_TIME;
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER_STRING = "Authorization";
     public static final String EXPOSE_HEADER_STRING = "Access-Control-Expose-Headers";
@@ -12,4 +16,9 @@ public class SecurityConstants {
     public static final String ROLE_SUPERADMIN = "SUPERADMIN";
     public static final String AUTHORITY_PREFIX = "ACCESS";
     public static final String ROLE_PREFIX = "ROLE";
+
+    @Value("${ester.session.login.timeout}")
+    public void setExpirationTime(Long expirationTime) {
+        EXPIRATION_TIME = expirationTime;
+    }
 }
