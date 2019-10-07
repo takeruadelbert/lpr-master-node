@@ -31,7 +31,7 @@ public interface AdvanceSearchTrait<U extends BaseEntity, X extends BaseReposito
         Collection result = new ArrayList<>();
         Specification<U> spec = SearchAndFilterHelper.resolveSpecificationSingleKeyword(keys, keyword);
         if (externalSpec != null) {
-            spec.and(externalSpec);
+            spec = Specification.where(spec).or(externalSpec);
         }
         if (appSpecifications != null) {
             spec = SearchAndFilterHelper.joinSpecification(spec, appSpecifications);
