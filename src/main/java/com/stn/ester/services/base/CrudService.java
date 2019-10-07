@@ -2,6 +2,7 @@ package com.stn.ester.services.base;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
+import com.stn.ester.core.base.OnDeleteRemoveChild;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.core.base.OnDeleteSetParentNull;
 import com.stn.ester.core.base.TableFieldPair;
@@ -113,8 +114,10 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
 
     public void delete(Long id) {
         this.onDeleteSetParentNull(id);
+        this.onDeleteRemoveChild(id);
         currentEntityRepository.deleteById(id);
     }
+
 
     // TODO
     // check prepare for level 2 or more
@@ -142,6 +145,31 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
                 preUpdate(toCompare, toSave, childComparator);
                 bw.setPropertyValue(pd.getName(), toSave);
             }
+        }
+    }
+
+    private void onDeleteRemoveChild(Long parentId) {
+        Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
+        Annotation onDeleteRemoveChild = clazz.getDeclaredAnnotation(OnDeleteRemoveChild.class);
+        if (onDeleteRemoveChild != null) {
+            TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(OnDeleteRemoveChild.class).value();
+            for (TableFieldPair tableFieldPair : tableFieldPairs) {
+                if (CrudService.class.isAssignableFrom(tableFieldPair.service())) {
+                    String serviceName = tableFieldPair.service().getSimpleName();
+                    serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
+                    applicationContext.getBean(serviceName, tableFieldPair.service()).deleteByParentId(parentId, tableFieldPair.fieldName());
+                }
+            }
+        }
+    }
+
+    protected void deleteByParentId(Long parentId, String fieldName) {
+        String lowerCamelCase = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, fieldName);
+        SpecSearchCriteria searchByParentId = new SpecSearchCriteria(null, lowerCamelCase, SearchOperation.EQUALITY, parentId);
+        AppSpecification spec = new AppSpecification(searchByParentId);
+        Iterable<T> entities = currentEntityRepository.findAll(spec);
+        for (T baseEntity : entities) {
+            delete(baseEntity.getId());
         }
     }
 
