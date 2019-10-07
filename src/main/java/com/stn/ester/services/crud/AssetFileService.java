@@ -4,6 +4,7 @@ import com.stn.ester.entities.AssetFile;
 import com.stn.ester.entities.SystemProfile;
 import com.stn.ester.helpers.DateTimeHelper;
 import com.stn.ester.helpers.FileHelper;
+import com.stn.ester.helpers.GlobalFunctionHelper;
 import com.stn.ester.repositories.jpa.AssetFileRepository;
 import com.stn.ester.repositories.jpa.SystemProfileRepository;
 import com.stn.ester.services.base.CrudService;
@@ -32,7 +33,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Service
-public class AssetFileService extends CrudService {
+public class AssetFileService extends CrudService<AssetFile, AssetFileRepository> {
 
     @Autowired
     private AssetFileRepository assetFileRepository;
@@ -63,6 +64,16 @@ public class AssetFileService extends CrudService {
         FileHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
     }
 
+    @Override
+    public AssetFile create(AssetFile o) {
+        String token;
+        do {
+            token = GlobalFunctionHelper.generateToken();
+        } while (currentEntityRepository.findByToken(token).isPresent());
+        o.setToken(token);
+        return super.create(o);
+    }
+
     @Transactional
     public Object uploadFile(MultipartFile[] files) {
         Map<String, Object> result = new HashMap<>();
@@ -77,7 +88,7 @@ public class AssetFileService extends CrudService {
                         fileOutputStream.write(file.getBytes());
                         fileOutputStream.close();
 
-                        data.add((AssetFile) super.create(fileAttribute.asAssetFile()));
+                        data.add((AssetFile) this.create(fileAttribute.asAssetFile()));
                     } else {
                         System.out.println("NULL");
                     }
@@ -114,7 +125,7 @@ public class AssetFileService extends CrudService {
                 fileOutputStream.write(fileByteArray);
                 fileOutputStream.close();
 
-                result.put("data", super.create(fileAttribute.asAssetFile()));
+                result.put("data", this.create(fileAttribute.asAssetFile()));
                 result.put("status", HttpStatus.OK.value());
                 result.put("message", "Encoded file has successfully been uploaded.");
                 return new ResponseEntity<>(result, HttpStatus.OK);
@@ -142,7 +153,7 @@ public class AssetFileService extends CrudService {
                     .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             fileOutputStream.close();
 
-            result.put("data", super.create(fileAttribute.asAssetFile()));
+            result.put("data", this.create(fileAttribute.asAssetFile()));
             result.put("status", HttpStatus.OK.value());
             result.put("message", "Encoded file has successfully been uploaded.");
         } catch (IOException ex) {
@@ -269,7 +280,7 @@ public class AssetFileService extends CrudService {
 
                 // save default data
                 SystemProfile systemProfile = new SystemProfile(address, telephone, name, shortname, header, email, website, logo_id);
-                super.create(systemProfile);
+                systemProfileRepository.save(systemProfile);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -280,7 +291,7 @@ public class AssetFileService extends CrudService {
     public Long saveAssetFile(String filepath, String filename) {
         AssetFile assetFile = new AssetFile(filepath, FileHelper.getNameFile(filename), FileHelper.getExtensionFile(filename));
         assetFile.setAssetFileToDefault();
-        super.create(assetFile);
+        this.create(assetFile);
         return assetFile.getId();
     }
 
