@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
 public class LoginListener implements ApplicationListener<LoginEvent> {
     @Override
     public void onApplicationEvent(LoginEvent loginEvent) {
-        System.out.println(loginEvent.getUser().getUsername());
+        System.out.printf("User Login : %s", loginEvent.getUser().getUsername());
     }
 }
