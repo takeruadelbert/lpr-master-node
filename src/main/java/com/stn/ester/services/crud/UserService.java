@@ -1,13 +1,23 @@
 package com.stn.ester.services.crud;
 
 import com.stn.ester.core.events.RegistrationEvent;
+import com.stn.ester.constants.LogoResource;
 import com.stn.ester.core.exceptions.*;
+import com.stn.ester.core.search.AppSpecification;
+import com.stn.ester.core.search.util.SearchOperation;
+import com.stn.ester.core.search.util.SpecSearchCriteria;
+import com.stn.ester.core.security.SecurityConstants;
+import com.stn.ester.dto.UserDTO;
 import com.stn.ester.dto.UserSimpleDTO;
-import com.stn.ester.entities.*;
+import com.stn.ester.entities.AssetFile;
+import com.stn.ester.entities.PasswordReset;
+import com.stn.ester.entities.SystemProfile;
+import com.stn.ester.entities.User;
 import com.stn.ester.entities.enumerate.UserStatus;
 import com.stn.ester.helpers.*;
 import com.stn.ester.repositories.jpa.*;
 import com.stn.ester.services.base.CrudService;
+import com.stn.ester.services.base.traits.AdvanceSearchTrait;
 import com.stn.ester.services.base.traits.AssetFileClaimTrait;
 import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +37,11 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService, SimpleSearchTrait<User, UserSimpleDTO, UserRepository> {
+public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService, SimpleSearchTrait<User, UserSimpleDTO, UserRepository>, AdvanceSearchTrait<User, UserRepository> {
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;
@@ -98,47 +107,6 @@ public class UserService extends CrudService<User, UserRepository> implements As
         return super.update(id, user);
     }
 
-    public Map login(String username, String password, HttpSession session) {
-        User user = userRepository.findByUsername(username).orElse(null);
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            throw new InvalidLoginException();
-        }
-        UUID randomUUID = UUID.randomUUID();
-        String token = randomUUID.toString();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, sessionTimeout);
-        LoginSession loginSession = new LoginSession(token, calendar.getTime(), user);
-        LoginSession savedLoginSession = loginSessionRepository.save(loginSession);
-        Map o = new HashMap();
-        o.put("username", username);
-        o.put("token", token);
-
-        Map<String, Object> loginInfoSession = new HashMap();
-
-        loginInfoSession.put("token", token);
-        loginInfoSession.put("username", username);
-        loginInfoSession.put("loginSessionId", savedLoginSession.getId());
-
-        session.setAttribute("login", loginInfoSession);
-        return o;
-    }
-
-    public LoginSession isValidToken(String token) {
-        return loginSessionRepository.isTokenExist(token);
-    }
-
-    public LoginSession tokenHeartbeat(String token) {
-        LoginSession loginSession = loginSessionRepository.isTokenExist(token);
-        if (loginSession == null) {
-            return null;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, sessionTimeout);
-        loginSession.setExpire(calendar.getTime());
-        LoginSession savedLoginSession = loginSessionRepository.save(loginSession);
-        return savedLoginSession;
-    }
-
     @Transactional
     public Object changePassword(Long userID, String oldPassword, String newPassword, String retypeNewPassword) {
         System.out.println(userID);
@@ -189,10 +157,6 @@ public class UserService extends CrudService<User, UserRepository> implements As
         result.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
         result.put("message", "Failed to change profile picture : Invalid Token.");
         return new ResponseEntity<>(result, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    public void addDefaultProfilePicture() {
-
     }
 
     @Override
@@ -255,7 +219,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
         if (user != null) {
             try {
                 MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true, ConstantHelper.ENCODING_UTF_8);
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, LogoResource.ENCODING_UTF_8);
                 helper.setFrom(EmailHelper.emailFrom());
                 helper.setTo(EmailHelper.emailTo(user.get().getEmail()));
                 helper.setSubject(EmailHelper.emailSubject());
@@ -263,12 +227,12 @@ public class UserService extends CrudService<User, UserRepository> implements As
                 Context context = new Context();
                 String linkResetPassword = EmailHelper.createLinkResetPassword(token, request);
                 SystemProfile systemProfile = this.systemProfileRepository.findById(1L).get();
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_USERNAME, user.get().getUsername());
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_ACTION, linkResetPassword);
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_ADDRESS, systemProfile.getAddress());
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_NAME, systemProfile.getName());
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_WEBSITE, systemProfile.getWebsite());
-                String htmlFile = templateEngine.process(ConstantHelper.TEMPLATE_MAIL_FILE, context);
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_USERNAME, user.get().getUsername());
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_ACTION, linkResetPassword);
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_ADDRESS, systemProfile.getAddress());
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_NAME, systemProfile.getName());
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_WEBSITE, systemProfile.getWebsite());
+                String htmlFile = templateEngine.process(LogoResource.TEMPLATE_MAIL_FILE, context);
                 EmailHelper.embeddedImageOnTemplateMail(htmlFile, message);
                 mailSender.send(message);
 
@@ -357,6 +321,12 @@ public class UserService extends CrudService<User, UserRepository> implements As
         }
         user.get().setUserStatus(userStatus);
         currentEntityRepository.save(user.get());
+    }
+
+    public Collection<UserDTO> searchSuperAdmin(String keyword) {
+        Collection<AppSpecification> appSpecifications = new ArrayList();
+        appSpecifications.add(new AppSpecification(new SpecSearchCriteria(null, "name", SearchOperation.EQUALITY, SecurityConstants.ROLE_SUPERADMIN, "userGroup")));
+        return advanceSearch(keyword, getSimpleSearchKeys(), appSpecifications, UserDTO.class);
     }
 
     @Override

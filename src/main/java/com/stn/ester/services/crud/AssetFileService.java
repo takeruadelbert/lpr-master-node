@@ -1,9 +1,13 @@
 package com.stn.ester.services.crud;
 
 import com.stn.ester.core.events.FileUploadEvent;
+import com.stn.ester.core.search.AppSpecification;
+import com.stn.ester.core.search.util.SearchOperation;
+import com.stn.ester.core.search.util.SpecSearchCriteria;
 import com.stn.ester.entities.AssetFile;
 import com.stn.ester.entities.SystemProfile;
 import com.stn.ester.helpers.DateTimeHelper;
+import com.stn.ester.helpers.FileHelper;
 import com.stn.ester.helpers.GlobalFunctionHelper;
 import com.stn.ester.repositories.jpa.AssetFileRepository;
 import com.stn.ester.repositories.jpa.SystemProfileRepository;
@@ -15,9 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,13 +31,17 @@ import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.io.*;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-public class AssetFileService extends CrudService {
+public class AssetFileService extends CrudService<AssetFile, AssetFileRepository> {
 
     @Autowired
     private AssetFileRepository assetFileRepository;
@@ -46,6 +56,9 @@ public class AssetFileService extends CrudService {
 
     @Value("${ester.asset.temp}")
     private String assetTempPath;
+
+    @Value("${ester.file.temp-file-max-age}")
+    private Integer TEMP_FILE_MAX_AGE;
 
     private String parentDirectory = new File(System.getProperty("user.dir")).getParent() != null ? new File(System.getProperty("user.dir")).getParent() : new File(System.getProperty("user.dir")).toString();
 
@@ -63,7 +76,17 @@ public class AssetFileService extends CrudService {
 
     @PostConstruct
     public void createDefaultDir() {
-        GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
+        FileHelper.autoCreateDir(this.parentDirectory + DS + this.assetTempPath);
+    }
+
+    @Override
+    public AssetFile create(AssetFile o) {
+        String token;
+        do {
+            token = GlobalFunctionHelper.generateToken();
+        } while (currentEntityRepository.findByToken(token).isPresent());
+        o.setToken(token);
+        return super.create(o);
     }
 
     @Transactional
@@ -80,7 +103,7 @@ public class AssetFileService extends CrudService {
                         fileOutputStream.write(file.getBytes());
                         fileOutputStream.close();
 
-                        AssetFile savedAssetFile = (AssetFile) super.create(fileAttribute.asAssetFile());
+                        AssetFile savedAssetFile = (AssetFile) this.create(fileAttribute.asAssetFile());
                         data.add(savedAssetFile);
                         applicationEventPublisher.publishEvent(new FileUploadEvent(this, savedAssetFile, target));
                     } else {
@@ -115,12 +138,11 @@ public class AssetFileService extends CrudService {
                 FileAttribute fileAttribute = new FileAttribute(filename);
 
                 FileOutputStream fileOutputStream = new FileOutputStream(fileAttribute.getFileAbsolutePath());
-                byte[] fileByteArray = Base64.getDecoder().decode(GlobalFunctionHelper.getRawDataFromEncodedBase64(encoded_file));
+                byte[] fileByteArray = Base64.getDecoder().decode(FileHelper.getRawDataFromEncodedBase64(encoded_file));
                 fileOutputStream.write(fileByteArray);
                 fileOutputStream.close();
 
-
-                AssetFile savedAssetFile = (AssetFile) super.create(fileAttribute.asAssetFile());
+                AssetFile savedAssetFile = (AssetFile) this.create(fileAttribute.asAssetFile());
                 applicationEventPublisher.publishEvent(new FileUploadEvent(this, savedAssetFile, target));
                 result.put("data", savedAssetFile);
                 result.put("status", HttpStatus.OK.value());
@@ -143,16 +165,14 @@ public class AssetFileService extends CrudService {
         try {
             FileAttribute fileAttribute = new FileAttribute(url);
 
-            BufferedInputStream in = new BufferedInputStream(url.openStream());
+            ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
             FileOutputStream fileOutputStream = new FileOutputStream(fileAttribute.getFileAbsolutePath());
-            byte dataBuffer[] = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                fileOutputStream.write(dataBuffer, 0, bytesRead);
-            }
+            FileChannel fileChannel = fileOutputStream.getChannel();
+            fileOutputStream.getChannel()
+                    .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             fileOutputStream.close();
 
-            AssetFile savedAssetFile = (AssetFile) super.create(fileAttribute.asAssetFile());
+            AssetFile savedAssetFile = (AssetFile) this.create(fileAttribute.asAssetFile());
             applicationEventPublisher.publishEvent(new FileUploadEvent(this, savedAssetFile, target));
             result.put("data", savedAssetFile);
             result.put("status", HttpStatus.OK.value());
@@ -182,7 +202,7 @@ public class AssetFileService extends CrudService {
                 outputStream.write(buffer, 0, buffer.length);
                 String[] temp = path.split("/");
                 String name = temp[temp.length - 1];
-                String extension = GlobalFunctionHelper.getExtensionFile(name);
+                String extension = FileHelper.getExtensionFile(name);
                 if (is_download) {
                     headers.set("Content-Type", "application/x-javascript; charset=utf-8");
                     headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
@@ -218,7 +238,7 @@ public class AssetFileService extends CrudService {
                 String path = this.assetRootPath + DS + assetDir;
 
                 // create if the path doesn't exists
-                GlobalFunctionHelper.autoCreateDir(this.parentDirectory + DS + path);
+                FileHelper.autoCreateDir(this.parentDirectory + DS + path);
 
                 String from = this.parentDirectory + file.getPath();
                 String targetFileName = this.assetRootPath + DS + assetDir + DS + file.getName() + '.' + file.getExtension();
@@ -281,7 +301,7 @@ public class AssetFileService extends CrudService {
 
                 // save default data
                 SystemProfile systemProfile = new SystemProfile(address, telephone, name, shortname, header, email, website, logo_id);
-                super.create(systemProfile);
+                systemProfileRepository.save(systemProfile);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -290,9 +310,9 @@ public class AssetFileService extends CrudService {
 
     @Transactional
     public Long saveAssetFile(String filepath, String filename) {
-        AssetFile assetFile = new AssetFile(filepath, GlobalFunctionHelper.getNameFile(filename), GlobalFunctionHelper.getExtensionFile(filename));
+        AssetFile assetFile = new AssetFile(filepath, FileHelper.getNameFile(filename), FileHelper.getExtensionFile(filename));
         assetFile.setAssetFileToDefault();
-        super.create(assetFile);
+        this.create(assetFile);
         return assetFile.getId();
     }
 
@@ -314,6 +334,28 @@ public class AssetFileService extends CrudService {
         return byteArrayOutputStream.toByteArray();
     }
 
+    @Scheduled(fixedDelay = 43_200_000, initialDelay = 1_000_000)
+    public void scheduledCleanTempFile() {
+        String dayAgo = DateTimeHelper.convertToDateTimeString(LocalDateTime.now().minusDays(TEMP_FILE_MAX_AGE));
+        AppSpecification<AssetFile> assetFileAppSpecification = new AppSpecification<>(new SpecSearchCriteria(null, "path", SearchOperation.STARTS_WITH, DS + assetTempPath));
+        AppSpecification<AssetFile> assetFileAppSpecificationAge = new AppSpecification<>(new SpecSearchCriteria(null, "createdDate", SearchOperation.LESS_THAN_OR_EQUAL, dayAgo));
+        Specification<AssetFile> assetFileAppSpecificationNullToken = (Specification<AssetFile>) (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.isNotNull(root.get("token"));
+        Collection<AssetFile> assetFiles = currentEntityRepository.findAll(Specification.where(assetFileAppSpecification).and(assetFileAppSpecificationAge).and(assetFileAppSpecificationNullToken));
+        int cleanCount = 0;
+        for (AssetFile assetFile : assetFiles) {
+            try {
+                if (Files.deleteIfExists(Paths.get(this.parentDirectory + assetFile.getPath()))) {
+                    cleanCount++;
+                    assetFile.setToken(null);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.printf("Temp File Cleaner : %d file(s) have been clean up.", cleanCount);
+        currentEntityRepository.saveAll(assetFiles);
+    }
+
     @Data
     private class FileAttribute {
         String name;
@@ -327,7 +369,7 @@ public class AssetFileService extends CrudService {
 
         public FileAttribute(URL url) {
             name = com.google.common.io.Files.getNameWithoutExtension(url.getFile());
-            ext = com.google.common.io.Files.getFileExtension(url.getFile());
+            ext = FileHelper.removeRequestParamFromExtension(com.google.common.io.Files.getFileExtension(url.getFile()));
             appendFilenameIfExist();
         }
 

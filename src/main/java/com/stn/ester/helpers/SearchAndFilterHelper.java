@@ -29,6 +29,15 @@ public class SearchAndFilterHelper {
         return builder.build();
     }
 
+    public static Specification joinSpecification(Specification currentSpecification, Collection<AppSpecification> appSpecifications) {
+        for (AppSpecification appSpecification : appSpecifications) {
+            currentSpecification = appSpecification.getCriteria().isOrPredicate()
+                    ? Specification.where(currentSpecification).or(appSpecification)
+                    : Specification.where(currentSpecification).and(appSpecification);
+        }
+        return currentSpecification;
+    }
+
     public static Specification resolveSpecificationSingleKeyword(Collection<String> keys, String keyword) {
         SpecificationsBuilder builder = new SpecificationsBuilder<>();
         for (String key : keys) {

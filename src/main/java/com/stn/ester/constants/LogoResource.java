@@ -1,10 +1,10 @@
-package com.stn.ester.helpers;
+package com.stn.ester.constants;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class ConstantHelper {
+public class LogoResource {
     private static final Path ROOT = FileSystems.getDefault().getPath("").toAbsolutePath();
     public static final Path FILE_PATH_ICON_FACEBOOK = Paths.get(ROOT.toString(),"src", "main", "resources", "static", "images", "facebook.png");
     public static final Path FILE_PATH_ICON_TWITTER = Paths.get(ROOT.toString(),"src", "main", "resources", "static", "images", "twitter.png");

@@ -1,9 +1,7 @@
 package com.stn.ester.helpers;
 
 import com.stn.ester.constants.DateTimeFormat;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -13,19 +11,8 @@ import java.util.Date;
 
 public class DateTimeHelper {
 
-    @Autowired
     public DateTimeHelper() {
 
-    }
-
-    public static String getCurrentDateInString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DateTimeFormat.FORMAT_DATE);
-        Date date = new Date();
-        return simpleDateFormat.format(date);
-    }
-
-    public static Date getCurrentDate() {
-        return new Date();
     }
 
     public static LocalDate getCurrentLocalDate() {
@@ -42,6 +29,14 @@ public class DateTimeHelper {
 
     public static LocalDateTime convertToDateTime(String dateTimeValue) throws DateTimeParseException {
         return LocalDateTime.parse(dateTimeValue, DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATETIME));
+    }
+
+    public static String convertToDateString(LocalDate localDate) {
+        return localDate.format(DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATE));
+    }
+
+    public static String convertToDateTimeString(LocalDateTime localDateTime) {
+        return localDateTime.format(DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATETIME));
     }
 
     public static String getCurrentTimeStamp() {

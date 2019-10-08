@@ -1,5 +1,7 @@
 package com.stn.ester.core.search;
 
+import com.stn.ester.core.exceptions.BadRequestException;
+import com.stn.ester.core.search.util.SearchOperation;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.core.exceptions.FilterException;
 import com.stn.ester.helpers.DateTimeHelper;
@@ -36,7 +38,7 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
         } catch (IllegalArgumentException illegal) {
             throw new FilterException(criteria.getKey());
         } catch (DateTimeParseException e) {
-            throw new FilterException();
+            throw new BadRequestException(String.format("Wrong format for %s", criteria.getKey()));
         }
     }
 
@@ -53,7 +55,11 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
         if (LocalDate.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
             return DateTimeHelper.convertToDate(criteria.getValue().toString());
         } else if (LocalDateTime.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
-            return DateTimeHelper.convertToDateTime(criteria.getValue().toString());
+            if (criteria.getOperation() == SearchOperation.EQUAL_DATE_WITH_DATETIME) {
+                return DateTimeHelper.convertToDate(criteria.getValue().toString());
+            } else {
+                return DateTimeHelper.convertToDateTime(criteria.getValue().toString());
+            }
         } else if (Enum.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
             return Enum.valueOf(path.getModel().getBindableJavaType(), criteria.getValue().toString());
         } else {
@@ -83,6 +89,8 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
                 return builder.like(path, "%" + value);
             case CONTAINS:
                 return builder.like(path, "%" + value + "%");
+            case EQUAL_DATE_WITH_DATETIME:
+                return builder.and(builder.greaterThanOrEqualTo(path, ((LocalDate) value).atStartOfDay()), builder.lessThan(path, ((LocalDate) value).plusDays(1).atStartOfDay()));
             default:
                 return null;
         }

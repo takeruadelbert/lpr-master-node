@@ -1,0 +1,23 @@
+package com.stn.ester.dto;
+
+import com.stn.ester.entities.User;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class UserDTO extends EntityDTO<User> {
+
+    public Long id;
+    public String username;
+    public String email;
+    public String fullName;
+
+    public UserDTO(User user) {
+        super(user);
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.email = user.getEmail();
+        this.fullName = user.getBiodata().getFullname();
+    }
+}

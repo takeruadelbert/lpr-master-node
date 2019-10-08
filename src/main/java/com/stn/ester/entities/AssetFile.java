@@ -2,7 +2,6 @@ package com.stn.ester.entities;
 
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
-import com.stn.ester.helpers.GlobalFunctionHelper;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -27,7 +26,6 @@ public class AssetFile extends BaseEntity {
         this.path = path;
         this.name = name;
         this.extension = extension;
-        this.token = GlobalFunctionHelper.generateToken();
     }
 
     public String getPath() {

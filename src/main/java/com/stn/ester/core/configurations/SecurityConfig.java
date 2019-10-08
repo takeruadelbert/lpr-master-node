@@ -1,9 +1,9 @@
 package com.stn.ester.core.configurations;
 
 import com.stn.ester.core.base.AccessAllowed;
-import com.stn.ester.helpers.FunctionHelper;
 import com.stn.ester.core.security.JWTAuthenticationFilter;
 import com.stn.ester.core.security.JWTAuthorizationFilter;
+import com.stn.ester.helpers.GlobalFunctionHelper;
 import com.stn.ester.services.crud.AccessGroupService;
 import com.stn.ester.services.crud.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +32,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.stn.ester.core.security.SecurityConstants.*;
+import static com.stn.ester.core.security.SecurityConstants.SIGN_UP_URL;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserService userService;
@@ -61,12 +58,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-//        web
-//                .ignoring()
-//                .antMatchers(HttpMethod.GET, SYSTEM_PROFILE_URL)
-//                .antMatchers(HttpMethod.GET, "/asset_files/**");
         for (PathMethod pathMethod : findPathAnnotedAccessAllowed()) {
-            web.ignoring().antMatchers(HttpMethod.resolve(pathMethod.requestMethod.toString()),pathMethod.Path);
+            web.ignoring().antMatchers(HttpMethod.resolve(pathMethod.requestMethod.toString()), pathMethod.Path);
         }
     }
 
@@ -121,7 +114,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     RequestMethod[] requestMethods = method.getAnnotation(RequestMapping.class).method();
                     for (String path : paths) {
                         for (RequestMethod requestMethod : requestMethods) {
-                            result.add(new PathMethod(requestMethod, FunctionHelper.replacePathVariableTo(topPath + path, "**")));
+                            result.add(new PathMethod(requestMethod, GlobalFunctionHelper.replacePathVariableTo(topPath + path, "**")));
                         }
                     }
                 }
