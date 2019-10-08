@@ -14,6 +14,7 @@ import java.net.URL;
 @RequestMapping("/asset_files")
 public class AssetFileController {
     private AssetFileService assetFileService;
+    public static final String DEFAULT_TARGET = "none";
 
     @Autowired
     public AssetFileController(AssetFileService assetFileService) {
@@ -22,20 +23,20 @@ public class AssetFileController {
 
     @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public Object uploadFile(@RequestParam MultipartFile[] files) {
-        return assetFileService.uploadFile(files);
+    public Object uploadFile(@RequestParam MultipartFile[] files, @RequestParam(defaultValue = DEFAULT_TARGET) String target) {
+        return assetFileService.uploadFile(files, target);
     }
 
     @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/upload-encoded", method = RequestMethod.POST)
-    public Object uploadEncodedFile(@RequestParam String filename, @RequestParam String files) {
-        return assetFileService.uploadEncodedFile(filename, files);
+    public Object uploadEncodedFile(@RequestParam String filename, @RequestParam String files, @RequestParam(defaultValue = DEFAULT_TARGET) String target) {
+        return assetFileService.uploadEncodedFile(filename, files, target);
     }
 
     @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/upload-url", method = RequestMethod.POST)
-    public Object uploadViaUrl(@RequestParam URL url) {
-        return assetFileService.uploadViaUrl(url);
+    public Object uploadViaUrl(@RequestParam URL url, @RequestParam(defaultValue = DEFAULT_TARGET) String target) {
+        return assetFileService.uploadViaUrl(url, target);
     }
 
     @AccessAllowed

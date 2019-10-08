@@ -1,5 +1,6 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.core.events.FileUploadEvent;
 import com.stn.ester.core.search.AppSpecification;
 import com.stn.ester.core.search.util.SearchOperation;
 import com.stn.ester.core.search.util.SpecSearchCriteria;
@@ -16,6 +17,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +47,10 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
     private AssetFileRepository assetFileRepository;
     @Autowired
     private SystemProfileRepository systemProfileRepository;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @Value("${ester.asset.root}")
     private String assetRootPath;
 
@@ -84,7 +90,7 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
     }
 
     @Transactional
-    public Object uploadFile(MultipartFile[] files) {
+    public Object uploadFile(MultipartFile[] files, String target) {
         Map<String, Object> result = new HashMap<>();
         List<AssetFile> data = new ArrayList<>();
         try {
@@ -97,7 +103,9 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
                         fileOutputStream.write(file.getBytes());
                         fileOutputStream.close();
 
-                        data.add((AssetFile) this.create(fileAttribute.asAssetFile()));
+                        AssetFile savedAssetFile = (AssetFile) this.create(fileAttribute.asAssetFile());
+                        data.add(savedAssetFile);
+                        applicationEventPublisher.publishEvent(new FileUploadEvent(this, savedAssetFile, target));
                     } else {
                         System.out.println("NULL");
                     }
@@ -121,7 +129,7 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
     }
 
     @Transactional
-    public Object uploadEncodedFile(String filename, String encoded_file) {
+    public Object uploadEncodedFile(String filename, String encoded_file, String target) {
         Map<String, Object> result = new HashMap<>();
 
         // decode it first
@@ -134,7 +142,9 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
                 fileOutputStream.write(fileByteArray);
                 fileOutputStream.close();
 
-                result.put("data", this.create(fileAttribute.asAssetFile()));
+                AssetFile savedAssetFile = (AssetFile) this.create(fileAttribute.asAssetFile());
+                applicationEventPublisher.publishEvent(new FileUploadEvent(this, savedAssetFile, target));
+                result.put("data", savedAssetFile);
                 result.put("status", HttpStatus.OK.value());
                 result.put("message", "Encoded file has successfully been uploaded.");
                 return new ResponseEntity<>(result, HttpStatus.OK);
@@ -150,7 +160,7 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
     }
 
     @Transactional
-    public Object uploadViaUrl(URL url) {
+    public Object uploadViaUrl(URL url, String target) {
         Map<String, Object> result = new HashMap<>();
         try {
             FileAttribute fileAttribute = new FileAttribute(url);
@@ -162,7 +172,9 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
                     .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             fileOutputStream.close();
 
-            result.put("data", this.create(fileAttribute.asAssetFile()));
+            AssetFile savedAssetFile = (AssetFile) this.create(fileAttribute.asAssetFile());
+            applicationEventPublisher.publishEvent(new FileUploadEvent(this, savedAssetFile, target));
+            result.put("data", savedAssetFile);
             result.put("status", HttpStatus.OK.value());
             result.put("message", "Encoded file has successfully been uploaded.");
         } catch (IOException ex) {

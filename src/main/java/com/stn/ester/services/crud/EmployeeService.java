@@ -1,5 +1,6 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.core.events.RegistrationEvent;
 import com.stn.ester.entities.Employee;
 import com.stn.ester.entities.Position;
 import com.stn.ester.entities.User;
@@ -9,6 +10,7 @@ import com.stn.ester.repositories.jpa.PositionRepository;
 import com.stn.ester.repositories.jpa.UserRepository;
 import com.stn.ester.services.base.CrudService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +23,21 @@ import java.util.Map;
 public class EmployeeService extends CrudService<Employee, EmployeeRepository> {
 
     private PositionRepository positionRepository;
+    private ApplicationEventPublisher eventPublisher;
     @Autowired
     private PasswordEncoder passwordEncoder;
     private final String defaultPassword = "password123";
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository, PositionRepository positionRepository, UserRepository userRepository) {
+    public EmployeeService(
+            EmployeeRepository employeeRepository,
+            PositionRepository positionRepository,
+            UserRepository userRepository,
+            ApplicationEventPublisher eventPublisher
+    ) {
         super(employeeRepository);
         this.positionRepository = positionRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -50,7 +59,9 @@ public class EmployeeService extends CrudService<Employee, EmployeeRepository> {
 
         // encode password
         employee.getUser().setPassword(this.passwordEncoder.encode(this.defaultPassword));
-        return super.create(employee);
+        Employee createdEmployee = super.create(employee);
+        eventPublisher.publishEvent(new RegistrationEvent(this, createdEmployee.getUser()));
+        return createdEmployee;
     }
 
     public Map<EmployeeWorkStatus, String> getEmployeeWorkStatusList() {
