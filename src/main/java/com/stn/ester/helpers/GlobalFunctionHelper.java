@@ -1,12 +1,9 @@
 package com.stn.ester.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,14 +13,7 @@ public class GlobalFunctionHelper {
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final String ALPHANUMERIC_CHAR = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    @Autowired
     public GlobalFunctionHelper() {
-    }
-
-    // Get date and time now.
-    public static String getDateTimeNow() {
-        String timeStamp = new SimpleDateFormat(timeNow).format(new Date());
-        return timeStamp;
     }
 
     public static String generateToken() {
@@ -38,5 +28,9 @@ public class GlobalFunctionHelper {
             return jsonMap;
         jsonMap = mapper.readValue(jsonString, Map.class);
         return jsonMap;
+    }
+
+    public static String replacePathVariableTo(String target,String replaceWith){
+        return target.replaceAll("\\{.*?}", replaceWith);
     }
 }

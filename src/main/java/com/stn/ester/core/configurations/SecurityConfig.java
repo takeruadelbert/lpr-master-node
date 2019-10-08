@@ -3,7 +3,7 @@ package com.stn.ester.core.configurations;
 import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.core.security.JWTAuthenticationFilter;
 import com.stn.ester.core.security.JWTAuthorizationFilter;
-import com.stn.ester.helpers.FunctionHelper;
+import com.stn.ester.helpers.GlobalFunctionHelper;
 import com.stn.ester.services.crud.AccessGroupService;
 import com.stn.ester.services.crud.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     RequestMethod[] requestMethods = method.getAnnotation(RequestMapping.class).method();
                     for (String path : paths) {
                         for (RequestMethod requestMethod : requestMethods) {
-                            result.add(new PathMethod(requestMethod, FunctionHelper.replacePathVariableTo(topPath + path, "**")));
+                            result.add(new PathMethod(requestMethod, GlobalFunctionHelper.replacePathVariableTo(topPath + path, "**")));
                         }
                     }
                 }
