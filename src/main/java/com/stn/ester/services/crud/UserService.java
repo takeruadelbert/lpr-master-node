@@ -1,5 +1,6 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.constants.LogoResource;
 import com.stn.ester.core.exceptions.*;
 import com.stn.ester.core.search.AppSpecification;
 import com.stn.ester.core.search.util.SearchOperation;
@@ -202,7 +203,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
         if (user != null) {
             try {
                 MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true, ConstantHelper.ENCODING_UTF_8);
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, LogoResource.ENCODING_UTF_8);
                 helper.setFrom(EmailHelper.emailFrom());
                 helper.setTo(EmailHelper.emailTo(user.get().getEmail()));
                 helper.setSubject(EmailHelper.emailSubject());
@@ -210,12 +211,12 @@ public class UserService extends CrudService<User, UserRepository> implements As
                 Context context = new Context();
                 String linkResetPassword = EmailHelper.createLinkResetPassword(token, request);
                 SystemProfile systemProfile = this.systemProfileRepository.findById(1L).get();
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_USERNAME, user.get().getUsername());
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_ACTION, linkResetPassword);
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_ADDRESS, systemProfile.getAddress());
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_NAME, systemProfile.getName());
-                context.setVariable(ConstantHelper.CONTEXT_VARIABLE_WEBSITE, systemProfile.getWebsite());
-                String htmlFile = templateEngine.process(ConstantHelper.TEMPLATE_MAIL_FILE, context);
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_USERNAME, user.get().getUsername());
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_ACTION, linkResetPassword);
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_ADDRESS, systemProfile.getAddress());
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_NAME, systemProfile.getName());
+                context.setVariable(LogoResource.CONTEXT_VARIABLE_WEBSITE, systemProfile.getWebsite());
+                String htmlFile = templateEngine.process(LogoResource.TEMPLATE_MAIL_FILE, context);
                 EmailHelper.embeddedImageOnTemplateMail(htmlFile, message);
                 mailSender.send(message);
 

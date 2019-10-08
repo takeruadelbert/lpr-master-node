@@ -1,5 +1,7 @@
 package com.stn.ester.helpers;
 
+import com.stn.ester.constants.LogoResource;
+
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
@@ -45,7 +47,7 @@ public class EmailHelper {
     public static Object embeddedImageOnTemplateMail(String htmlFile, MimeMessage message) throws IOException, MessagingException {
         MimeMultipart multipart = new MimeMultipart();
         BodyPart messageBodyPart = new MimeBodyPart();
-        messageBodyPart.setContent(htmlFile, ConstantHelper.CONTENT_HTML);
+        messageBodyPart.setContent(htmlFile, LogoResource.CONTENT_HTML);
         multipart.addBodyPart(messageBodyPart);
 
         // inline the image to MimeBodyPart, and each MimeBodyPart only have maximum one img, so create one MimeBodyPart again if you want to add new image/logo
@@ -56,11 +58,11 @@ public class EmailHelper {
 
         // put here all source image, logo, and icon to get path file
         List<Path> imgPath = new ArrayList<Path>();
-        imgPath.addAll(Arrays.asList(ConstantHelper.FILE_PATH_ICON_FACEBOOK, ConstantHelper.FILE_PATH_ICON_TWITTER, ConstantHelper.FILE_PATH_ICON_LINKEDIN, ConstantHelper.FILE_PATH_ICON_MY_WEBSITE));
+        imgPath.addAll(Arrays.asList(LogoResource.FILE_PATH_ICON_FACEBOOK, LogoResource.FILE_PATH_ICON_TWITTER, LogoResource.FILE_PATH_ICON_LINKEDIN, LogoResource.FILE_PATH_ICON_MY_WEBSITE));
 
         // put here all image, logo, and icon name to create content_id
         List<String> contentID = new ArrayList<String>();
-        contentID.addAll(Arrays.asList(ConstantHelper.CONTENT_ID_FACEBOOK, ConstantHelper.CONTENT_ID_TWITTER, ConstantHelper.CONTENT_ID_LINKEDIN, ConstantHelper.CONTENT_ID_MY_WEBSITE));
+        contentID.addAll(Arrays.asList(LogoResource.CONTENT_ID_FACEBOOK, LogoResource.CONTENT_ID_TWITTER, LogoResource.CONTENT_ID_LINKEDIN, LogoResource.CONTENT_ID_MY_WEBSITE));
 
         // put here all imgBody to embed the image
         List<MimeBodyPart> imgBodyPart = new ArrayList<MimeBodyPart>();
@@ -71,7 +73,7 @@ public class EmailHelper {
             imgBodyPart.get(l).attachFile(imgPath.get(i).toString());
             imgBodyPart.get(l).setContentID("<" + contentID.get(k) + ">");
             imgBodyPart.get(l).setDisposition(MimeBodyPart.INLINE);
-            imgBodyPart.get(l).setHeader(ConstantHelper.CONTENT_TYPE, ConstantHelper.CONTENT_TYPE_IMAGE_PNG);
+            imgBodyPart.get(l).setHeader(LogoResource.CONTENT_TYPE, LogoResource.CONTENT_TYPE_IMAGE_PNG);
             multipart.addBodyPart(imgBodyPart.get(l));
         }
         message.setContent(multipart);
