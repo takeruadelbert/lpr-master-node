@@ -52,7 +52,7 @@ pipeline{
             }
     }
     environment{
-        STAGING_HOME='/home/stn-server/documents'
+        STAGING_HOME='/home/stn-server/Documents'
         ESTER_DIR='ester/v2'
         TARGET_DIR="${STAGING_HOME}/${ESTER_DIR}"
     }
