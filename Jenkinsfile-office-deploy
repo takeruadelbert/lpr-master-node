@@ -1,3 +1,13 @@
+def SLACK_FLOWSTAGE_STAGING='STAGING'
+def SLACK_STEP_BUILD='BUILD'
+def SLACK_STEP_DEPLOY='DEPLOY'
+def SLACK_ICON_FAIL=':x:'
+def SLACK_ICON_SUCCESS=':heavy_check_mark:'
+def SLACK_ICON_ABORT=':black_circle:'
+def SLACK_MSG_FAIL='FAIL'
+def SLACK_MSG_SUCCESS='SUCCEED'
+def SLACK_MSG_ABORT='ABORTED'
+
 def BUILD_JOB_NAME='ester-test-build'
 
 pipeline{
@@ -8,6 +18,7 @@ pipeline{
     stages{
         stage("Copying artifact"){
             steps{
+                slackSend (color: "#0f91f5",message: "[${SLACK_STEP_DEPLOY}] Started - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
                 copyArtifacts(projectName: "${BUILD_JOB_NAME}")
                 sh "mv target/*.war app.war"
                 sh "rm -rf target"
@@ -15,21 +26,34 @@ pipeline{
         }
         stage("Stopping server"){
             steps{
-                sh "(cd /home/stn-server/Documents/ester/v2/ && docker-compose down)"
+                sh "(cd ${TARGET_DIR} && docker-compose down)"
             }
         }
         stage("Deploy"){
             steps{
-                sh "cp app.war ${STAGING_HOME}app.war"
+                sh "cp app.war ${TARGET_DIR}/app.war"
             }
         }
         stage("Starting server"){
             steps{
-                sh "(cd /home/stn-server/Documents/ester/v2/ && docker-compose up -d)"
+                sh "(cd ${TARGET_DIR}/ && docker-compose up -d)"
             }
         }
     }
+    post{
+    	    failure{
+    	        slackSend (color: "#FF0000",message: "[${SLACK_STEP_DEPLOY}][${SLACK_MSG_FAIL}]${SLACK_ICON_FAIL} Failed - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+    	    }
+    	    success{
+    	        slackSend (color: "#00FF00",message: "[${SLACK_STEP_DEPLOY}][${SLACK_MSG_SUCCESS}]${SLACK_ICON_SUCCESS} Succeed - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+    	    }
+            aborted{
+                slackSend (color: "#bdc3c7",message: "[${SLACK_STEP_DEPLOY}][${SLACK_MSG_ABORT}]${SLACK_ICON_ABORT} Aborted - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+            }
+    }
     environment{
-        STAGING_HOME='/home/stn-server/Documents/ester/v2/'
+        STAGING_HOME='/home/stn-server/documents'
+        ESTER_DIR='ester/v2'
+        TARGET_DIR="${STAGING_HOME}/${ESTER_DIR}"
     }
 }
