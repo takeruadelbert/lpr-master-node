@@ -28,7 +28,6 @@ public interface AdvanceSearchTrait<U extends BaseEntity, X extends BaseReposito
     }
 
     default Collection advanceSearch(String keyword, Collection<String> keys, Collection<AppSpecification> appSpecifications, Specification externalSpec, Class targetClazz) {
-        Collection result = new ArrayList<>();
         Specification<U> spec = SearchAndFilterHelper.resolveSpecificationSingleKeyword(keys, keyword);
         if (externalSpec != null) {
             spec = Specification.where(spec).or(externalSpec);
@@ -36,6 +35,11 @@ public interface AdvanceSearchTrait<U extends BaseEntity, X extends BaseReposito
         if (appSpecifications != null) {
             spec = SearchAndFilterHelper.joinSpecification(spec, appSpecifications);
         }
+        return advanceSearch(spec, targetClazz);
+    }
+
+    default Collection advanceSearch(Specification<U> spec, Class targetClazz) {
+        Collection result = new ArrayList<>();
         Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterface(getClass(), BaseEntity.class, AdvanceSearchTrait.class);
         Constructor constructor;
         try {
