@@ -327,6 +327,8 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
                 InputStream inputStream = isDefault == 1 ? getClass().getResourceAsStream(filename) : new FileInputStream(filename);
                 byte[] buffer = IOUtils.toByteArray(inputStream);
                 byteArrayOutputStream.write(buffer, 0, buffer.length);
+                byteArrayOutputStream.close();
+                inputStream.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
