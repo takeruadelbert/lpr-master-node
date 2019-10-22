@@ -84,6 +84,7 @@ public class User extends BaseEntity implements UserDetails {
     private Collection<RoleGroup> roleGroups;
 
     @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Collection<Long> roleIds;
 
     @Column(columnDefinition = DEFINITION_COLUMN_USER_STATUS)

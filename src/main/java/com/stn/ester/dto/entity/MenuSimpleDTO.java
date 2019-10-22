@@ -1,7 +1,7 @@
-package com.stn.ester.dto;
+package com.stn.ester.dto.entity;
 
+import com.stn.ester.dto.base.EntityDTO;
 import com.stn.ester.entities.Menu;
-import com.stn.ester.entities.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

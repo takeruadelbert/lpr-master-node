@@ -2,6 +2,7 @@ package com.stn.ester.controllers.crud;
 
 import com.stn.ester.controllers.base.CrudController;
 import com.stn.ester.core.base.AccessAllowed;
+import com.stn.ester.dto.UserProfileDTO;
 import com.stn.ester.entities.User;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.enumerate.Gender;
@@ -49,8 +50,8 @@ public class UserController extends CrudController<UserService, User> {
 
     @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/heartbeat")
-    public User isValid() {
-        return SessionHelper.getCurrentUser();
+    public UserProfileDTO isValid() {
+        return new UserProfileDTO(SessionHelper.getCurrentUser());
     }
 
     @PreAuthorize("hasPermission(null,'allowall')")

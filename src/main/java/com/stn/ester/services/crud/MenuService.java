@@ -2,7 +2,7 @@ package com.stn.ester.services.crud;
 
 import com.stn.ester.core.exceptions.NotFoundException;
 import com.stn.ester.core.security.SecurityConstants;
-import com.stn.ester.dto.MenuSimpleDTO;
+import com.stn.ester.dto.entity.MenuSimpleDTO;
 import com.stn.ester.dto.PrivilegeDTO;
 import com.stn.ester.entities.AccessGroup;
 import com.stn.ester.entities.Menu;
