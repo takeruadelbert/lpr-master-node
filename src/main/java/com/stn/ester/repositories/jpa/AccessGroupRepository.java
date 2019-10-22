@@ -26,5 +26,5 @@ public interface AccessGroupRepository extends BaseRepository<AccessGroup> {
 
     Optional<AccessGroup> findByMenuIdAndRoleId(Long menuId, Long roleId);
 
-    Optional<AccessGroup> findByMenuIdAndRoleIdIn(Long menuId, Collection<Long> roleIds);
+    Collection<AccessGroup> findAllByMenuIdAndRoleIdIn(Long menuId, Collection<Long> roleIds);
 }

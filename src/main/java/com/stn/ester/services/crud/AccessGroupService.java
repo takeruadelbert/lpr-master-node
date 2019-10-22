@@ -102,7 +102,7 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
         if (menus.isEmpty()) {
             return "NOACCESS";
         }
-        Collection<Long> userGroupIds = SessionHelper.getUserGroupIds();
+        Collection<Long> userGroupIds = SessionHelper.getRoleIds();
         Collection<AccessGroup> accessGroups = currentEntityRepository.findAllByMenuIdInAndRoleIdIn(menus.stream().map(Menu::getId).collect(Collectors.toCollection(ArrayList::new)), userGroupIds);
         if (accessGroups.isEmpty()) {
             return "NOACCESS";

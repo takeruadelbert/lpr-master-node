@@ -2,6 +2,7 @@ package com.stn.ester.controllers.crud;
 
 import com.stn.ester.controllers.base.CrudController;
 import com.stn.ester.core.exceptions.UnauthorizedException;
+import com.stn.ester.dto.PrivilegeDTO;
 import com.stn.ester.entities.Menu;
 import com.stn.ester.entities.User;
 import com.stn.ester.helpers.SessionHelper;
@@ -35,13 +36,13 @@ public class MenuController extends CrudController<MenuService, Menu> {
         if (user == null) {
             throw new UnauthorizedException();
         }
-        return this.menuService.getByUserGroupId(SessionHelper.getUserGroupIds());
+        return this.menuService.getByUserGroupId(SessionHelper.getRoleIds());
     }
 
     @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/check_privilege/{menuId}", method = RequestMethod.GET)
-    public Object checkPrivilege(@PathVariable long menuId) {
-        return this.service.checkPrivilege(SessionHelper.getUserGroupIds(), menuId);
+    public PrivilegeDTO checkPrivilege(@PathVariable long menuId) {
+        return this.service.checkPrivilege(SessionHelper.getRoleIds(), menuId);
     }
 
     @PreAuthorize("hasPermission(null,'allowall')")

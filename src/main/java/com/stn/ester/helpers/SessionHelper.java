@@ -33,13 +33,13 @@ public class SessionHelper {
         }
     }
 
-    public static Collection<Long> getUserGroupIds() {
-        Collection<Long> userGroupIds = new ArrayList<>();
+    public static Collection<Long> getRoleIds() {
+        Collection<Long> roleIds = new ArrayList<>();
         User user = getCurrentUser();
         for (RoleGroup roleGroup : user.getRoleGroups()) {
-            userGroupIds.add(roleGroup.getRole().getId());
+            roleIds.add(roleGroup.getRole().getId());
         }
-        return userGroupIds;
+        return roleIds;
     }
 
     public static Long getDepartmentID() {

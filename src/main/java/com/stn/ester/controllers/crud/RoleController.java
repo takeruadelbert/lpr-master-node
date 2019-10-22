@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/roles")
+@RequestMapping("/user_groups")
 public class RoleController extends CrudController<RoleService, Role> {
 
     AccessGroupService accessGroupService;

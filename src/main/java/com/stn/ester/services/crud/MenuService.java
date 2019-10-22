@@ -3,6 +3,7 @@ package com.stn.ester.services.crud;
 import com.stn.ester.core.exceptions.NotFoundException;
 import com.stn.ester.core.security.SecurityConstants;
 import com.stn.ester.dto.MenuSimpleDTO;
+import com.stn.ester.dto.PrivilegeDTO;
 import com.stn.ester.entities.AccessGroup;
 import com.stn.ester.entities.Menu;
 import com.stn.ester.entities.Role;
@@ -131,8 +132,12 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
         super.delete(id);
     }
 
-    public Object checkPrivilege(Collection<Long> userGroupIds, Long menuId) {
-        return this.accessGroupRepository.findByMenuIdAndRoleIdIn(menuId, userGroupIds).orElseThrow(() -> new NotFoundException());
+    public PrivilegeDTO checkPrivilege(Collection<Long> userGroupIds, Long menuId) {
+        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByMenuIdAndRoleIdIn(menuId, userGroupIds);
+        if (accessGroups.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return new PrivilegeDTO(accessGroups);
     }
 
     @Override
