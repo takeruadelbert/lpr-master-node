@@ -8,10 +8,7 @@ import com.stn.ester.dto.UserDTO;
 import com.stn.ester.dto.UserSimpleDTO;
 import com.stn.ester.entities.*;
 import com.stn.ester.entities.enumerate.UserStatus;
-import com.stn.ester.helpers.DateTimeHelper;
-import com.stn.ester.helpers.EmailHelper;
-import com.stn.ester.helpers.GlobalFunctionHelper;
-import com.stn.ester.helpers.SessionHelper;
+import com.stn.ester.helpers.*;
 import com.stn.ester.repositories.jpa.*;
 import com.stn.ester.services.base.CrudService;
 import com.stn.ester.services.base.traits.AdvanceSearchTrait;
@@ -34,11 +31,13 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.internet.MimeMessage;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService, SimpleSearchTrait<User, UserSimpleDTO, UserRepository>, AdvanceSearchTrait<User, UserRepository> {
@@ -336,14 +335,20 @@ public class UserService extends CrudService<User, UserRepository> implements As
     }
 
     public Collection<UserDTO> searchSuperAdmin(String keyword) {
+        //superadmin specification
         Long superAdminId = this.roleService.getIdByName(SecurityConstants.ROLE_SUPERADMIN);
-        Collection<RoleGroup> roleGroups = roleGroupRepository.findAllByRoleId(superAdminId);
-        Collection<Long> roleGroupIds = roleGroups.stream().map(v -> v.getId()).collect(Collectors.toList());
-        Specification<User> specification = (Specification) (root, criteriaQuery, criteriaBuilder) -> {
-            final Path path = root.get("roleGroups");
-            return path.in(roleGroups);
+        Specification superAdminSpecification = (Specification) (root, criteriaQuery, criteriaBuilder) -> {
+            final Subquery<Long> roleGroupQuery = criteriaQuery.subquery(Long.class);
+            final Root<RoleGroup> roleGroupRoot = roleGroupQuery.from(RoleGroup.class);
+            final Join<User, RoleGroup> userRoleGroupJoin = root.join("roleGroups");
+            roleGroupQuery.select(roleGroupRoot.<Long>get("user"));
+            roleGroupQuery.where(criteriaBuilder.equal(roleGroupRoot.<Long>get("role"), superAdminId));
+            final Path<User> path = userRoleGroupJoin.<User>get("id");
+            return path.in(roleGroupQuery);
         };
-        return advanceSearch(keyword, getSimpleSearchKeys(), specification, UserDTO.class);
+        //search keyword
+        Specification keywordSpecification = SearchAndFilterHelper.resolveSpecificationSingleKeyword(getSimpleSearchKeys(), keyword);
+        return advanceSearch(Specification.where(keywordSpecification).and(superAdminSpecification), UserDTO.class);
     }
 
     @Override
