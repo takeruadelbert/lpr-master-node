@@ -1,9 +1,9 @@
 package com.stn.ester.controllers.crud;
 
 import com.stn.ester.controllers.base.CrudController;
+import com.stn.ester.core.exceptions.UnauthorizedException;
 import com.stn.ester.entities.Menu;
 import com.stn.ester.entities.User;
-import com.stn.ester.core.exceptions.UnauthorizedException;
 import com.stn.ester.helpers.SessionHelper;
 import com.stn.ester.services.crud.MenuService;
 import com.stn.ester.services.crud.UserService;
@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("menus")
@@ -29,18 +30,18 @@ public class MenuController extends CrudController<MenuService, Menu> {
 
     @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/navbar", method = RequestMethod.GET)
-    public Object getAccessGroup() {
+    public Collection<Menu> getNavBar() {
         User user = SessionHelper.getCurrentUser();
         if (user == null) {
             throw new UnauthorizedException();
         }
-        return this.menuService.getByUserGroupId(user.getUserGroupId());
+        return this.menuService.getByUserGroupId(SessionHelper.getUserGroupIds());
     }
 
     @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/check_privilege/{menuId}", method = RequestMethod.GET)
     public Object checkPrivilege(@PathVariable long menuId) {
-        return this.service.checkPrivilege(SessionHelper.getUserGroupId(), menuId);
+        return this.service.checkPrivilege(SessionHelper.getUserGroupIds(), menuId);
     }
 
     @PreAuthorize("hasPermission(null,'allowall')")

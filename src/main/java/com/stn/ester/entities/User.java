@@ -5,12 +5,17 @@ import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
 import com.stn.ester.entities.enumerate.UserStatus;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -23,8 +28,7 @@ public class User extends BaseEntity implements UserDetails {
     private static final String COLUMN_PROFILE_PICTURE_ID = "profile_picture_id";
     private static final String COLUMN_MAPPED_USER = "user";
     private static final String COLUMN_EMPLOYEE_ID = "employee_id";
-    private static final String COLUMN_USER_GROUP_ID = "user_group_id";
-    private static final String JSON_PROPERTY_USER_GROUP = "userGroupId";
+
     private static final String JSON_PROPERTY_PROFILE_PICTURE = "profilePictureId";
     private static final String DEFINITION_COLUMN_USER_STATUS = "varchar(255) default 'ACTIVE'";
 
@@ -74,23 +78,13 @@ public class User extends BaseEntity implements UserDetails {
     @JsonManagedReference
     private PasswordReset passwordReset;
 
-    //contoh belongsto(unidirection manytoone)
-    //start
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = COLUMN_USER_GROUP_ID, insertable = false, updatable = false)
-    private UserGroup userGroup;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Collection<RoleGroup> roleGroups;
 
-    @NotNull(groups = {New.class, Existing.class}, message = EntityConstant.MESSAGE_NOT_BLANK)
-    @JsonProperty(JSON_PROPERTY_USER_GROUP)
-    @Column(name = COLUMN_USER_GROUP_ID)
-    private Long userGroupId;
-
-    @JsonSetter(JSON_PROPERTY_USER_GROUP)
-    public void setUserGroupId(long userGroupId) {
-        if (userGroupId != 0)
-            this.userGroupId = userGroupId;
-    }
-    //end
+    @Transient
+    private Collection<Long> roleIds;
 
     @Column(columnDefinition = DEFINITION_COLUMN_USER_STATUS)
     @Enumerated(EnumType.STRING)
@@ -139,8 +133,11 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList();
-        if (this.userGroup != null)
-            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + "_" + this.userGroup.getName()));
+        if (this.roleGroups != null) {
+            for (RoleGroup roleGroup : roleGroups) {
+                authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + "_" + roleGroup.getRole().getName()));
+            }
+        }
         return authorities;
     }
 
@@ -156,10 +153,6 @@ public class User extends BaseEntity implements UserDetails {
         return email;
     }
 
-    public Long getUserGroupId() {
-        return userGroupId;
-    }
-
     public String getToken() {
         return this.token;
     }
@@ -168,16 +161,18 @@ public class User extends BaseEntity implements UserDetails {
         this.email = email;
     }
 
-    public void setUserGroupId(Long userGroupId) {
-        this.userGroupId = userGroupId;
-    }
-
     public void setBiodata(Biodata biodata) {
         this.biodata = biodata;
     }
 
-    public UserGroup getUserGroup() {
-        return userGroup;
+    public void addRole(Role role) {
+        if (this.roleGroups == null) {
+            this.roleGroups = new ArrayList<>();
+        }
+        RoleGroup roleGroup = new RoleGroup();
+        roleGroup.setUser(this);
+        roleGroup.setRole(role);
+        this.roleGroups.add(roleGroup);
     }
 
 }

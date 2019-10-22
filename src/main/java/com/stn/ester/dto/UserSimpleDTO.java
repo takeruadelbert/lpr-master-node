@@ -20,6 +20,5 @@ public class UserSimpleDTO extends EntityDTO<User> {
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.fullName = user.getBiodata().getFullname();
-        this.userGroup = user.getUserGroup().getLabel();
     }
 }

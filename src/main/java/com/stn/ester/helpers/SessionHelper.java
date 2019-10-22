@@ -1,11 +1,15 @@
 package com.stn.ester.helpers;
 
+import com.stn.ester.entities.RoleGroup;
 import com.stn.ester.entities.User;
 import com.stn.ester.services.crud.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
 import static com.stn.ester.core.security.SecurityConstants.ROLE_SUPERADMIN;
@@ -21,21 +25,21 @@ public class SessionHelper {
     }
 
     public static Long getUserID() {
-        User user=getCurrentUser();
-        if (user!=null) {
+        User user = getCurrentUser();
+        if (user != null) {
             return user.getId();
-        }else{
+        } else {
             return null;
         }
     }
 
-    public static Long getUserGroupId(){
-        User user=getCurrentUser();
-        if (user!=null) {
-            return user.getUserGroup().getId();
-        }else{
-            return null;
+    public static Collection<Long> getUserGroupIds() {
+        Collection<Long> userGroupIds = new ArrayList<>();
+        User user = getCurrentUser();
+        for (RoleGroup roleGroup : user.getRoleGroups()) {
+            userGroupIds.add(roleGroup.getRole().getId());
         }
+        return userGroupIds;
     }
 
     public static Long getDepartmentID() {
@@ -45,10 +49,10 @@ public class SessionHelper {
     public static User getCurrentUser() {
         //jwt set username on auth, not user object
         Authentication auth = SecurityContextHelper.getAuthentication();
-        if (auth!=null) {
+        if (auth != null) {
             String username = auth.getPrincipal().toString();
             return (User) userService.loadUserByUsername(username);
-        }else{
+        } else {
             return null;
         }
     }

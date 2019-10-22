@@ -50,7 +50,7 @@ public class Position extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = COLUMN_USER_GROUP, insertable = false, updatable = false)
-    private UserGroup userGroup;
+    private Role role;
 
     @NotNull(message = EntityConstant.MESSAGE_NOT_BLANK)
     @JsonProperty(JSON_PROPERTY_USER_GROUP)

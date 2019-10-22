@@ -10,16 +10,21 @@ import java.util.Optional;
 @Repository
 public interface AccessGroupRepository extends BaseRepository<AccessGroup> {
 
-    Collection<AccessGroup> findAllByUserGroupId(Long userGroupId);
+    Collection<AccessGroup> findAllByRoleId(Long roleId);
 
-    Collection<AccessGroup> findAllByUserGroupIdAndViewable(Long userGroupId, boolean viewable);
+    Collection<AccessGroup> findAllByRoleIdAndViewable(Long roleId, boolean viewable);
+
+    Collection<AccessGroup> findAllByRoleIdInAndViewable(Collection<Long> roleIds, boolean viewable);
 
     Collection<AccessGroup> findAllByMenuId(Long menuId);
 
-    Collection<AccessGroup> findAllByMenuIdAndUserGroupId(Long menuId,Long userGroupId);
+    Collection<AccessGroup> findAllByMenuIdAndRoleId(Long menuId, Long roleId);
 
-    Collection<AccessGroup> findAllByMenuIdInAndUserGroupId(Collection<Long> menuIds, Long userGroupId);
+    Collection<AccessGroup> findAllByMenuIdInAndRoleId(Collection<Long> menuIds, Long roleId);
 
+    Collection<AccessGroup> findAllByMenuIdInAndRoleIdIn(Collection<Long> menuIds, Collection<Long> roleIds);
 
-    Optional<AccessGroup> findByMenuIdAndUserGroupId(Long menuId,Long userGroupId);
+    Optional<AccessGroup> findByMenuIdAndRoleId(Long menuId, Long roleId);
+
+    Optional<AccessGroup> findByMenuIdAndRoleIdIn(Long menuId, Collection<Long> roleIds);
 }

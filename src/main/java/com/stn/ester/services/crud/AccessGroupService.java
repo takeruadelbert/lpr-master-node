@@ -24,7 +24,7 @@ import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
 @Service
 public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepository> {
 
-    UserGroupRepository userGroupRepository;
+    RoleRepository roleRepository;
     ModuleRepository moduleRepository;
     MenuRepository menuRepository;
     ModuleLinkRepository moduleLinkRepository;
@@ -32,18 +32,18 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
     @Autowired
     public AccessGroupService(AccessGroupRepository accessGroupRepository,
                               MenuRepository menuRepository,
-                              UserGroupRepository userGroupRepository,
+                              RoleRepository roleRepository,
                               ModuleRepository moduleRepository,
                               ModuleLinkRepository moduleLinkRepository) {
         super(accessGroupRepository);
-        this.userGroupRepository = userGroupRepository;
+        this.roleRepository = roleRepository;
         this.moduleRepository = moduleRepository;
         this.menuRepository = menuRepository;
         this.moduleLinkRepository = moduleLinkRepository;
     }
 
     @Transactional
-    public void updateAll(Long userGroupId, ArrayList<HashMap> accessGroups) {
+    public void updateAll(Long roleId, ArrayList<HashMap> accessGroups) {
         for (HashMap<String, Object> it : accessGroups) {
             AccessGroup accessGroup = new AccessGroup();
             accessGroup.setMenuId(Long.parseLong(it.get("menuId").toString()));
@@ -51,7 +51,7 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
             accessGroup.setAddable(Boolean.parseBoolean(it.get("addable").toString()));
             accessGroup.setEditable(Boolean.parseBoolean(it.get("editable").toString()));
             accessGroup.setDeleteable(Boolean.parseBoolean(it.get("deleteable").toString()));
-            accessGroup.setUserGroupId(userGroupId);
+            accessGroup.setRoleId(roleId);
             if (it.containsKey("id")) {
                 Long accessGroupId = Long.parseLong(it.get("id").toString());
                 accessGroup.setId(accessGroupId);
@@ -64,7 +64,7 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
 
     public Collection<? extends GrantedAuthority> buildAccessAuthorities(Long userGroupId) {
         Collection<GrantedAuthority> authorities = new ArrayList();
-        Collection<AccessGroup> accessGroups = currentEntityRepository.findAllByUserGroupId(userGroupId);
+        Collection<AccessGroup> accessGroups = currentEntityRepository.findAllByRoleId(userGroupId);
         for (AccessGroup accessGroup : accessGroups) {
             Menu menu = accessGroup.getMenu();
             com.stn.ester.entities.Module module = menu.getModule();
@@ -102,40 +102,41 @@ public class AccessGroupService extends CrudService<AccessGroup, AccessGroupRepo
         if (menus.isEmpty()) {
             return "NOACCESS";
         }
-        Long userGroupId = SessionHelper.getCurrentUser().getUserGroupId();
-        Collection<AccessGroup> accessGroups = currentEntityRepository.findAllByMenuIdInAndUserGroupId(menus.stream().map(Menu::getId).collect(Collectors.toCollection(ArrayList::new)), userGroupId);
+        Collection<Long> userGroupIds = SessionHelper.getUserGroupIds();
+        Collection<AccessGroup> accessGroups = currentEntityRepository.findAllByMenuIdInAndRoleIdIn(menus.stream().map(Menu::getId).collect(Collectors.toCollection(ArrayList::new)), userGroupIds);
         if (accessGroups.isEmpty()) {
             return "NOACCESS";
         }
-        if (!this.hasAccess(requestMethod, accessGroups, name, isCrud))
-            return "NOACCESS";
-        return ROLE_PREFIX + "_" + SessionHelper.getCurrentUser().getUserGroup().getName();
+        for (AccessGroup accessGroup : accessGroups) {
+            if (this.hasAccess(requestMethod, accessGroup, name, isCrud)) {
+                return ROLE_PREFIX + "_" + accessGroup.getRole().getName();
+            }
+        }
+        return "NOACCESS";
     }
 
-    private boolean hasAccess(RequestMethod requestMethod, Collection<AccessGroup> accessGroups, String moduleName, Boolean isCrud) {
+    private boolean hasAccess(RequestMethod requestMethod, AccessGroup accessGroup, String moduleName, Boolean isCrud) {
         boolean result = false;
-        for (AccessGroup accessGroup : accessGroups) {
-            if (isCrud) {
-                if (accessGroup.isViewable() && (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.OPTIONS))) {
-                    result |= true;
-                }
-                if (accessGroup.isAddable() && requestMethod.equals(RequestMethod.POST)) {
-                    result |= true;
-                }
-                if (accessGroup.isEditable() && requestMethod.equals(RequestMethod.PUT)) {
-                    result |= true;
-                }
-                if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
-                    result |= true;
-                }
-            } else if (accessGroup.isViewable() && accessGroup.getMenu().getModule().getRequestMethod().equals(requestMethod)) {
+        if (isCrud) {
+            if (accessGroup.isViewable() && (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.OPTIONS))) {
                 result |= true;
             }
-            Set<ModuleLink> moduleLinks = accessGroup.getMenu().getModule().getModuleLink();
-            for (ModuleLink moduleLink : moduleLinks) {
-                if (accessGroup.isViewable() && (moduleLink.getName().equals(moduleName) && moduleLink.getRequestMethod().equals(requestMethod))) {
-                    result |= true;
-                }
+            if (accessGroup.isAddable() && requestMethod.equals(RequestMethod.POST)) {
+                result |= true;
+            }
+            if (accessGroup.isEditable() && requestMethod.equals(RequestMethod.PUT)) {
+                result |= true;
+            }
+            if (accessGroup.isDeleteable() && requestMethod.equals(RequestMethod.DELETE)) {
+                result |= true;
+            }
+        } else if (accessGroup.isViewable() && accessGroup.getMenu().getModule().getRequestMethod().equals(requestMethod)) {
+            result |= true;
+        }
+        Set<ModuleLink> moduleLinks = accessGroup.getMenu().getModule().getModuleLink();
+        for (ModuleLink moduleLink : moduleLinks) {
+            if (accessGroup.isViewable() && (moduleLink.getName().equals(moduleName) && moduleLink.getRequestMethod().equals(requestMethod))) {
+                result |= true;
             }
         }
         return result;

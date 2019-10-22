@@ -3,11 +3,11 @@ package com.stn.ester.repositories.jpa;
 import com.stn.ester.repositories.jpa.base.BaseRepository;
 import com.stn.ester.repositories.jpa.base.traits.RepositoryListTrait;
 import com.stn.ester.repositories.jpa.projections.IdLabelOption;
-import com.stn.ester.entities.UserGroup;
+import com.stn.ester.entities.Role;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserGroupRepository extends BaseRepository<UserGroup>, RepositoryListTrait<IdLabelOption> {
+public interface RoleRepository extends BaseRepository<Role>, RepositoryListTrait<IdLabelOption> {
 
-    UserGroup findByName(String name);
+    Role findByName(String name);
 }

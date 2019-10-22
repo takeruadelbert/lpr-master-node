@@ -15,26 +15,26 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class AccessGroup extends BaseEntity {
 
-    private static final String COLUMN_USER_GROUP = "user_group_id";
+    private static final String COLUMN_USER_GROUP = "role_id";
     private static final String COLUMN_MENU = "menu_id";
-    private static final String JSON_PROPERTY_USER_GROUP = "userGroupId";
+    private static final String JSON_PROPERTY_USER_GROUP = "roleId";
     private static final String JSON_PROPERTY_MENU = "menuId";
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = COLUMN_USER_GROUP, insertable = false, updatable = false)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private UserGroup userGroup;
+    private Role role;
 
     @NotNull(message = EntityConstant.MESSAGE_NOT_BLANK)
     @JsonProperty(JSON_PROPERTY_USER_GROUP)
     @Column(name = COLUMN_USER_GROUP)
-    private long userGroupId;
+    private Long roleId;
 
     @JsonSetter(JSON_PROPERTY_USER_GROUP)
-    public void setUserGroupId(long userGroupId) {
-        if (userGroupId != 0)
-            this.userGroupId = userGroupId;
+    public void setRoleId(Long roleId) {
+        if (roleId != 0)
+            this.roleId = roleId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -61,8 +61,8 @@ public class AccessGroup extends BaseEntity {
 
     }
 
-    public AccessGroup(long userGroupId, long menuId, boolean viewable, boolean editable, boolean addable, boolean deleteable) {
-        this.userGroupId = userGroupId;
+    public AccessGroup(Long roleId, long menuId, boolean viewable, boolean editable, boolean addable, boolean deleteable) {
+        this.roleId = roleId;
         this.menuId = menuId;
         this.viewable = viewable;
         this.editable = editable;

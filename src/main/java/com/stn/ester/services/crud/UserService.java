@@ -1,20 +1,17 @@
 package com.stn.ester.services.crud;
 
-import com.stn.ester.core.events.RegistrationEvent;
 import com.stn.ester.constants.LogoResource;
+import com.stn.ester.core.events.RegistrationEvent;
 import com.stn.ester.core.exceptions.*;
-import com.stn.ester.core.search.AppSpecification;
-import com.stn.ester.core.search.util.SearchOperation;
-import com.stn.ester.core.search.util.SpecSearchCriteria;
 import com.stn.ester.core.security.SecurityConstants;
 import com.stn.ester.dto.UserDTO;
 import com.stn.ester.dto.UserSimpleDTO;
-import com.stn.ester.entities.AssetFile;
-import com.stn.ester.entities.PasswordReset;
-import com.stn.ester.entities.SystemProfile;
-import com.stn.ester.entities.User;
+import com.stn.ester.entities.*;
 import com.stn.ester.entities.enumerate.UserStatus;
-import com.stn.ester.helpers.*;
+import com.stn.ester.helpers.DateTimeHelper;
+import com.stn.ester.helpers.EmailHelper;
+import com.stn.ester.helpers.GlobalFunctionHelper;
+import com.stn.ester.helpers.SessionHelper;
 import com.stn.ester.repositories.jpa.*;
 import com.stn.ester.services.base.CrudService;
 import com.stn.ester.services.base.traits.AdvanceSearchTrait;
@@ -23,6 +20,7 @@ import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -36,21 +34,25 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.internet.MimeMessage;
+import javax.persistence.criteria.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService, SimpleSearchTrait<User, UserSimpleDTO, UserRepository>, AdvanceSearchTrait<User, UserRepository> {
 
     private UserRepository userRepository;
     private LoginSessionRepository loginSessionRepository;
-    private UserGroupRepository userGroupRepository;
+    private RoleRepository roleRepository;
     private AssetFileService assetFileService;
     private PasswordResetRepository passwordResetRepository;
     private PasswordResetService passwordResetService;
     private SystemProfileRepository systemProfileRepository;
     private ApplicationEventPublisher eventPublisher;
+    private RoleService roleService;
+    private RoleGroupRepository roleGroupRepository;
     private String asset_path = "profile_picture";
 
     @Value("${ester.session.login.timeout}")
@@ -70,22 +72,26 @@ public class UserService extends CrudService<User, UserRepository> implements As
             UserRepository userRepository,
             BiodataRepository biodataRepository,
             LoginSessionRepository loginSessionRepository,
-            UserGroupRepository userGroupRepository,
+            RoleRepository roleRepository,
             AssetFileService assetFileService,
             PasswordResetRepository passwordResetRepository,
             PasswordResetService passwordResetService,
             SystemProfileRepository systemProfileRepository,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            RoleService roleService,
+            RoleGroupRepository roleGroupRepository
     ) {
         super(userRepository);
         this.userRepository = userRepository;
         this.loginSessionRepository = loginSessionRepository;
-        this.userGroupRepository = userGroupRepository;
+        this.roleRepository = roleRepository;
         this.passwordResetRepository = passwordResetRepository;
         this.assetFileService = assetFileService;
         this.passwordResetService = passwordResetService;
+        this.roleService = roleService;
         this.systemProfileRepository = systemProfileRepository;
         this.eventPublisher = eventPublisher;
+        this.roleGroupRepository = roleGroupRepository;
     }
 
     @Override
@@ -96,6 +102,12 @@ public class UserService extends CrudService<User, UserRepository> implements As
             user.setProfilePictureId(AssetFileService.defaultProfilePictureID);
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRoleIds() != null) {
+            for (Long roleId : user.getRoleIds()) {
+                Optional<Role> role = roleRepository.findById(roleId);
+                user.addRole(role.orElseThrow(() -> new BadRequestException(String.format("Role with id %d not found", roleId))));
+            }
+        }
         User registeredUser = super.create(user);
         eventPublisher.publishEvent(new RegistrationEvent(this, user));
         return registeredUser;
@@ -324,9 +336,14 @@ public class UserService extends CrudService<User, UserRepository> implements As
     }
 
     public Collection<UserDTO> searchSuperAdmin(String keyword) {
-        Collection<AppSpecification> appSpecifications = new ArrayList();
-        appSpecifications.add(new AppSpecification(new SpecSearchCriteria(null, "name", SearchOperation.EQUALITY, SecurityConstants.ROLE_SUPERADMIN, "userGroup")));
-        return advanceSearch(keyword, getSimpleSearchKeys(), appSpecifications, UserDTO.class);
+        Long superAdminId = this.roleService.getIdByName(SecurityConstants.ROLE_SUPERADMIN);
+        Collection<RoleGroup> roleGroups = roleGroupRepository.findAllByRoleId(superAdminId);
+        Collection<Long> roleGroupIds = roleGroups.stream().map(v -> v.getId()).collect(Collectors.toList());
+        Specification<User> specification = (Specification) (root, criteriaQuery, criteriaBuilder) -> {
+            final Path path = root.get("roleGroups");
+            return path.in(roleGroups);
+        };
+        return advanceSearch(keyword, getSimpleSearchKeys(), specification, UserDTO.class);
     }
 
     @Override

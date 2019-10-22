@@ -3,7 +3,7 @@ package com.stn;
 import com.stn.ester.core.configurations.DatabaseConfig;
 import com.stn.ester.entities.Biodata;
 import com.stn.ester.entities.User;
-import com.stn.ester.entities.UserGroup;
+import com.stn.ester.entities.Role;
 import com.stn.ester.services.crud.*;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -41,7 +41,7 @@ public class RestApplication extends SpringBootServletInitializer {
     private AssetFileService assetFileService;
 
     @Autowired
-    private UserGroupService userGroupService;
+    private RoleService roleService;
 
     @Autowired
     private UserService userService;
@@ -84,16 +84,16 @@ public class RestApplication extends SpringBootServletInitializer {
     }
 
     public void addSuperAdmin() {
-        UserGroup userGroup = new UserGroup();
-        userGroup.setName(ROLE_SUPERADMIN);
-        userGroup.setLabel("Super Admin");
-        userGroup = (UserGroup) userGroupService.createIfNameNotExist(userGroup, ROLE_SUPERADMIN);
+        Role role = new Role();
+        role.setName(ROLE_SUPERADMIN);
+        role.setLabel("Super Admin");
+        role = (Role) roleService.createIfNameNotExist(role, ROLE_SUPERADMIN);
         User user = new User();
         String username = "admin";
         user.setUsername(username);
         user.setPassword("adminstn");
         user.setEmail("info@suryateknologi.co.id");
-        user.setUserGroupId(userGroup.getId());
+        user.addRole(role);
         Biodata biodata = new Biodata();
         biodata.setFirstName("STN");
         biodata.setLastName("Ester");
