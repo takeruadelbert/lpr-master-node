@@ -35,7 +35,7 @@ public abstract class CrudController<T extends CrudService, U extends BaseEntity
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Page<Object> index(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUM) Integer page, @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) Integer size, @RequestParam(value = "search", required = false) String search) throws UnsupportedEncodingException {
+    public Page<? extends Object> index(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUM) Integer page, @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) Integer size, @RequestParam(value = "search", required = false) String search) throws UnsupportedEncodingException {
         if (search != null) {
             search = URLDecoder.decode(search, StandardCharsets.UTF_8.toString());
         }
