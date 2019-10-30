@@ -45,11 +45,11 @@ public class News extends BaseEntity {
             this.authorId = authorId;
     }
 
-    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_DATETIME)
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_DATE)
     @DateTimeFormat(pattern = EntityConstant.FORMAT_DEFAULT_DATE)
     private LocalDate startDate;
 
-    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_DATETIME)
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_DATE)
     @DateTimeFormat(pattern = EntityConstant.FORMAT_DEFAULT_DATE)
     private LocalDate expiredDate;
 
