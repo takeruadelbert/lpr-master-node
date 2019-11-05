@@ -8,10 +8,10 @@
         <version>2.1.3.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.stn.ester</groupId>
-    <artifactId>estercore</artifactId>
+    <groupId>com.stn</groupId>
+    <artifactId>ester</artifactId>
     <version>0.0.03</version>
-    <name>esterbackpack</name>
+    <name>ester</name>
     <description>STN</description>
     <packaging>war</packaging>
 
