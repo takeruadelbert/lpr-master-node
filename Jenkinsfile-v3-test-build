@@ -85,6 +85,6 @@ pipeline{
 	    DB_NAME='ester-staging-test2'
 	    DB_USERNAME='developer'
 	    DB_PASSWORD='stndeveloper'
-	    ESTER_PORT='4003'
+	    ESTER_PORT='4013'
 	}
 }
