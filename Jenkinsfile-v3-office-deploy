@@ -8,7 +8,7 @@ def SLACK_MSG_FAIL='FAIL'
 def SLACK_MSG_SUCCESS='SUCCEED'
 def SLACK_MSG_ABORT='ABORTED'
 
-def BUILD_JOB_NAME='ester-v3-test-build'
+def BUILD_JOB_NAME='ester3-test-build'
 
 pipeline{
     agent any
