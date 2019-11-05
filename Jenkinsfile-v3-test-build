@@ -17,7 +17,7 @@ pipeline{
 		stage('Preparation'){
 			steps{
                 slackSend (color: "#0f91f5",message: "[${SLACK_STEP_BUILD}] Started - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
-				git branch:'development',
+				git branch:'v3',
 					credentialsId: 'bitbucket-suryawono',
 					url: 'https://suryawono@bitbucket.org/suryateknologi/ester.git'
 			}
