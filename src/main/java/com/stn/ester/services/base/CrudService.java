@@ -153,7 +153,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
     private void autoRemoveChild(Long parentId, T oldObject, T newObject, Map<String, Object> comparator) {
         Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
         Annotation autoRemoveChild = clazz.getDeclaredAnnotation(AutoRemoveChild.class);
-        if (autoRemoveChild != null) {
+        if (autoRemoveChild != null && comparator != null) {
             TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(AutoRemoveChild.class).value();
             for (TableFieldPair tableFieldPair : tableFieldPairs) {
                 if (CrudService.class.isAssignableFrom(tableFieldPair.service())) {
