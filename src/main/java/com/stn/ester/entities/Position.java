@@ -3,8 +3,11 @@ package com.stn.ester.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.core.base.OnDeleteSetParentNull;
+import com.stn.ester.core.base.TableFieldPair;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
+import com.stn.ester.services.crud.PositionService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,6 +20,9 @@ import java.util.Set;
 
 @Data
 @Entity
+@OnDeleteSetParentNull({
+        @TableFieldPair(service = PositionService.class, fieldName = "parent_position_id")
+})
 public class Position extends BaseEntity {
     private static final String COLUMN_PARENT_POSITION = "parent_position_id";
     private static final String COLUMN_USER_GROUP = "user_group_id";
