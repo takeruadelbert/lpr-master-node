@@ -69,11 +69,6 @@ public class User extends BaseEntity implements UserDetails {
             this.profilePictureId = profilePictureId;
     }
 
-    @OneToOne
-    @JoinColumn(name = COLUMN_EMPLOYEE_ID)
-    @JsonBackReference
-    private Employee employee;
-
     @OneToOne(fetch = FetchType.LAZY, mappedBy = COLUMN_MAPPED_USER, cascade = CascadeType.ALL)
     @JsonManagedReference
     private PasswordReset passwordReset;
