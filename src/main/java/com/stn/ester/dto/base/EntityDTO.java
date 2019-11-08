@@ -1,4 +1,4 @@
-package com.stn.ester.dto;
+package com.stn.ester.dto.base;
 
 import com.stn.ester.entities.base.BaseEntity;
 

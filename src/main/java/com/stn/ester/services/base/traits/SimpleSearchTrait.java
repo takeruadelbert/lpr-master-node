@@ -1,7 +1,7 @@
 package com.stn.ester.services.base.traits;
 
 import com.stn.ester.core.exceptions.SimpleSearchException;
-import com.stn.ester.dto.EntityDTO;
+import com.stn.ester.dto.base.EntityDTO;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.helpers.ReflectionHelper;
 import com.stn.ester.helpers.SearchAndFilterHelper;

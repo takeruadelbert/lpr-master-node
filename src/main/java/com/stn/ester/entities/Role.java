@@ -13,7 +13,7 @@ import java.util.HashSet;
 
 @Data
 @Entity
-public class UserGroup extends BaseEntity {
+public class Role extends BaseEntity {
 
     @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     private String label;

@@ -2,13 +2,14 @@ package com.stn.ester.services.crud;
 
 import com.stn.ester.core.exceptions.NotFoundException;
 import com.stn.ester.core.security.SecurityConstants;
-import com.stn.ester.dto.MenuSimpleDTO;
+import com.stn.ester.dto.entity.MenuSimpleDTO;
+import com.stn.ester.dto.PrivilegeDTO;
 import com.stn.ester.entities.AccessGroup;
 import com.stn.ester.entities.Menu;
-import com.stn.ester.entities.UserGroup;
+import com.stn.ester.entities.Role;
 import com.stn.ester.repositories.jpa.AccessGroupRepository;
 import com.stn.ester.repositories.jpa.MenuRepository;
-import com.stn.ester.repositories.jpa.UserGroupRepository;
+import com.stn.ester.repositories.jpa.RoleRepository;
 import com.stn.ester.services.base.CrudService;
 import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +23,17 @@ import java.util.*;
 public class MenuService extends CrudService<Menu, MenuRepository> implements SimpleSearchTrait<Menu, MenuSimpleDTO, MenuRepository> {
 
     private MenuRepository menuRepository;
-    private UserGroupService userGroupService;
+    private RoleService roleService;
     private AccessGroupRepository accessGroupRepository;
-    private UserGroupRepository userGroupRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
-    public MenuService(MenuRepository menuRepository, UserGroupService userGroupService, AccessGroupRepository accessGroupRepository, UserGroupRepository userGroupRepository) {
+    public MenuService(MenuRepository menuRepository, RoleService roleService, AccessGroupRepository accessGroupRepository, RoleRepository roleRepository) {
         super(menuRepository);
         this.menuRepository = menuRepository;
-        this.userGroupService = userGroupService;
+        this.roleService = roleService;
         this.accessGroupRepository = accessGroupRepository;
-        this.userGroupRepository = userGroupRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -47,8 +48,8 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
         }
     }
 
-    public Object getByUserGroupId(Long userGroupId) {
-        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByUserGroupIdAndViewable(userGroupId, true);
+    public Collection<Menu> getByUserGroupId(Collection<Long> userGroupIds) {
+        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByRoleIdInAndViewable(userGroupIds, true);
         Set<Long> menuIds = new LinkedHashSet<>();
         for (AccessGroup accessGroup : accessGroups) {
             menuIds.add(accessGroup.getMenuId());
@@ -63,10 +64,6 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
             ((Menu) menu).mergeSubMenu(subMenus);
         }
         return menus;
-    }
-
-    public Object getByUserGroupName(String userGroupName) {
-        return this.getByUserGroupId(this.userGroupService.getIdByName(userGroupName));
     }
 
     private List<Menu> findSubMenu(Long parentId) {
@@ -111,14 +108,14 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
         Long lastInsertID = menu.getId();
 
         // automatically add access group once either menu or submenu has been added
-        Iterable<UserGroup> userGroups = this.userGroupRepository.findAll();
+        Iterable<Role> userGroups = this.roleRepository.findAll();
         List<AccessGroup> accessGroups = new ArrayList<>();
-        for (UserGroup userGroup : userGroups) {
+        for (Role role : userGroups) {
             AccessGroup accessGroup;
-            if (userGroup.getName().equals(SecurityConstants.ROLE_SUPERADMIN)) {
-                accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, true, true, true, true);
+            if (role.getName().equals(SecurityConstants.ROLE_SUPERADMIN)) {
+                accessGroup = new AccessGroup(role.getId(), lastInsertID, true, true, true, true);
             } else {
-                accessGroup = new AccessGroup(userGroup.getId(), lastInsertID, false, false, false, false);
+                accessGroup = new AccessGroup(role.getId(), lastInsertID, false, false, false, false);
             }
             accessGroups.add(accessGroup);
         }
@@ -135,8 +132,12 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
         super.delete(id);
     }
 
-    public Object checkPrivilege(Long userGroupId, Long menuId) {
-        return this.accessGroupRepository.findByMenuIdAndUserGroupId(menuId, userGroupId).orElseThrow(() -> new NotFoundException());
+    public PrivilegeDTO checkPrivilege(Collection<Long> userGroupIds, Long menuId) {
+        Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByMenuIdAndRoleIdIn(menuId, userGroupIds);
+        if (accessGroups.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return new PrivilegeDTO(accessGroups);
     }
 
     @Override

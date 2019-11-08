@@ -1,0 +1,90 @@
+def SLACK_FLOWSTAGE_STAGING='STAGING'
+def SLACK_STEP_BUILD='BUILD'
+def SLACK_STEP_DEPLOY='DEPLOY'
+def SLACK_ICON_FAIL=':x:'
+def SLACK_ICON_SUCCESS=':heavy_check_mark:'
+def SLACK_ICON_ABORT=':black_circle:'
+def SLACK_MSG_FAIL='FAIL'
+def SLACK_MSG_SUCCESS='SUCCEED'
+def SLACK_MSG_ABORT='ABORTED'
+
+pipeline{
+    agent any
+    triggers {
+            bitbucketPush()
+        }
+	stages{
+		stage('Preparation'){
+			steps{
+                slackSend (color: "#0f91f5",message: "[${SLACK_STEP_BUILD}] Started - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+				git branch:'v3',
+					credentialsId: 'bitbucket-suryawono',
+					url: 'https://suryawono@bitbucket.org/suryateknologi/ester.git'
+			}
+		}
+		stage('Build') {
+			steps{
+				sh 'mvn -Dmaven.test.skip=true clean package'
+			}
+		}
+		stage('Starting Server'){
+		    steps{
+		        sh 'JENKINS_NODE_COOKIE=dontKillMe'
+				sh 'nohup java -jar target/*.war > log.out &'
+		    }
+		}
+		stage('Waiting...'){
+		    steps{
+		        timeout(1){
+		            waitUntil{
+		                script{
+		                    def r = sh script: 'wget -q localhost:${ESTER_PORT}/status -O -| grep server', returnStatus:true
+		                    return (r==0)
+		                 }
+		            }
+		        }
+		    }
+		}
+		stage('Test-defaultdata'){
+			steps{
+				sh 'newman run https://www.getpostman.com/collections/82b1a91062809aee4ea0 --env-var "host=localhost:${ESTER_PORT}" --export-environment ester-env-newman.json'
+			}
+		}
+		stage('Test-general'){
+			steps{
+				sh 'newman run https://www.getpostman.com/collections/59681179ef4d53f1cb43 -e ester-env-newman.json --export-environment ester-env-newman.json'
+			}
+		}
+		stage('Test-security'){
+			steps{
+				sh 'newman run https://www.getpostman.com/collections/c3d11423f83c0fc8100f -e ester-env-newman.json --export-environment ester-env-newman.json'
+			}
+		}
+		stage('Results') {
+			steps{
+				archiveArtifacts 'target/*.war'
+			}
+		}
+	}
+	post{
+	    failure{
+	        slackSend (color: "#FF0000",message: "[${SLACK_STEP_BUILD}][${SLACK_MSG_FAIL}]${SLACK_ICON_FAIL} Failed - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+	    }
+	    success{
+	        slackSend (color: "#00FF00",message: "[${SLACK_STEP_BUILD}][${SLACK_MSG_SUCCESS}]${SLACK_ICON_SUCCESS} Succeed - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+	    }
+        aborted{
+            slackSend (color: "#bdc3c7",message: "[${SLACK_STEP_BUILD}][${SLACK_MSG_ABORT}]${SLACK_ICON_ABORT} Aborted - ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+        }
+	}
+	environment{
+	    ENVIRONMENT='development'
+	    DB_MS='mysql'
+	    DB_HOST='127.0.0.1'
+	    DB_PORT='3306'
+	    DB_NAME='ester-staging-test2'
+	    DB_USERNAME='developer'
+	    DB_PASSWORD='stndeveloper'
+	    ESTER_PORT='4013'
+	}
+}

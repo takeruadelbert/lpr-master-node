@@ -3,7 +3,6 @@ package com.stn.ester.services.crud;
 import com.stn.ester.core.events.RegistrationEvent;
 import com.stn.ester.entities.Employee;
 import com.stn.ester.entities.Position;
-import com.stn.ester.entities.User;
 import com.stn.ester.entities.enumerate.EmployeeWorkStatus;
 import com.stn.ester.repositories.jpa.EmployeeRepository;
 import com.stn.ester.repositories.jpa.PositionRepository;
@@ -45,10 +44,9 @@ public class EmployeeService extends CrudService<Employee, EmployeeRepository> {
     public Employee create(Employee employee) {
 
         // fetch data user group by selected position and then append it into User object.
-        long position_id = employee.getPositionId();
+        Long position_id = employee.getPositionId();
         Position position = this.positionRepository.findById(position_id).get();
-        long user_group_id = position.getUserGroupId();
-        employee.getUser().setUserGroupId(user_group_id);
+        employee.getUser().addRole(position.getRole());
 
         if (employee.getUser().getToken() == null) {
             employee.getUser().setProfilePictureId(AssetFileService.defaultProfilePictureID); // set default profile picture
