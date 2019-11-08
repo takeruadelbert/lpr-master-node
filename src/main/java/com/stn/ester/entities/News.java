@@ -56,10 +56,6 @@ public class News extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private NewsStatus newsStatus;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = COLUMN_DEPARTMENT, insertable = false, updatable = false)
-    private Department department;
-
     @Column(name = COLUMN_DEPARTMENT)
     @JsonProperty(JSON_PROPERTY_DEPARTMENT)
     private Long departmentId;
