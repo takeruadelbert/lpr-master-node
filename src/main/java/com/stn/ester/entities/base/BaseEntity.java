@@ -73,6 +73,16 @@ public abstract class BaseEntity {
         }
     }
 
+    public Object getAttribute(String attributeName, Object value) {
+        try {
+            Field attribute = getClass().getDeclaredField(attributeName);
+            attribute.setAccessible(true);
+            return attribute.get(value);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
     // for validation grouping purpose
     public interface Existing {
 

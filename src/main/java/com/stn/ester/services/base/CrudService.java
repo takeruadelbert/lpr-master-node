@@ -2,14 +2,16 @@ package com.stn.ester.services.base;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
+import com.google.common.collect.Sets;
+import com.stn.ester.core.base.AutoRemoveChild;
 import com.stn.ester.core.base.OnDeleteRemoveChild;
-import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.core.base.OnDeleteSetParentNull;
 import com.stn.ester.core.base.TableFieldPair;
 import com.stn.ester.core.exceptions.ListNotFoundException;
 import com.stn.ester.core.search.AppSpecification;
 import com.stn.ester.core.search.util.SearchOperation;
 import com.stn.ester.core.search.util.SpecSearchCriteria;
+import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.helpers.ReflectionHelper;
 import com.stn.ester.helpers.UpdaterHelper;
 import com.stn.ester.repositories.jpa.base.BaseRepository;
@@ -31,9 +33,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class CrudService<T extends BaseEntity, U extends BaseRepository<T>> extends BaseService<T> {
 
@@ -92,6 +93,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         if (old == null) {
             throw new ResourceNotFoundException();
         }
+        autoRemoveChild(id, old, object, comparator);
         preUpdate(object, old, comparator);
         T saved = currentEntityRepository.save(old);
         entityManager.flush();
@@ -145,6 +147,43 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
                 preUpdate(toCompare, toSave, childComparator);
                 bw.setPropertyValue(pd.getName(), toSave);
             }
+        }
+    }
+
+    private void autoRemoveChild(Long parentId, T oldObject, T newObject, Map<String, Object> comparator) {
+        Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
+        Annotation autoRemoveChild = clazz.getDeclaredAnnotation(AutoRemoveChild.class);
+        if (autoRemoveChild != null) {
+            TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(AutoRemoveChild.class).value();
+            for (TableFieldPair tableFieldPair : tableFieldPairs) {
+                if (CrudService.class.isAssignableFrom(tableFieldPair.service())) {
+                    String serviceName = tableFieldPair.service().getSimpleName();
+                    String attributeName = tableFieldPair.attributeName();
+                    serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
+                    Object attributeOfNewObject = newObject.getAttribute(attributeName, newObject);
+                    Object attributeOfOldObject = newObject.getAttribute(attributeName, oldObject);
+                    Set<Long> newIds;
+                    Set<Long> oldIds;
+                    if (attributeOfNewObject != null
+                            && Collection.class.isAssignableFrom(attributeOfNewObject.getClass())
+                            && attributeOfOldObject != null
+                            && Collection.class.isAssignableFrom(attributeOfOldObject.getClass())
+                            && comparator.containsKey(attributeName)) {
+                        Set<BaseEntity> newEntities = (Set) attributeOfNewObject;
+                        Set<BaseEntity> oldEntities = (Set) attributeOfOldObject;
+                        newIds = newEntities.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+                        oldIds = oldEntities.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+                        applicationContext.getBean(serviceName, tableFieldPair.service()).deleteIfIdsNotFound(oldIds, newIds);
+                    }
+                }
+            }
+        }
+    }
+
+    protected void deleteIfIdsNotFound(Set<Long> oldIds, Set<Long> newIds) {
+        Sets.SetView<Long> differentIds = Sets.difference(oldIds, newIds);
+        for (Long toRemove : differentIds) {
+            delete(toRemove);
         }
     }
 
