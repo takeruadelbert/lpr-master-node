@@ -1,5 +1,6 @@
 package com.stn.ester.services.crud;
 
+import com.google.common.collect.Sets;
 import com.stn.ester.constants.LogoResource;
 import com.stn.ester.core.events.RegistrationEvent;
 import com.stn.ester.core.exceptions.*;
@@ -38,6 +39,7 @@ import javax.persistence.criteria.Subquery;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService, SimpleSearchTrait<User, UserSimpleDTO, UserRepository>, AdvanceSearchTrait<User, UserRepository> {
@@ -52,6 +54,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
     private ApplicationEventPublisher eventPublisher;
     private RoleService roleService;
     private RoleGroupRepository roleGroupRepository;
+    private RoleGroupService roleGroupService;
     private String asset_path = "profile_picture";
 
     @Value("${ester.session.login.timeout}")
@@ -78,7 +81,8 @@ public class UserService extends CrudService<User, UserRepository> implements As
             SystemProfileRepository systemProfileRepository,
             ApplicationEventPublisher eventPublisher,
             RoleService roleService,
-            RoleGroupRepository roleGroupRepository
+            RoleGroupRepository roleGroupRepository,
+            RoleGroupService roleGroupService
     ) {
         super(userRepository);
         this.userRepository = userRepository;
@@ -91,6 +95,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
         this.systemProfileRepository = systemProfileRepository;
         this.eventPublisher = eventPublisher;
         this.roleGroupRepository = roleGroupRepository;
+        this.roleGroupService = roleGroupService;
     }
 
     @Override
@@ -115,7 +120,30 @@ public class UserService extends CrudService<User, UserRepository> implements As
     @Override
     @Transactional
     public User update(Long id, User user) {
-        return super.update(id, user);
+        Set<Long> removedRoleIds = null;
+        if (user.getRoleIds() != null) {
+            Collection<RoleGroup> roleGroup = roleGroupRepository.findAllByUserId(id);
+            Set<Long> currentRoleIds = roleGroup.stream().map(role -> role.getRole().getId()).collect(Collectors.toSet());
+            removedRoleIds = Sets.difference(currentRoleIds, new HashSet<>(user.getRoleIds()));
+            Set<Long> newRoleIds = Sets.difference(new HashSet<>(user.getRoleIds()), currentRoleIds);
+
+            for (Long roleId : newRoleIds) {
+                Optional<Role> role = roleRepository.findById(roleId);
+                user.addRole(role.orElseThrow(() -> new BadRequestException(String.format("Role with id %d not found", roleId))));
+            }
+        }
+        super.update(id, user);
+        for (Long roleId : removedRoleIds) {
+            Optional<RoleGroup> toDeleteRoleGroup = roleGroupRepository.findByRoleIdAndUserId(roleId, id);
+            if (toDeleteRoleGroup.isPresent()) {
+                toDeleteRoleGroup.get().getUser().getRoleGroups().clear();
+                roleGroupService.delete(toDeleteRoleGroup.get().getId());
+            }
+        }
+        User saved = get(id);
+        entityManager.flush();
+        entityManager.refresh(saved);
+        return saved;
     }
 
     @Transactional
