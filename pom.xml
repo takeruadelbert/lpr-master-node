@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.stn</groupId>
     <artifactId>ester</artifactId>
-    <version>0.3.00</version>
+    <version>0.3.01</version>
     <name>ester</name>
     <description>STN</description>
     <packaging>war</packaging>
