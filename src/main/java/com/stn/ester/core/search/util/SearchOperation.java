@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum SearchOperation {
-    EQUALITY, NEGATION, GREATER_THAN, LESS_THAN, CONTAINS, GREATER_THAN_OR_EQUAL, LESS_THAN_OR_EQUAL, LIKE, STARTS_WITH, ENDS_WITH, EQUAL_DATE_WITH_DATETIME;
+    EQUALITY, NEGATION, GREATER_THAN, LESS_THAN, CONTAINS, GREATER_THAN_OR_EQUAL, LESS_THAN_OR_EQUAL, LIKE, STARTS_WITH, ENDS_WITH, EQUAL_DATE_WITH_DATETIME,IN;
 
     public static final Map<SearchOperation, String> OPERATION_SYMBOL_MAP;
 
@@ -19,6 +19,7 @@ public enum SearchOperation {
         operationMap.put(GREATER_THAN_OR_EQUAL, ">:");
         operationMap.put(LESS_THAN_OR_EQUAL, "<:");
         operationMap.put(EQUAL_DATE_WITH_DATETIME, "d:");
+        operationMap.put(IN,"i:");
         OPERATION_SYMBOL_MAP = Collections.unmodifiableMap(operationMap);
     }
 

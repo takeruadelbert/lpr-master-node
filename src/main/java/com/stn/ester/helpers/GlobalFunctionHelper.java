@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,16 @@ public class GlobalFunctionHelper {
         return jsonMap;
     }
 
-    public static String replacePathVariableTo(String target,String replaceWith){
+    public static ArrayList stringCommaToList(String s) {
+        ArrayList result = new ArrayList();
+        Object[] values = s.split(",", -1);
+        for (Object value : values) {
+            result.add(value);
+        }
+        return result;
+    }
+
+    public static String replacePathVariableTo(String target, String replaceWith) {
         return target.replaceAll("\\{.*?}", replaceWith);
     }
 }
