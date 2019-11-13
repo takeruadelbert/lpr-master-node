@@ -5,6 +5,7 @@ import com.stn.ester.core.exceptions.FilterException;
 import com.stn.ester.core.search.util.SpecSearchCriteria;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.helpers.DateTimeHelper;
+import com.stn.ester.helpers.GlobalFunctionHelper;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
@@ -12,8 +13,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 import static com.stn.ester.core.search.util.SearchOperation.EQUAL_DATE_WITH_DATETIME;
+import static com.stn.ester.core.search.util.SearchOperation.IN;
 
 public class AppSpecification<T extends BaseEntity> implements Specification<T> {
 
@@ -64,6 +67,8 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
             }
         } else if (Enum.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
             return new ValueWrap(Enum.valueOf(path.getModel().getBindableJavaType(), criteria.getValue().toString()));
+        } else if (criteria.getOperation() == IN) {
+            return new ValueWrap(GlobalFunctionHelper.stringCommaToList(criteria.getValue().toString()));
         } else {
             return new ValueWrap(criteria.getValue().toString());
         }
@@ -112,6 +117,8 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
                 return builder.like(path, "%" + valueWrap.getValue());
             case CONTAINS:
                 return builder.like(path, "%" + valueWrap.getValue() + "%");
+            case IN:
+                return path.in(valueWrap.getValues());
             default:
                 return null;
         }
@@ -120,6 +127,7 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
     class ValueWrap {
         Comparable value;
         Boolean isDateCompareToDatetime;
+        ArrayList values;
 
         ValueWrap(Comparable value) {
             this(value, false);
@@ -128,6 +136,14 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
         ValueWrap(Comparable value, Boolean isDateCompareToDatetime) {
             this.value = value;
             this.isDateCompareToDatetime = isDateCompareToDatetime;
+        }
+
+        ValueWrap(ArrayList values) {
+            this.values = values;
+        }
+
+        public ArrayList getValues() {
+            return this.values;
         }
 
         public Comparable getValue() {

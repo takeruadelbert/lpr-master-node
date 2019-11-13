@@ -7,10 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -29,9 +26,15 @@ public class RoleGroup extends BaseEntity {
     @JsonIgnore
     private User user;
 
+    @Column(name = COLUMN_USER_ID, insertable = false, updatable = false)
+    private Long userId;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = COLUMN_ROLE_ID)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Role role;
+
+    @Column(name = COLUMN_ROLE_ID, insertable = false, updatable = false)
+    private Long roleId;
 }
