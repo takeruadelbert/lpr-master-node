@@ -1,9 +1,12 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.core.security.SecurityConstants;
+import com.stn.ester.dto.MenuAndAccess.AccessGroupDTO;
+import com.stn.ester.dto.MenuAndAccess.MenuDTO;
+import com.stn.ester.dto.MenuAndAccess.RoleDTO;
 import com.stn.ester.entities.AccessGroup;
 import com.stn.ester.entities.Menu;
 import com.stn.ester.entities.Role;
-import com.stn.ester.core.security.SecurityConstants;
 import com.stn.ester.repositories.jpa.AccessGroupRepository;
 import com.stn.ester.repositories.jpa.MenuRepository;
 import com.stn.ester.repositories.jpa.RoleRepository;
@@ -13,10 +16,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class RoleService extends CrudService<Role, RoleRepository> {
@@ -47,6 +47,33 @@ public class RoleService extends CrudService<Role, RoleRepository> {
         Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByRoleId(id);
         role.mergeAccessGroup(accessGroups);
         return role;
+    }
+
+    public RoleDTO getRoleAccessGroup(Long roleId) {
+        if (!this.roleRepository.existsById(roleId))
+            throw new ResourceNotFoundException();
+        Role role = this.roleRepository.findById(roleId).get();
+        RoleDTO roleDTO = new RoleDTO(role);
+        List<Menu> topMenus = this.menuRepository.findAllByParentMenuIdIsNull();
+        for (Menu topMenu : topMenus) {
+            Optional<AccessGroup> accessGroup = this.accessGroupRepository.findByMenuIdAndRoleId(topMenu.getId(), roleId);
+            MenuDTO topMenuDTO = new MenuDTO(topMenu);
+            topMenuDTO.setAccessGroup(new AccessGroupDTO(accessGroup.get()));
+            traceSubmenu(topMenu.getId(), topMenuDTO, roleId);
+            roleDTO.getMenus().add(topMenuDTO);
+        }
+        return roleDTO;
+    }
+
+    private void traceSubmenu(Long parentId, MenuDTO parentMenu, Long roleId) {
+        List<Menu> subMenus = this.menuRepository.findAllByParentMenuId(parentId);
+        for (Menu subMenu : subMenus) {
+            Optional<AccessGroup> accessGroup = this.accessGroupRepository.findByMenuIdAndRoleId(subMenu.getId(), roleId);
+            MenuDTO subMenuDTO = new MenuDTO(subMenu);
+            subMenuDTO.setAccessGroup(new AccessGroupDTO(accessGroup.get()));
+            traceSubmenu(subMenu.getId(), subMenuDTO, roleId);
+            parentMenu.getSubMenus().add(subMenuDTO);
+        }
     }
 
     @Override

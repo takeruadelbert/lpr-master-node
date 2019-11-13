@@ -31,6 +31,12 @@ public class RoleController extends CrudController<RoleService, Role> {
         return service.getAccessGroup(id);
     }
 
+    @PreAuthorize("hasRole(#this.this.readCurrentUserRole('viewAccessGroup'))")
+    @RequestMapping(value = "/{id}/access_groups/v2", method = RequestMethod.GET)
+    public Object getAccessGroupV2(@PathVariable long id) {
+        return service.getRoleAccessGroup(id);
+    }
+
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole('editAccessGroup'))")
     @RequestMapping(value = "/{id}/access_groups", method = RequestMethod.PUT)
     public Object editAccessGroup(@PathVariable long id, @RequestBody HashMap<String, Object> o) {
