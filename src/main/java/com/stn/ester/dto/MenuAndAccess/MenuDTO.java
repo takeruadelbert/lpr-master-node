@@ -13,11 +13,11 @@ public class MenuDTO {
     private String label;
     private int orderingNumber;
     private AccessGroupDTO accessGroup;
-    private SortedSet<MenuDTO> subMenus = new TreeSet<>(Comparator.comparing(MenuDTO::getOrderingNumber));
+    private SortedSet<MenuDTO> subMenus = new TreeSet<>(Comparator.comparing(MenuDTO::getOrderingNumber).thenComparing(MenuDTO::getLabel));
 
-    public MenuDTO(Menu menu){
-        this.id=menu.getId();
-        this.label=menu.getLabel();
-        this.orderingNumber=menu.getOrderingNumber();
+    public MenuDTO(Menu menu) {
+        this.id = menu.getId();
+        this.label = menu.getLabel();
+        this.orderingNumber = menu.getOrderingNumber();
     }
 }
