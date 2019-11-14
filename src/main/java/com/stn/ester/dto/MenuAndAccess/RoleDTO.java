@@ -13,7 +13,7 @@ public class RoleDTO {
     private Long id;
     private String label;
     private String name;
-    private SortedSet<MenuDTO> menus = new TreeSet<>(Comparator.comparing(MenuDTO::getOrderingNumber));
+    private SortedSet<MenuDTO> menus = new TreeSet<>(Comparator.comparing(MenuDTO::getOrderingNumber).thenComparing(MenuDTO::getLabel));
 
     public RoleDTO(Role role) {
         this.id = role.getId();
