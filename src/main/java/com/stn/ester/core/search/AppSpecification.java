@@ -39,6 +39,7 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
         try {
             Path path = getPathOrJoinedPath(root);
             ValueWrap valueWrap = parseValue(path);
+            query.distinct(true);
             return createPredicate(builder, path, valueWrap);
         } catch (IllegalArgumentException illegal) {
             throw new FilterException(criteria.getKey());
