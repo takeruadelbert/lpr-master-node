@@ -124,6 +124,7 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         // delete access group as well
         Collection<AccessGroup> accessGroups = this.accessGroupRepository.findAllByMenuId(id);
