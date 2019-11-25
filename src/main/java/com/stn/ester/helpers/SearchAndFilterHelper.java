@@ -54,7 +54,11 @@ public class SearchAndFilterHelper {
     private static void loopSpecToSpecBuilder(SpecificationsBuilder specificationsBuilder, Map<String, Object> jsonMap, String className) {
         for (Map.Entry<String, Object> entry : jsonMap.entrySet()) {
             if (Map.class.isAssignableFrom(entry.getValue().getClass())) {
-                SearchAndFilterHelper.loopSpecToSpecBuilder(specificationsBuilder, (Map<String, Object>) entry.getValue(), entry.getKey());
+                String joinClass = entry.getKey();
+                if (className != null) {
+                    joinClass = className + "," + joinClass;
+                }
+                SearchAndFilterHelper.loopSpecToSpecBuilder(specificationsBuilder, (Map<String, Object>) entry.getValue(), joinClass);
             } else {
                 SearchOperation operation = SearchOperation.getOperation(entry.getKey());
                 String key = getKey(entry.getKey(), operation);

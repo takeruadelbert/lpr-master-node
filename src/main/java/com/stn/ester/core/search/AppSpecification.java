@@ -52,7 +52,15 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
         if (criteria.getClassJoin() == null) {
             return root.get(criteria.getKey());
         } else {
-            Join joinPredicate = root.join(getCriteria().getClassJoin());
+            String[] multiJoinClass = criteria.getClassJoin().split(",");
+            Join joinPredicate = null;
+            for (String joinClass : multiJoinClass) {
+                if (joinPredicate == null) {
+                    joinPredicate = root.join(joinClass);
+                } else {
+                    joinPredicate = joinPredicate.join(joinClass);
+                }
+            }
             return joinPredicate.get(criteria.getKey());
         }
     }
