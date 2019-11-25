@@ -1,5 +1,6 @@
 package com.stn.ester.services.crud;
 
+import com.stn.ester.core.exceptions.BadRequestException;
 import com.stn.ester.core.exceptions.NotFoundException;
 import com.stn.ester.core.security.SecurityConstants;
 import com.stn.ester.dto.entity.MenuSimpleDTO;
@@ -9,6 +10,7 @@ import com.stn.ester.entities.Menu;
 import com.stn.ester.entities.Role;
 import com.stn.ester.repositories.jpa.AccessGroupRepository;
 import com.stn.ester.repositories.jpa.MenuRepository;
+import com.stn.ester.repositories.jpa.ModuleRepository;
 import com.stn.ester.repositories.jpa.RoleRepository;
 import com.stn.ester.services.base.CrudService;
 import com.stn.ester.services.base.traits.SimpleSearchTrait;
@@ -26,14 +28,20 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
     private RoleService roleService;
     private AccessGroupRepository accessGroupRepository;
     private RoleRepository roleRepository;
+    private ModuleRepository moduleRepository;
 
     @Autowired
-    public MenuService(MenuRepository menuRepository, RoleService roleService, AccessGroupRepository accessGroupRepository, RoleRepository roleRepository) {
+    public MenuService(MenuRepository menuRepository,
+                       RoleService roleService,
+                       AccessGroupRepository accessGroupRepository,
+                       RoleRepository roleRepository,
+                       ModuleRepository moduleRepository) {
         super(menuRepository);
         this.menuRepository = menuRepository;
         this.roleService = roleService;
         this.accessGroupRepository = accessGroupRepository;
         this.roleRepository = roleRepository;
+        this.moduleRepository = moduleRepository;
     }
 
     @Override
@@ -104,6 +112,9 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
     @Override
     @Transactional
     public Menu create(Menu o) {
+        if (o.getModuleId() != null && !moduleRepository.existsById(o.getModuleId())) {
+            throw new BadRequestException(String.format("Module id %d not found", o.getModuleId()));
+        }
         Menu menu = super.create(o);
         Long lastInsertID = menu.getId();
 
