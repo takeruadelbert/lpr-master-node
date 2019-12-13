@@ -17,17 +17,29 @@ import java.util.List;
 public class SystemProfile extends BaseEntity {
     private static final String COLUMN_LOGO = "logo_id";
     private static final String COLUMN_IMAGE_BACKGROUND = "image_background_id";
+    private static final String COLUMN_COMPANY_LOGO = "company_logo_id";
+    private static final String COLUMN_APP_ICON = "app_icon_id";
     private static final String COLUMN_SYSTEM_PROFILE = "system_profile_id";
     private static final String COLUMN_COUNTRY = "country_id";
     private static final String COLUMN_STATE = "state_id";
     private static final String COLUMN_CITY = "city_id";
     private static final String JSON_PROPERTY_LOGO = "logoId";
     private static final String JSON_PROPERTY_IMAGE_BACKGROUND = "imageBackgroundId";
+    private static final String JSON_PROPERTY_COMPANY_LOGO = "companyLogoId";
+    private static final String JSON_PROPERTY_APP_ICON = "appIconId";
     private static final String VALIDATOR_URL_REGEXP = "^(http|https).*";
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = COLUMN_LOGO, insertable = false, updatable = false)
     private AssetFile logo;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = COLUMN_COMPANY_LOGO, insertable = false, updatable = false)
+    private AssetFile companyLogo;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = COLUMN_APP_ICON, insertable = false, updatable = false)
+    private AssetFile appIcon;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
@@ -58,6 +70,14 @@ public class SystemProfile extends BaseEntity {
     @Column(name = COLUMN_IMAGE_BACKGROUND)
     private Long imageBackgroundId;
 
+    @JsonProperty(JSON_PROPERTY_COMPANY_LOGO)
+    @Column(name = COLUMN_COMPANY_LOGO)
+    private Long companyLogoId;
+
+    @JsonProperty(JSON_PROPERTY_APP_ICON)
+    @Column(name = COLUMN_APP_ICON)
+    private Long appIconId;
+
     public void setLogoId(Long logoId) {
         if (logoId != null)
             this.logoId = logoId;
@@ -69,8 +89,16 @@ public class SystemProfile extends BaseEntity {
 
     @Transient
     private String tokenLogo;
+
     @Transient
     private String tokenImageBackground;
+
+    @Transient
+    private String tokenAppIcon;
+
+    @Transient
+    private String tokenCompanyLogo;
+
     private String address;
     private String telephone;
     private String name;

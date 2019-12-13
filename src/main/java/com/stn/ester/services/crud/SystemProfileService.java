@@ -54,6 +54,22 @@ public class SystemProfileService extends CrudService implements AssetFileClaimT
             systemProfile.setImageBackground(imageBackground);
         }
 
+        // insert company logo
+        String tokenCompanyLogo = systemProfile.getTokenCompanyLogo();
+        if (tokenCompanyLogo != null && !tokenCompanyLogo.isEmpty()) {
+            AssetFile companyLogo = claimFile(tokenCompanyLogo);
+            systemProfile.setCompanyLogoId(companyLogo.getId());
+            systemProfile.setCompanyLogo(companyLogo);
+        }
+
+        // insert app icon
+        String tokenAppIcon = systemProfile.getTokenAppIcon();
+        if (tokenAppIcon != null && !tokenAppIcon.isEmpty()) {
+            AssetFile appIcon = claimFile(tokenAppIcon);
+            systemProfile.setAppIconId(appIcon.getId());
+            systemProfile.setAppIcon(appIcon);
+        }
+
         if (systemProfileRepository.existsById(id)) {
             systemProfile.setId(id);
             return super.update(id, systemProfile);
