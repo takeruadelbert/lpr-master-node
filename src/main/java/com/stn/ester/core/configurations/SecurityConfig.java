@@ -61,6 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         for (PathMethod pathMethod : findPathAnnotedAccessAllowed()) {
             web.ignoring().antMatchers(HttpMethod.resolve(pathMethod.requestMethod.toString()), pathMethod.Path);
         }
+        web.ignoring().antMatchers("/error");
     }
 
     @Override
