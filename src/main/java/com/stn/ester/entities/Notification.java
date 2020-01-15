@@ -30,21 +30,22 @@ public class Notification extends BaseEntity {
         this.receiverId = receiverId;
     }
 
-    @Column(columnDefinition = EntityConstant.COLUMN_DEFAULT_INIT_ZERO, nullable = false)
-    private int hasSeen;
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_BOOLEAN_FALSE, nullable = false)
+    private boolean seen;
+
+    private String data;
+    private String type;
 
     public Notification() {
 
     }
 
-    public Notification(Long receiverId, String message, String url) {
+    public Notification(Long receiverId, String message, String url, String data, String type) {
         this.receiverId = receiverId;
         this.message = message;
         this.url = url;
-    }
-
-    public void setToHasSeen() {
-        this.hasSeen = 1;
+        this.data = data;
+        this.type = type;
     }
 
 }

@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 import com.stn.ester.constants.LogoResource;
 import com.stn.ester.core.events.RegistrationEvent;
 import com.stn.ester.core.exceptions.*;
-import com.stn.ester.core.security.SecurityConstants;
 import com.stn.ester.dto.entity.UserDTO;
 import com.stn.ester.dto.entity.UserSimpleDTO;
 import com.stn.ester.entities.*;
@@ -40,6 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.stn.ester.core.security.SecurityConstants.ROLE_SUPERADMIN;
 
 @Service
 public class UserService extends CrudService<User, UserRepository> implements AssetFileClaimTrait, UserDetailsService, SimpleSearchTrait<User, UserSimpleDTO, UserRepository>, AdvanceSearchTrait<User, UserRepository> {
@@ -113,7 +114,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
             }
         }
         User registeredUser = super.create(user);
-        eventPublisher.publishEvent(new RegistrationEvent(this, user));
+        eventPublisher.publishEvent(new RegistrationEvent(this, registeredUser));
         return registeredUser;
     }
 
@@ -364,7 +365,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
 
     public Collection<UserDTO> searchSuperAdmin(String keyword) {
         //superadmin specification
-        Long superAdminId = this.roleService.getIdByName(SecurityConstants.ROLE_SUPERADMIN);
+        Long superAdminId = this.roleService.getIdByName(ROLE_SUPERADMIN);
         Specification superAdminSpecification = (Specification) (root, criteriaQuery, criteriaBuilder) -> {
             final Subquery<Long> roleGroupQuery = criteriaQuery.subquery(Long.class);
             final Root<RoleGroup> roleGroupRoot = roleGroupQuery.from(RoleGroup.class);
@@ -392,5 +393,9 @@ public class UserService extends CrudService<User, UserRepository> implements As
     @Override
     public UserRepository getRepository() {
         return currentEntityRepository;
+    }
+
+    public Collection<Long> getAllSuperAdminId() {
+        return roleGroupRepository.findAllByRoleId(roleRepository.findByName(ROLE_SUPERADMIN).getId()).stream().map(RoleGroup::getUserId).collect(Collectors.toSet());
     }
 }

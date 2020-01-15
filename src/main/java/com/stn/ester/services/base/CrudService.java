@@ -36,6 +36,8 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.stn.ester.entities.constant.EntityConstant.FIELD_CREATED_DATE;
+
 public abstract class CrudService<T extends BaseEntity, U extends BaseRepository<T>> extends BaseService<T> {
 
     protected U currentEntityRepository;
@@ -60,7 +62,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
     }
 
     public Page<T> index(Integer page, Integer size, Specification spec) {
-        return index(page, size, spec, Sort.by("createdDate").descending());
+        return index(page, size, spec, Sort.by(FIELD_CREATED_DATE).descending());
     }
 
     public Page<T> index(Integer page, Integer size, Specification spec, Sort sort) {

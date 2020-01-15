@@ -1,7 +1,7 @@
 package com.stn.ester.controllers.function;
 
-import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.controllers.base.SecuredController;
+import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.services.GeneralService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +14,8 @@ public class GeneralController extends SecuredController {
     private GeneralService generalService;
 
     @Autowired
-    public GeneralController(GeneralService generalService){
-        this.generalService=generalService;
+    public GeneralController(GeneralService generalService) {
+        this.generalService = generalService;
     }
 
 
@@ -24,4 +24,5 @@ public class GeneralController extends SecuredController {
     public Object getServerTime() {
         return generalService.getStatus();
     }
+
 }

@@ -9,4 +9,6 @@ public class EntityConstant {
     public static final String COLUMN_DEFINITION_DATE = "DATE";
     public static final String COLUMN_DEFINITION_DATETIME = "DATETIME";
     public static final String COLUMN_DEFINITION_TEXT = "TEXT";
+    public static final String COLUMN_DEFINITION_BOOLEAN_FALSE = "tinyint(1) default 0";
+    public static final String FIELD_CREATED_DATE = "createdDate";
 }
