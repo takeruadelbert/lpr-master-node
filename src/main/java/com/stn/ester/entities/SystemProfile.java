@@ -131,6 +131,7 @@ public class SystemProfile extends BaseEntity {
         this.email = email;
         this.website = website;
         this.logoId = logoId;
+        this.multipleSession = true;
     }
 
     public String getTokenLogo() {
