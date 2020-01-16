@@ -4,7 +4,8 @@ import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stn.ester.core.events.LoginEvent;
 import com.stn.ester.entities.User;
-import com.stn.ester.services.crud.AccessGroupService;
+import com.stn.ester.helpers.DateTimeHelper;
+import com.stn.ester.services.AuthenticationService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -29,17 +31,17 @@ import static com.stn.ester.core.security.SecurityConstants.*;
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
-    private AccessGroupService accessGroupService;
     private ApplicationEventPublisher applicationEventPublisher;
+    private AuthenticationService authenticationService;
 
     public JWTAuthenticationFilter(
             AuthenticationManager authenticationManager,
-            AccessGroupService accessGroupService,
+            AuthenticationService authenticationService,
             ApplicationEventPublisher applicationEventPublisher
     ) {
         this.authenticationManager = authenticationManager;
-        this.accessGroupService = accessGroupService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.authenticationService = authenticationService;
     }
 
     @Override
@@ -73,7 +75,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         final String authoritiesString = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
+        LocalDateTime loginDateTime = DateTimeHelper.getCurrentLocalDateTime();
+        authenticationService.setLastLogin(user.getId(), loginDateTime);
         String token = JWT.create()
+                .withIssuedAt(DateTimeHelper.asDate(loginDateTime))
                 .withSubject(user.getUsername())
                 .withClaim(AUTHORITIES_KEY, authoritiesString)
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
