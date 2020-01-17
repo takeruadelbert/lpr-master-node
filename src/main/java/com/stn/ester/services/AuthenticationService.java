@@ -32,7 +32,7 @@ public class AuthenticationService {
         return user.getLastLogin().compareTo(iat) == 0;
     }
 
-    public boolean isMultipleSessionAllowed() {
-        return this.systemProfileService.get().isMultipleSession();
+    public Boolean isMultipleSessionAllowed() {
+        return this.systemProfileService.get().getMultipleSession();
     }
 }
