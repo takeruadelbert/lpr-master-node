@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,8 +76,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         final String authoritiesString = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-        Date loginDate = DateTimeHelper.getDateTimeNow();
-        LocalDateTime loginDateTime = DateTimeHelper.asLocalDateTime(loginDate);
+        LocalDateTime loginDateTime = DateTimeHelper.getCurrentLocalDateTime();
+        Timestamp now = Timestamp.valueOf(loginDateTime);
+        Date loginDate = new Date(now.getTime());
         authenticationService.setLastLogin(user.getId(), loginDateTime);
         String token = JWT.create()
                 .withIssuedAt(loginDate)
