@@ -75,8 +75,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         final String authoritiesString = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-        LocalDateTime loginDateTime = DateTimeHelper.getCurrentLocalDateTime();
-        Date loginDate = DateTimeHelper.asDate(loginDateTime);
+        Date loginDate = DateTimeHelper.getDateTimeNow();
+        LocalDateTime loginDateTime = DateTimeHelper.asLocalDateTime(loginDate);
         authenticationService.setLastLogin(user.getId(), loginDateTime);
         String token = JWT.create()
                 .withIssuedAt(loginDate)
