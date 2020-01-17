@@ -50,7 +50,13 @@ public class UserController extends CrudController<UserService, User> {
 
     @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/heartbeat")
-    public UserProfileDTO isValid() {
+    public void isValid() {
+
+    }
+
+    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequestMapping(value = "/profile")
+    public UserProfileDTO getMyProfile() {
         return new UserProfileDTO(SessionHelper.getCurrentUser());
     }
 
