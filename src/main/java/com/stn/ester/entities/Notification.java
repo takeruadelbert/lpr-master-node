@@ -31,7 +31,7 @@ public class Notification extends BaseEntity {
     }
 
     @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_BOOLEAN_FALSE, nullable = false)
-    private Boolean seen;
+    private Boolean seen=false;
 
     private String data;
     private String type;

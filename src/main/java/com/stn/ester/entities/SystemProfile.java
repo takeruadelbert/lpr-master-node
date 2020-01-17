@@ -116,7 +116,7 @@ public class SystemProfile extends BaseEntity {
     private Date startYear;
 
     @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_BOOLEAN_TRUE)
-    private Boolean multipleSession;
+    private Boolean multipleSession=true;
 
     public SystemProfile() {
 
@@ -131,7 +131,6 @@ public class SystemProfile extends BaseEntity {
         this.email = email;
         this.website = website;
         this.logoId = logoId;
-        this.multipleSession = true;
     }
 
     public String getTokenLogo() {
