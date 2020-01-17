@@ -76,9 +76,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
         LocalDateTime loginDateTime = DateTimeHelper.getCurrentLocalDateTime();
+        Date loginDate = DateTimeHelper.asDate(loginDateTime);
         authenticationService.setLastLogin(user.getId(), loginDateTime);
         String token = JWT.create()
-                .withIssuedAt(DateTimeHelper.asDate(loginDateTime))
+                .withIssuedAt(loginDate)
                 .withSubject(user.getUsername())
                 .withClaim(AUTHORITIES_KEY, authoritiesString)
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
