@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -76,10 +77,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         final String authoritiesString = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-        LocalDateTime loginDateTime = DateTimeHelper.getCurrentLocalDateTime();
-        Timestamp now = Timestamp.valueOf(loginDateTime);
+        LocalDateTime loginLocalDateTime = DateTimeHelper.getCurrentLocalDateTime().truncatedTo(ChronoUnit.SECONDS);
+        Timestamp now = Timestamp.valueOf(loginLocalDateTime);
         Date loginDate = new Date(now.getTime());
-        authenticationService.setLastLogin(user.getId(), loginDateTime);
+        authenticationService.setLastLogin(user.getId(), loginLocalDateTime);
         String token = JWT.create()
                 .withIssuedAt(loginDate)
                 .withSubject(user.getUsername())
