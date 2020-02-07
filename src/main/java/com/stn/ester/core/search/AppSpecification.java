@@ -76,6 +76,8 @@ public class AppSpecification<T extends BaseEntity> implements Specification<T> 
             }
         } else if (Enum.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
             return new ValueWrap(Enum.valueOf(path.getModel().getBindableJavaType(), criteria.getValue().toString()));
+        } else if (Boolean.class.isAssignableFrom(path.getModel().getBindableJavaType())) {
+            return new ValueWrap(Boolean.parseBoolean(criteria.getValue().toString()));
         } else if (criteria.getOperation() == IN) {
             return new ValueWrap(GlobalFunctionHelper.stringCommaToList(criteria.getValue().toString()));
         } else {

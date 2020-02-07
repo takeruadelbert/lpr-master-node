@@ -16,7 +16,7 @@ public class NotificationDTO implements Comparable<NotificationDTO> {
     public Long userId;
     public String message;
     public String url;
-    public boolean seen;
+    public Boolean seen;
     public LocalDateTime publishTime;
     public Map<String, Object> data;
     public String type;
@@ -25,7 +25,7 @@ public class NotificationDTO implements Comparable<NotificationDTO> {
         this.userId = notification.getReceiverId();
         this.message = notification.getMessage();
         this.url = notification.getUrl();
-        this.seen = notification.isSeen();
+        this.seen = notification.getSeen();
         this.publishTime = notification.getCreatedDate();
         this.type = notification.getType();
         this.notificationId = notification.getId();
