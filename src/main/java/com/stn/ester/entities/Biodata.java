@@ -3,9 +3,15 @@ package com.stn.ester.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.core.base.OnDeleteSetParentNull;
+import com.stn.ester.core.base.TableFieldPair;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
 import com.stn.ester.entities.enumerate.Gender;
+import com.stn.ester.services.crud.CityService;
+import com.stn.ester.services.crud.CountryService;
+import com.stn.ester.services.crud.IdentityTypeService;
+import com.stn.ester.services.crud.StateService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -17,6 +23,12 @@ import javax.validation.constraints.NotBlank;
 @Entity
 @EqualsAndHashCode(exclude = {"user"})
 @ToString(exclude = {"user"})
+@OnDeleteSetParentNull({
+        @TableFieldPair(service = IdentityTypeService.class, fieldName = "identity_type_id"),
+        @TableFieldPair(service = CountryService.class, fieldName = "country_id"),
+        @TableFieldPair(service = StateService.class, fieldName = "state_id"),
+        @TableFieldPair(service = CityService.class, fieldName = "city_id")
+})
 public class Biodata extends BaseEntity {
 
     private static final String COLUMN_USER = "user_id";
