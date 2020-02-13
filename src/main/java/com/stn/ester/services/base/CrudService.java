@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.stn.ester.entities.constant.EntityConstant.FIELD_CREATED_DATE;
+import static com.stn.ester.entities.constant.EntityConstant.FIELD_ID;
 
 public abstract class CrudService<T extends BaseEntity, U extends BaseRepository<T>> extends BaseService<T> {
 
@@ -62,7 +63,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
     }
 
     public Page<T> index(Integer page, Integer size, Specification spec) {
-        return index(page, size, spec, Sort.by(FIELD_CREATED_DATE).descending());
+        return index(page, size, spec, Sort.by(Sort.Order.desc(FIELD_CREATED_DATE), Sort.Order.desc(FIELD_ID)));
     }
 
     public Page<T> index(Integer page, Integer size, Specification spec, Sort sort) {
@@ -152,6 +153,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         }
     }
 
+    //untuk automatis menghapus data yang tidak child yang tidak diterima
     private void autoRemoveChild(Long parentId, T oldObject, T newObject, Map<String, Object> comparator) {
         Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
         Annotation autoRemoveChild = clazz.getDeclaredAnnotation(AutoRemoveChild.class);
