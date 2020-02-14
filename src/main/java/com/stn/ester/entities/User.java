@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.core.validation.IsUnique;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
 import com.stn.ester.entities.enumerate.UserStatus;
@@ -39,11 +40,13 @@ public class User extends BaseEntity implements UserDetails {
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = EntityConstant.MESSAGE_ALPHANUMERIC_ONLY, groups = {New.class, Existing.class})
     @NotBlank(groups = New.class, message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false, unique = true)
+    @IsUnique(key = "username", entityClass = User.class, groups = {New.class, Existing.class})
     private String username;
 
     @Email(message = EntityConstant.MESSAGE_INVALID_FORMAT, groups = {New.class, Existing.class})
     @NotBlank(groups = {New.class, Existing.class}, message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(unique = true)
+    @IsUnique(key = "username", entityClass = User.class, groups = {New.class, Existing.class})
     private String email;
 
     @NotBlank(groups = New.class, message = EntityConstant.MESSAGE_NOT_BLANK)
