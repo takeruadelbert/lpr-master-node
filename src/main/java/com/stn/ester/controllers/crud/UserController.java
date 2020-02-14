@@ -4,9 +4,10 @@ import com.stn.ester.controllers.base.CrudController;
 import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.dto.UserProfileDTO;
 import com.stn.ester.entities.User;
-import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.enumerate.Gender;
 import com.stn.ester.entities.enumerate.UserStatus;
+import com.stn.ester.entities.validationgroups.Create;
+import com.stn.ester.entities.validationgroups.Update;
 import com.stn.ester.helpers.SessionHelper;
 import com.stn.ester.services.crud.BiodataService;
 import com.stn.ester.services.crud.UserService;
@@ -39,12 +40,12 @@ public class UserController extends CrudController<UserService, User> {
     }
 
     @Override
-    public Object create(@Validated(BaseEntity.New.class) @RequestBody User user) {
+    public Object create(@Validated(Create.class) @RequestBody User user) {
         return super.service.create(user);
     }
 
     @Override
-    public Object update(@PathVariable long id, @Validated(BaseEntity.Existing.class) @RequestBody User user, @RequestBody Map<String, Object> requestBody) {
+    public Object update(@PathVariable long id, @Validated(Update.class) @RequestBody User user, @RequestBody Map<String, Object> requestBody) {
         return super.service.update(id, user);
     }
 

@@ -1,13 +1,12 @@
 package com.stn.ester.core.validation;
 
 import com.stn.ester.core.validation.constraintvalidator.IsUniqueValidator;
-import com.stn.ester.entities.base.BaseEntity;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
 
-@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = IsUniqueValidator.class)
 @Repeatable(IsUnique.List.class)
@@ -18,11 +17,9 @@ public @interface IsUnique {
 
     Class<? extends Payload>[] payload() default {};
 
-    public String key() default "";
+    String columnNames();
 
-    public Class<? extends BaseEntity> entityClass();
-
-    @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
+    @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     public @interface List {

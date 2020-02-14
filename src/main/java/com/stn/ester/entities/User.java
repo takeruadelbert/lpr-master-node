@@ -8,6 +8,8 @@ import com.stn.ester.core.validation.IsUnique;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
 import com.stn.ester.entities.enumerate.UserStatus;
+import com.stn.ester.entities.validationgroups.Create;
+import com.stn.ester.entities.validationgroups.Update;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -28,6 +30,10 @@ import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
 
 @Data
 @Entity
+@IsUnique.List(value = {
+        @IsUnique(columnNames = "username", message = "Username have been taken", groups = {Create.class, Update.class}),
+        @IsUnique(columnNames = "email", message = "Email have been taken", groups = {Create.class, Update.class})
+})
 public class User extends BaseEntity implements UserDetails {
 
     private static final String COLUMN_PROFILE_PICTURE_ID = "profile_picture_id";
@@ -37,20 +43,18 @@ public class User extends BaseEntity implements UserDetails {
     private static final String JSON_PROPERTY_PROFILE_PICTURE = "profilePictureId";
     private static final String DEFINITION_COLUMN_USER_STATUS = "varchar(255) default 'ACTIVE'";
 
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = EntityConstant.MESSAGE_ALPHANUMERIC_ONLY, groups = {New.class, Existing.class})
-    @NotBlank(groups = New.class, message = EntityConstant.MESSAGE_NOT_BLANK)
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = EntityConstant.MESSAGE_ALPHANUMERIC_ONLY, groups = {Create.class, Update.class})
+    @NotBlank(groups = Create.class, message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(nullable = false, unique = true)
-    @IsUnique(key = "username", entityClass = User.class, groups = {New.class, Existing.class})
     private String username;
 
-    @Email(message = EntityConstant.MESSAGE_INVALID_FORMAT, groups = {New.class, Existing.class})
-    @NotBlank(groups = {New.class, Existing.class}, message = EntityConstant.MESSAGE_NOT_BLANK)
+    @Email(message = EntityConstant.MESSAGE_INVALID_FORMAT, groups = {Create.class, Update.class})
+    @NotBlank(groups = {Create.class, Update.class}, message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(unique = true)
-    @IsUnique(key = "username", entityClass = User.class, groups = {New.class, Existing.class})
     private String email;
 
-    @NotBlank(groups = New.class, message = EntityConstant.MESSAGE_NOT_BLANK)
-    @Null(groups = Existing.class)
+    @NotBlank(groups = Create.class, message = EntityConstant.MESSAGE_NOT_BLANK)
+    @Null(groups = Update.class)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 

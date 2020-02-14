@@ -83,12 +83,4 @@ public abstract class BaseEntity {
         }
     }
 
-    // for validation grouping purpose
-    public interface Existing {
-
-    }
-
-    public interface New {
-
-    }
 }
