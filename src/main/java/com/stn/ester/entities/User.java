@@ -4,12 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.stn.ester.core.base.AutoRemoveChild;
+import com.stn.ester.core.base.AutoRemoveChildType;
+import com.stn.ester.core.base.TableFieldPair;
 import com.stn.ester.core.validation.IsUnique;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
 import com.stn.ester.entities.enumerate.UserStatus;
 import com.stn.ester.entities.validationgroups.Create;
 import com.stn.ester.entities.validationgroups.Update;
+import com.stn.ester.repositories.jpa.RoleGroupRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -33,6 +37,9 @@ import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
 @IsUnique.List(value = {
         @IsUnique(columnNames = "username", message = "Username have been taken", groups = {Create.class, Update.class}),
         @IsUnique(columnNames = "email", message = "Email have been taken", groups = {Create.class, Update.class})
+})
+@AutoRemoveChild({
+        @TableFieldPair(attributeName = "roleGroups", fieldName = "roleId", attributeArrayName = "roleIds", repository = RoleGroupRepository.class, autoRemoveChildType = AutoRemoveChildType.MANYTOMANY)
 })
 public class User extends BaseEntity implements UserDetails {
 

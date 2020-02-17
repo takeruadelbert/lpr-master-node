@@ -134,15 +134,15 @@ public class UserService extends CrudService<User, UserRepository> implements As
             }
         }
         super.update(id, user, comparator);
-        if (removedRoleIds != null) {
-            for (Long roleId : removedRoleIds) {
-                Optional<RoleGroup> toDeleteRoleGroup = roleGroupRepository.findByRoleIdAndUserId(roleId, id);
-                if (toDeleteRoleGroup.isPresent()) {
-                    toDeleteRoleGroup.get().getUser().getRoleGroups().clear();
-                    roleGroupService.delete(toDeleteRoleGroup.get().getId());
-                }
-            }
-        }
+//        if (removedRoleIds != null) {
+//            for (Long roleId : removedRoleIds) {
+//                Optional<RoleGroup> toDeleteRoleGroup = roleGroupRepository.findByRoleIdAndUserId(roleId, id);
+//                if (toDeleteRoleGroup.isPresent()) {
+//                    toDeleteRoleGroup.get().getUser().getRoleGroups().clear();
+//                    roleGroupService.delete(toDeleteRoleGroup.get().getId());
+//                }
+//            }
+//        }
         User saved = get(id);
         entityManager.flush();
         entityManager.refresh(saved);

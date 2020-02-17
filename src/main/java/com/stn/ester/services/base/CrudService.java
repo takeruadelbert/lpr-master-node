@@ -3,10 +3,7 @@ package com.stn.ester.services.base;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Sets;
-import com.stn.ester.core.base.AutoRemoveChild;
-import com.stn.ester.core.base.OnDeleteRemoveChild;
-import com.stn.ester.core.base.OnDeleteSetParentNull;
-import com.stn.ester.core.base.TableFieldPair;
+import com.stn.ester.core.base.*;
 import com.stn.ester.core.exceptions.ListNotFoundException;
 import com.stn.ester.core.search.AppSpecification;
 import com.stn.ester.core.search.util.SearchOperation;
@@ -160,32 +157,60 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         if (autoRemoveChild != null && comparator != null) {
             TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(AutoRemoveChild.class).value();
             for (TableFieldPair tableFieldPair : tableFieldPairs) {
-                if (CrudService.class.isAssignableFrom(tableFieldPair.service())) {
-                    String serviceName = tableFieldPair.service().getSimpleName();
-                    String attributeName = tableFieldPair.attributeName();
-                    serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
-                    Object attributeOfNewObject = newObject.getAttribute(attributeName, newObject);
-                    Object attributeOfOldObject = newObject.getAttribute(attributeName, oldObject);
-                    Set<Long> newIds;
-                    Set<Long> oldIds;
-                    if (attributeOfNewObject != null
-                            && Collection.class.isAssignableFrom(attributeOfNewObject.getClass())
-                            && attributeOfOldObject != null
-                            && Collection.class.isAssignableFrom(attributeOfOldObject.getClass())
+                String attributeName = tableFieldPair.attributeName();
+                String fieldName = tableFieldPair.fieldName();
+                String attributeArrayName = tableFieldPair.attributeArrayName();
+                Object attributeOfNewObject = null;
+                Object attributeOfOldObject = null;
+                String serviceName = tableFieldPair.service().getSimpleName();
+                serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
+                if (tableFieldPair.autoRemoveChildType() == AutoRemoveChildType.ONETOMANY) {
+                    attributeOfNewObject = newObject.getAttribute(attributeName, newObject);
+                    attributeOfOldObject = newObject.getAttribute(attributeName, oldObject);
+                } else if (tableFieldPair.autoRemoveChildType() == AutoRemoveChildType.MANYTOMANY) {
+                    attributeOfNewObject = newObject.getAttribute(attributeArrayName, newObject);
+                    attributeOfOldObject = newObject.getAttribute(attributeName, oldObject);
+                }
+                Collection<Long> newIds;
+                Collection<Long> oldIds;
+                if (attributeOfNewObject != null
+                        && Collection.class.isAssignableFrom(attributeOfNewObject.getClass())
+                        && attributeOfOldObject != null
+                        && Collection.class.isAssignableFrom(attributeOfOldObject.getClass())) {
+                    if (tableFieldPair.autoRemoveChildType() == AutoRemoveChildType.ONETOMANY
                             && comparator.containsKey(attributeName)) {
-                        Set<BaseEntity> newEntities = (Set) attributeOfNewObject;
-                        Set<BaseEntity> oldEntities = (Set) attributeOfOldObject;
+                        Collection<BaseEntity> newEntities = (Collection) attributeOfNewObject;
+                        Collection<BaseEntity> oldEntities = (Collection) attributeOfOldObject;
                         newIds = newEntities.stream().map(BaseEntity::getId).collect(Collectors.toSet());
                         oldIds = oldEntities.stream().map(BaseEntity::getId).collect(Collectors.toSet());
                         applicationContext.getBean(serviceName, tableFieldPair.service()).deleteIfIdsNotFound(oldIds, newIds);
+                    } else if (tableFieldPair.autoRemoveChildType() == AutoRemoveChildType.MANYTOMANY
+                            && comparator.containsKey(attributeArrayName)) {
+                        newIds = (Collection) attributeOfNewObject;
+                        Collection<BaseEntity> oldEntities = (Collection) attributeOfOldObject;
+                        oldIds = oldEntities.stream().map(entity -> (Long) entity.getAttribute(fieldName, entity)).filter(out -> out != null).collect(Collectors.toSet());
+                        Sets.SetView<Long> differentIds = Sets.difference(new HashSet<Long>(oldIds), new HashSet<Long>(newIds));
+                        String repositoryName = tableFieldPair.repository().getSimpleName();
+                        repositoryName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, repositoryName);
+                        if (differentIds.size() > 0) {
+                            HashMap<Long, Long> foreignKeytoId = new HashMap<>();
+                            for (BaseEntity entity : oldEntities) {
+                                foreignKeytoId.put((Long) entity.getAttribute(fieldName, entity), entity.getId());
+                            }
+                            for (Long foreignKey : differentIds) {
+                                applicationContext.getBean(repositoryName, tableFieldPair.repository()).deleteById(foreignKeytoId.get(foreignKey));
+                            }
+                            oldObject.setAttribute(attributeName, null);
+                        }
                     }
                 }
             }
         }
     }
 
-    protected void deleteIfIdsNotFound(Set<Long> oldIds, Set<Long> newIds) {
-        Sets.SetView<Long> differentIds = Sets.difference(oldIds, newIds);
+
+    protected void deleteIfIdsNotFound(Collection<Long> oldIds, Collection<Long> newIds) {
+        Sets.SetView<Long> differentIds = Sets.difference(new HashSet<Long>(oldIds), new HashSet<Long>(newIds));
         for (Long toRemove : differentIds) {
             delete(toRemove);
         }
