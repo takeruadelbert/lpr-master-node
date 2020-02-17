@@ -10,7 +10,12 @@ import org.springframework.stereotype.Service;
 public class NotificationRuleService extends CrudService<NotificationRule, NotificationRuleRepository> {
 
     @Autowired
-    public NotificationRuleService(NotificationRuleRepository notificationRuleRepository){
+    public NotificationRuleService(NotificationRuleRepository notificationRuleRepository) {
         super(notificationRuleRepository);
+    }
+
+    public Iterable<NotificationRule> getAll() {
+        Iterable<NotificationRule> notificationRules = this.currentEntityRepository.findAll();
+        return notificationRules;
     }
 }
