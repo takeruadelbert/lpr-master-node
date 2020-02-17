@@ -120,7 +120,7 @@ public class UserService extends CrudService<User, UserRepository> implements As
 
     @Override
     @Transactional
-    public User update(Long id, User user) {
+    public User update(Long id, User user, Map<String, Object> comparator) {
         Set<Long> removedRoleIds = null;
         if (user.getRoleIds() != null) {
             Collection<RoleGroup> roleGroup = roleGroupRepository.findAllByUserId(id);
@@ -133,12 +133,14 @@ public class UserService extends CrudService<User, UserRepository> implements As
                 user.addRole(role.orElseThrow(() -> new BadRequestException(String.format("Role with id %d not found", roleId))));
             }
         }
-        super.update(id, user);
-        for (Long roleId : removedRoleIds) {
-            Optional<RoleGroup> toDeleteRoleGroup = roleGroupRepository.findByRoleIdAndUserId(roleId, id);
-            if (toDeleteRoleGroup.isPresent()) {
-                toDeleteRoleGroup.get().getUser().getRoleGroups().clear();
-                roleGroupService.delete(toDeleteRoleGroup.get().getId());
+        super.update(id, user, comparator);
+        if (removedRoleIds != null) {
+            for (Long roleId : removedRoleIds) {
+                Optional<RoleGroup> toDeleteRoleGroup = roleGroupRepository.findByRoleIdAndUserId(roleId, id);
+                if (toDeleteRoleGroup.isPresent()) {
+                    toDeleteRoleGroup.get().getUser().getRoleGroups().clear();
+                    roleGroupService.delete(toDeleteRoleGroup.get().getId());
+                }
             }
         }
         User saved = get(id);

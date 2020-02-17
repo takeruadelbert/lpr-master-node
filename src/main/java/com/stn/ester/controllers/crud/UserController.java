@@ -46,7 +46,7 @@ public class UserController extends CrudController<UserService, User> {
 
     @Override
     public Object update(@PathVariable long id, @Validated(Update.class) @RequestBody User user, @RequestBody Map<String, Object> requestBody) {
-        return super.service.update(id, user);
+        return super.service.update(id, user, requestBody);
     }
 
     @PreAuthorize("hasPermission(null,'allowall')")

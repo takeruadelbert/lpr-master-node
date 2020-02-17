@@ -85,6 +85,7 @@ public class Biodata extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = COLUMN_COUNTRY, insertable = false, updatable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Country country;
 
     @JsonProperty(JSON_PROPERTY_COUNTRY)
@@ -92,9 +93,8 @@ public class Biodata extends BaseEntity {
     private Long countryId;
 
     @JsonSetter(JSON_PROPERTY_COUNTRY)
-    public void setCountryId(long countryId) {
-        if (countryId != 0)
-            this.countryId = countryId;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -105,9 +105,8 @@ public class Biodata extends BaseEntity {
     @Column(name = COLUMN_STATE)
     private Long stateId;
 
-    public void setStateId(long stateId) {
-        if (stateId != 0)
-            this.stateId = stateId;
+    public void setStateId(Long stateId) {
+        this.stateId = stateId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -118,17 +117,12 @@ public class Biodata extends BaseEntity {
     @Column(name = COLUMN_CITY)
     private Long cityId;
 
-    public void setCityId(long cityId) {
-        if (cityId != 0)
-            this.cityId = cityId;
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+    public Biodata() {
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public String getFullname() {
