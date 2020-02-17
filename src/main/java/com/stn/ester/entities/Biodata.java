@@ -78,9 +78,8 @@ public class Biodata extends BaseEntity {
     private Long identityTypeId;
 
     @JsonSetter(JSON_PROPERTY_IDENTITY_TYPE)
-    public void setIdentityTypeId(long identityTypeId) {
-        if (identityTypeId != 0)
-            this.identityTypeId = identityTypeId;
+    public void setIdentityTypeId(Long identityTypeId) {
+        this.identityTypeId = identityTypeId;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
