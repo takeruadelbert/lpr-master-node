@@ -153,7 +153,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         }
     }
 
-    //untuk automatis menghapus data yang tidak child yang tidak diterima
+    //untuk automatis menghapus data child yang tidak ada/diterima
     private void autoRemoveChild(Long parentId, T oldObject, T newObject, Map<String, Object> comparator) {
         Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
         Annotation autoRemoveChild = clazz.getDeclaredAnnotation(AutoRemoveChild.class);
@@ -191,6 +191,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         }
     }
 
+    //jika suatu entity didelete, makanya semua child nya akan didelete juga
     private void onDeleteRemoveChild(Long parentId) {
         Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
         Annotation onDeleteRemoveChild = clazz.getDeclaredAnnotation(OnDeleteRemoveChild.class);
@@ -216,6 +217,10 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         }
     }
 
+    //jika suatu entity didelete, maka entity lain yang memakai entity tersebut _id akan di set null
+    //contoh
+    //biodata terdapat countryId
+    //jika ada data country yg dipakai di biodata dan data country tersebut didelete, makanya countryId di biodata akan di set null
     private void onDeleteSetParentNull(Long parentId) {
         Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
         Annotation onDeleteSetParentNullAnnotation = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class);
