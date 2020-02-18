@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.stn.ester.core.base.AutoRemoveChild;
 import com.stn.ester.core.base.AutoRemoveChildType;
+import com.stn.ester.core.base.ManyToManyByArray;
 import com.stn.ester.core.base.TableFieldPair;
 import com.stn.ester.core.validation.IsUnique;
 import com.stn.ester.entities.base.BaseEntity;
@@ -41,6 +42,7 @@ import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
 @AutoRemoveChild({
         @TableFieldPair(attributeName = "roleGroups", fieldName = "roleId", attributeArrayName = "roleIds", repository = RoleGroupRepository.class, autoRemoveChildType = AutoRemoveChildType.MANYTOMANY)
 })
+@ManyToManyByArray(attributeName = "roleGroups",attributeArrayName = "roleIds", joinEntity = RoleGroup.class, targetEntity = Role.class)
 public class User extends BaseEntity implements UserDetails {
 
     private static final String COLUMN_PROFILE_PICTURE_ID = "profile_picture_id";

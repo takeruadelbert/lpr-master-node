@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Sets;
 import com.stn.ester.core.base.*;
+import com.stn.ester.core.exceptions.BadRequestException;
 import com.stn.ester.core.exceptions.ListNotFoundException;
 import com.stn.ester.core.search.AppSpecification;
 import com.stn.ester.core.search.util.SearchOperation;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.support.Repositories;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import javax.persistence.EntityManager;
@@ -77,6 +79,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
 
     @Transactional
     public T create(T o) {
+        addManyToManyByArray(null, o);
         T saved = currentEntityRepository.save(o);
         entityManager.refresh(saved);
         return saved;
@@ -93,6 +96,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         if (old == null) {
             throw new ResourceNotFoundException();
         }
+        addManyToManyByArray(id, object);
         autoRemoveChild(id, old, object, comparator);
         preUpdate(object, old, comparator);
         T saved = currentEntityRepository.save(old);
@@ -269,6 +273,57 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
         for (T baseEntity : entities) {
             baseEntity.setAttribute(lowerCamelCase, null);
             currentEntityRepository.save(baseEntity);
+        }
+    }
+
+    protected void addManyToManyByArray(Long id, BaseEntity newObject) {
+        Class<?> entityClass = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
+        ManyToManyByArray manyToManyByArrayAnnotation = entityClass.getDeclaredAnnotation(ManyToManyByArray.class);
+        ManyToManyByArray.List manyToManyByArrayListAnnotation = entityClass.getDeclaredAnnotation(ManyToManyByArray.List.class);
+        ArrayList<ManyToManyByArray> manyToManyByArrays = new ArrayList<>();
+        if (manyToManyByArrayAnnotation != null) {
+            manyToManyByArrays.add(manyToManyByArrayAnnotation);
+        }
+        if (manyToManyByArrayListAnnotation != null) {
+            manyToManyByArrays.addAll(Arrays.asList(manyToManyByArrayListAnnotation.value()));
+        }
+        Repositories repositories = new Repositories(applicationContext);
+        for (ManyToManyByArray manyToManyByArray : manyToManyByArrays) {
+            if (newObject.getAttribute(manyToManyByArray.attributeArrayName(), newObject) != null) {
+                BaseRepository<BaseEntity> joinEntityRepository = (BaseRepository) repositories.getRepositoryFor(manyToManyByArray.joinEntity()).get();
+                BaseRepository<BaseEntity> targetEntityRepository = (BaseRepository) repositories.getRepositoryFor(manyToManyByArray.targetEntity()).get();
+                String attributeForeignKey = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entityClass.getSimpleName()) + "Id";
+                String targetForeignKey = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, manyToManyByArray.targetEntity().getSimpleName()) + "Id";
+                Set<Long> currentJoinIds = new HashSet<>();
+                if (id != null) {
+                    AppSpecification spec = new AppSpecification(new SpecSearchCriteria(attributeForeignKey, SearchOperation.EQUALITY, id));
+                    Collection<BaseEntity> oldJoinEntities = joinEntityRepository.findAll(spec);
+                    currentJoinIds.addAll(oldJoinEntities.stream().map(entity -> (Long) entity.getAttribute(targetForeignKey, entity)).collect(Collectors.toSet()));
+                }
+                Set<Long> newIds = new HashSet<>((Collection<? extends Long>) newObject.getAttribute(manyToManyByArray.attributeArrayName(), newObject));
+                Set<Long> newTargetIds = Sets.difference(newIds, currentJoinIds);
+                for (Long targetId : newTargetIds) {
+                    BaseEntity targetEntity = targetEntityRepository.findById(targetId).orElseThrow(() -> new BadRequestException(String.format("%s with id %D not found", manyToManyByArray.targetEntity().getSimpleName(), targetId)));
+                    BaseEntity joinEntity = null;
+                    try {
+                        joinEntity = manyToManyByArray.joinEntity().newInstance();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    }
+                    if (joinEntity != null) {
+                        joinEntity.setAttribute(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, manyToManyByArray.targetEntity().getSimpleName()), targetEntity);
+                        joinEntity.setAttribute(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entityClass.getSimpleName()), newObject);
+                        Collection var = ((Collection) newObject.getAttribute(manyToManyByArray.attributeName(), newObject));
+                        if (var == null) {
+                            var = new ArrayList();
+                        }
+                        var.add(joinEntity);
+                        newObject.setAttribute(manyToManyByArray.attributeName(), var);
+                    }
+                }
+            }
         }
     }
 }

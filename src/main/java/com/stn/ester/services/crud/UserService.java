@@ -1,6 +1,5 @@
 package com.stn.ester.services.crud;
 
-import com.google.common.collect.Sets;
 import com.stn.ester.constants.LogoResource;
 import com.stn.ester.core.events.RegistrationEvent;
 import com.stn.ester.core.exceptions.*;
@@ -107,12 +106,12 @@ public class UserService extends CrudService<User, UserRepository> implements As
             user.setProfilePictureId(AssetFileService.defaultProfilePictureID);
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRoleIds() != null) {
-            for (Long roleId : user.getRoleIds()) {
-                Optional<Role> role = roleRepository.findById(roleId);
-                user.addRole(role.orElseThrow(() -> new BadRequestException(String.format("Role with id %d not found", roleId))));
-            }
-        }
+//        if (user.getRoleIds() != null) {
+//            for (Long roleId : user.getRoleIds()) {
+//                Optional<Role> role = roleRepository.findById(roleId);
+//                user.addRole(role.orElseThrow(() -> new BadRequestException(String.format("Role with id %d not found", roleId))));
+//            }
+//        }
         User registeredUser = super.create(user);
         eventPublisher.publishEvent(new RegistrationEvent(this, registeredUser));
         return registeredUser;
@@ -121,18 +120,18 @@ public class UserService extends CrudService<User, UserRepository> implements As
     @Override
     @Transactional
     public User update(Long id, User user, Map<String, Object> comparator) {
-        Set<Long> removedRoleIds = null;
-        if (user.getRoleIds() != null) {
-            Collection<RoleGroup> roleGroup = roleGroupRepository.findAllByUserId(id);
-            Set<Long> currentRoleIds = roleGroup.stream().map(role -> role.getRole().getId()).collect(Collectors.toSet());
-            removedRoleIds = Sets.difference(currentRoleIds, new HashSet<>(user.getRoleIds()));
-            Set<Long> newRoleIds = Sets.difference(new HashSet<>(user.getRoleIds()), currentRoleIds);
-
-            for (Long roleId : newRoleIds) {
-                Optional<Role> role = roleRepository.findById(roleId);
-                user.addRole(role.orElseThrow(() -> new BadRequestException(String.format("Role with id %d not found", roleId))));
-            }
-        }
+//        Set<Long> removedRoleIds = null;
+//        if (user.getRoleIds() != null) {
+//            Collection<RoleGroup> roleGroup = roleGroupRepository.findAllByUserId(id);
+//            Set<Long> currentRoleIds = roleGroup.stream().map(role -> role.getRole().getId()).collect(Collectors.toSet());
+//            removedRoleIds = Sets.difference(currentRoleIds, new HashSet<>(user.getRoleIds()));
+//            Set<Long> newRoleIds = Sets.difference(new HashSet<>(user.getRoleIds()), currentRoleIds);
+//
+//            for (Long roleId : newRoleIds) {
+//                Optional<Role> role = roleRepository.findById(roleId);
+//                user.addRole(role.orElseThrow(() -> new BadRequestException(String.format("Role with id %d not found", roleId))));
+//            }
+//        }
         super.update(id, user, comparator);
 //        if (removedRoleIds != null) {
 //            for (Long roleId : removedRoleIds) {
