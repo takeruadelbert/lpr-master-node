@@ -3,7 +3,7 @@ package com.stn.ester.core.validation.constraintvalidator;
 import com.stn.ester.core.search.AppSpecification;
 import com.stn.ester.core.search.util.SearchOperation;
 import com.stn.ester.core.search.util.SpecSearchCriteria;
-import com.stn.ester.core.validation.IsUnique;
+import com.stn.ester.core.validation.UniqueField;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.repositories.jpa.base.BaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 
-public class IsUniqueValidator implements ConstraintValidator<IsUnique, BaseEntity> {
+public class UniqueFieldValidator implements ConstraintValidator<UniqueField, BaseEntity> {
 
     String columnNames;
     ApplicationContext applicationContext;
@@ -24,14 +24,14 @@ public class IsUniqueValidator implements ConstraintValidator<IsUnique, BaseEnti
     EntityManager entityManager;
 
     @Autowired
-    public IsUniqueValidator(ApplicationContext applicationContext, EntityManager entityManager) {
+    public UniqueFieldValidator(ApplicationContext applicationContext, EntityManager entityManager) {
         this.entityManager = entityManager;
         this.applicationContext = applicationContext;
         this.repositories = new Repositories(applicationContext);
     }
 
     @Override
-    public void initialize(IsUnique constraintAnnotation) {
+    public void initialize(UniqueField constraintAnnotation) {
         columnNames = constraintAnnotation.columnNames();
     }
 

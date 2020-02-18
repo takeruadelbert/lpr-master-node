@@ -8,7 +8,7 @@ import com.stn.ester.core.base.AutoRemoveChild;
 import com.stn.ester.core.base.AutoRemoveChildType;
 import com.stn.ester.core.base.ManyToManyByArray;
 import com.stn.ester.core.base.TableFieldPair;
-import com.stn.ester.core.validation.IsUnique;
+import com.stn.ester.core.validation.UniqueField;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
 import com.stn.ester.entities.enumerate.UserStatus;
@@ -35,9 +35,9 @@ import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
 
 @Data
 @Entity
-@IsUnique.List(value = {
-        @IsUnique(columnNames = "username", message = "Username have been taken", groups = {Create.class, Update.class}),
-        @IsUnique(columnNames = "email", message = "Email have been taken", groups = {Create.class, Update.class})
+@UniqueField.List(value = {
+        @UniqueField(columnNames = "username", message = "Username have been taken", groups = {Create.class, Update.class}),
+        @UniqueField(columnNames = "email", message = "Email have been taken", groups = {Create.class, Update.class})
 })
 @AutoRemoveChild({
         @TableFieldPair(attributeName = "roleGroups", fieldName = "roleId", attributeArrayName = "roleIds", repository = RoleGroupRepository.class, autoRemoveChildType = AutoRemoveChildType.MANYTOMANY)
