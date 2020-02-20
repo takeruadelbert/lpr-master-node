@@ -23,6 +23,7 @@ public abstract class BaseEntity {
     @CreatedDate
     @CreationTimestamp
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(updatable = false)
     protected LocalDateTime createdDate;
 
     @LastModifiedDate
