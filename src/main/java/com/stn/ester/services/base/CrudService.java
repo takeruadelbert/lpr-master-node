@@ -31,7 +31,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -156,22 +155,29 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
 
     //untuk automatis menghapus data child yang tidak ada/diterima
     private void autoRemoveChild(Long parentId, T oldObject, T newObject, Map<String, Object> comparator) {
-        Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
-        Annotation autoRemoveChild = clazz.getDeclaredAnnotation(AutoRemoveChild.class);
-        if (autoRemoveChild != null && comparator != null) {
-            TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(AutoRemoveChild.class).value();
-            for (TableFieldPair tableFieldPair : tableFieldPairs) {
-                String attributeName = tableFieldPair.attributeName();
-                String fieldName = tableFieldPair.fieldName();
-                String attributeArrayName = tableFieldPair.attributeArrayName();
+        Class<?> entityClass = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
+        AutoRemoveChild autoRemoveChildAnnotation = entityClass.getDeclaredAnnotation(AutoRemoveChild.class);
+        AutoRemoveChild.List autoRemoveChildListAnnotation = entityClass.getDeclaredAnnotation(AutoRemoveChild.List.class);
+        ArrayList<AutoRemoveChild> autoRemoveChildren = new ArrayList<>();
+        if (autoRemoveChildAnnotation != null) {
+            autoRemoveChildren.add(autoRemoveChildAnnotation);
+        }
+        if (autoRemoveChildListAnnotation != null) {
+            autoRemoveChildren.addAll(Arrays.asList(autoRemoveChildListAnnotation.value()));
+        }
+        for (AutoRemoveChild autoRemoveChild : autoRemoveChildren) {
+            if (comparator != null) {
+                String attributeName = autoRemoveChild.attributeName();
+                String fieldName = autoRemoveChild.fieldName();
+                String attributeArrayName = autoRemoveChild.attributeArrayName();
                 Object attributeOfNewObject = null;
                 Object attributeOfOldObject = null;
-                String serviceName = tableFieldPair.service().getSimpleName();
+                String serviceName = autoRemoveChild.service().getSimpleName();
                 serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
-                if (tableFieldPair.autoRemoveChildType() == AutoRemoveChildType.ONETOMANY) {
+                if (autoRemoveChild.type() == AutoRemoveChildType.ONETOMANY) {
                     attributeOfNewObject = newObject.getAttribute(attributeName, newObject);
                     attributeOfOldObject = newObject.getAttribute(attributeName, oldObject);
-                } else if (tableFieldPair.autoRemoveChildType() == AutoRemoveChildType.MANYTOMANY) {
+                } else if (autoRemoveChild.type() == AutoRemoveChildType.MANYTOMANY) {
                     attributeOfNewObject = newObject.getAttribute(attributeArrayName, newObject);
                     attributeOfOldObject = newObject.getAttribute(attributeName, oldObject);
                 }
@@ -181,20 +187,20 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
                         && Collection.class.isAssignableFrom(attributeOfNewObject.getClass())
                         && attributeOfOldObject != null
                         && Collection.class.isAssignableFrom(attributeOfOldObject.getClass())) {
-                    if (tableFieldPair.autoRemoveChildType() == AutoRemoveChildType.ONETOMANY
+                    if (autoRemoveChild.type() == AutoRemoveChildType.ONETOMANY
                             && comparator.containsKey(attributeName)) {
                         Collection<BaseEntity> newEntities = (Collection) attributeOfNewObject;
                         Collection<BaseEntity> oldEntities = (Collection) attributeOfOldObject;
                         newIds = newEntities.stream().map(BaseEntity::getId).collect(Collectors.toSet());
                         oldIds = oldEntities.stream().map(BaseEntity::getId).collect(Collectors.toSet());
-                        applicationContext.getBean(serviceName, tableFieldPair.service()).deleteIfIdsNotFound(oldIds, newIds);
-                    } else if (tableFieldPair.autoRemoveChildType() == AutoRemoveChildType.MANYTOMANY
+                        applicationContext.getBean(serviceName, autoRemoveChild.service()).deleteIfIdsNotFound(oldIds, newIds);
+                    } else if (autoRemoveChild.type() == AutoRemoveChildType.MANYTOMANY
                             && comparator.containsKey(attributeArrayName)) {
                         newIds = (Collection) attributeOfNewObject;
                         Collection<BaseEntity> oldEntities = (Collection) attributeOfOldObject;
                         oldIds = oldEntities.stream().map(entity -> (Long) entity.getAttribute(fieldName, entity)).filter(out -> out != null).collect(Collectors.toSet());
                         Sets.SetView<Long> differentIds = Sets.difference(new HashSet<Long>(oldIds), new HashSet<Long>(newIds));
-                        String repositoryName = tableFieldPair.repository().getSimpleName();
+                        String repositoryName = autoRemoveChild.repository().getSimpleName();
                         repositoryName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, repositoryName);
                         if (differentIds.size() > 0) {
                             HashMap<Long, Long> foreignKeytoId = new HashMap<>();
@@ -202,7 +208,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
                                 foreignKeytoId.put((Long) entity.getAttribute(fieldName, entity), entity.getId());
                             }
                             for (Long foreignKey : differentIds) {
-                                applicationContext.getBean(repositoryName, tableFieldPair.repository()).deleteById(foreignKeytoId.get(foreignKey));
+                                applicationContext.getBean(repositoryName, autoRemoveChild.repository()).deleteById(foreignKeytoId.get(foreignKey));
                             }
                             oldObject.setAttribute(attributeName, null);
                         }
@@ -222,16 +228,21 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
 
     //jika suatu entity didelete, makanya semua child nya akan didelete juga
     private void onDeleteRemoveChild(Long parentId) {
-        Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
-        Annotation onDeleteRemoveChild = clazz.getDeclaredAnnotation(OnDeleteRemoveChild.class);
-        if (onDeleteRemoveChild != null) {
-            TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(OnDeleteRemoveChild.class).value();
-            for (TableFieldPair tableFieldPair : tableFieldPairs) {
-                if (CrudService.class.isAssignableFrom(tableFieldPair.service())) {
-                    String serviceName = tableFieldPair.service().getSimpleName();
-                    serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
-                    applicationContext.getBean(serviceName, tableFieldPair.service()).deleteByParentId(parentId, tableFieldPair.fieldName());
-                }
+        Class<?> entityClass = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
+        OnDeleteRemoveChild onDeleteRemoveChildAnnotation = entityClass.getDeclaredAnnotation(OnDeleteRemoveChild.class);
+        OnDeleteRemoveChild.List onDeleteRemoveChildListAnnotation = entityClass.getDeclaredAnnotation(OnDeleteRemoveChild.List.class);
+        ArrayList<OnDeleteRemoveChild> onDeleteRemoveChildren = new ArrayList<>();
+        if (onDeleteRemoveChildAnnotation != null) {
+            onDeleteRemoveChildren.add(onDeleteRemoveChildAnnotation);
+        }
+        if (onDeleteRemoveChildListAnnotation != null) {
+            onDeleteRemoveChildren.addAll(Arrays.asList(onDeleteRemoveChildListAnnotation.value()));
+        }
+        for (OnDeleteRemoveChild onDeleteRemoveChild : onDeleteRemoveChildren) {
+            if (CrudService.class.isAssignableFrom(onDeleteRemoveChild.service())) {
+                String serviceName = onDeleteRemoveChild.service().getSimpleName();
+                serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
+                applicationContext.getBean(serviceName, onDeleteRemoveChild.service()).deleteByParentId(parentId, onDeleteRemoveChild.fieldName());
             }
         }
     }
@@ -251,16 +262,21 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
     //biodata terdapat countryId
     //jika ada data country yg dipakai di biodata dan data country tersebut didelete, makanya countryId di biodata akan di set null
     private void onDeleteSetParentNull(Long parentId) {
-        Class<?> clazz = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
-        Annotation onDeleteSetParentNullAnnotation = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class);
+        Class<?> entityClass = ReflectionHelper.getActualTypeArgumentFromGenericInterfaceWithProxiedClass(currentEntityRepository.getClass(), BaseEntity.class, BaseRepository.class);
+        OnDeleteSetParentNull onDeleteSetParentNullAnnotation = entityClass.getDeclaredAnnotation(OnDeleteSetParentNull.class);
+        OnDeleteSetParentNull.List onDeleteSetParentNullListAnnotation = entityClass.getDeclaredAnnotation(OnDeleteSetParentNull.List.class);
+        ArrayList<OnDeleteSetParentNull> onDeleteSetParentNulls = new ArrayList<>();
         if (onDeleteSetParentNullAnnotation != null) {
-            TableFieldPair[] tableFieldPairs = clazz.getDeclaredAnnotation(OnDeleteSetParentNull.class).value();
-            for (TableFieldPair tableFieldPair : tableFieldPairs) {
-                if (CrudService.class.isAssignableFrom(tableFieldPair.service())) {
-                    String serviceName = tableFieldPair.service().getSimpleName();
-                    serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
-                    applicationContext.getBean(serviceName, tableFieldPair.service()).setParentNull(parentId, tableFieldPair.fieldName());
-                }
+            onDeleteSetParentNulls.add(onDeleteSetParentNullAnnotation);
+        }
+        if (onDeleteSetParentNullListAnnotation != null) {
+            onDeleteSetParentNulls.addAll(Arrays.asList(onDeleteSetParentNullListAnnotation.value()));
+        }
+        for (OnDeleteSetParentNull onDeleteSetParentNull : onDeleteSetParentNulls) {
+            if (CrudService.class.isAssignableFrom(onDeleteSetParentNull.service())) {
+                String serviceName = onDeleteSetParentNull.service().getSimpleName();
+                serviceName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, serviceName);
+                applicationContext.getBean(serviceName, onDeleteSetParentNull.service()).setParentNull(parentId, onDeleteSetParentNull.fieldName());
             }
         }
     }

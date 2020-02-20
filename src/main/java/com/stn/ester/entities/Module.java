@@ -3,7 +3,6 @@ package com.stn.ester.entities;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.stn.ester.core.base.AutoRemoveChild;
 import com.stn.ester.core.base.OnDeleteSetParentNull;
-import com.stn.ester.core.base.TableFieldPair;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
 import com.stn.ester.entities.enumerate.RequestMethod;
@@ -19,11 +18,11 @@ import java.util.Set;
 
 @Data
 @Entity
-@AutoRemoveChild({
-        @TableFieldPair(service = ModuleLinkService.class, attributeName = "moduleLink")
+@AutoRemoveChild.List(value = {
+        @AutoRemoveChild(service = ModuleLinkService.class, attributeName = "moduleLink")
 })
-@OnDeleteSetParentNull({
-        @TableFieldPair(service = MenuService.class, fieldName = "module_id")
+@OnDeleteSetParentNull.List(value = {
+        @OnDeleteSetParentNull(service = MenuService.class, fieldName = "module_id")
 })
 public class Module extends BaseEntity {
 

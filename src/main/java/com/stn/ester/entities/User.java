@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.stn.ester.core.base.AutoRemoveChild;
 import com.stn.ester.core.base.AutoRemoveChildType;
 import com.stn.ester.core.base.ManyToManyByArray;
-import com.stn.ester.core.base.TableFieldPair;
 import com.stn.ester.core.validation.UniqueField;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
@@ -39,10 +38,10 @@ import static com.stn.ester.core.security.SecurityConstants.ROLE_PREFIX;
         @UniqueField(columnNames = "username", message = "Username have been taken", groups = {Create.class, Update.class}),
         @UniqueField(columnNames = "email", message = "Email have been taken", groups = {Create.class, Update.class})
 })
-@AutoRemoveChild({
-        @TableFieldPair(attributeName = "roleGroups", fieldName = "roleId", attributeArrayName = "roleIds", repository = RoleGroupRepository.class, autoRemoveChildType = AutoRemoveChildType.MANYTOMANY)
+@AutoRemoveChild.List(value = {
+        @AutoRemoveChild(attributeName = "roleGroups", fieldName = "roleId", attributeArrayName = "roleIds", repository = RoleGroupRepository.class, type = AutoRemoveChildType.MANYTOMANY)
 })
-@ManyToManyByArray(attributeName = "roleGroups",attributeArrayName = "roleIds", joinEntity = RoleGroup.class, targetEntity = Role.class)
+@ManyToManyByArray(attributeName = "roleGroups", attributeArrayName = "roleIds", joinEntity = RoleGroup.class, targetEntity = Role.class)
 public class User extends BaseEntity implements UserDetails {
 
     private static final String COLUMN_PROFILE_PICTURE_ID = "profile_picture_id";

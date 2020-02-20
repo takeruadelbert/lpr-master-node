@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.stn.ester.core.base.OnDeleteSetParentNull;
-import com.stn.ester.core.base.TableFieldPair;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.services.crud.MenuService;
 import lombok.Data;
@@ -17,8 +16,8 @@ import java.util.Set;
 
 @Data
 @Entity
-@OnDeleteSetParentNull({
-        @TableFieldPair(service = MenuService.class, fieldName = "parent_menu_id")
+@OnDeleteSetParentNull.List({
+        @OnDeleteSetParentNull(service = MenuService.class, fieldName = "parent_menu_id")
 })
 public class Menu extends BaseEntity {
 

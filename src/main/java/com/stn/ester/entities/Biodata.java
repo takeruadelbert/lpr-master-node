@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.stn.ester.core.base.OnDeleteSetParentNull;
-import com.stn.ester.core.base.TableFieldPair;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
 import com.stn.ester.entities.enumerate.Gender;
@@ -23,11 +22,11 @@ import javax.validation.constraints.NotBlank;
 @Entity
 @EqualsAndHashCode(exclude = {"user"})
 @ToString(exclude = {"user"})
-@OnDeleteSetParentNull({
-        @TableFieldPair(service = IdentityTypeService.class, fieldName = "identity_type_id"),
-        @TableFieldPair(service = CountryService.class, fieldName = "country_id"),
-        @TableFieldPair(service = StateService.class, fieldName = "state_id"),
-        @TableFieldPair(service = CityService.class, fieldName = "city_id")
+@OnDeleteSetParentNull.List(value = {
+        @OnDeleteSetParentNull(service = IdentityTypeService.class, fieldName = "identity_type_id"),
+        @OnDeleteSetParentNull(service = CountryService.class, fieldName = "country_id"),
+        @OnDeleteSetParentNull(service = StateService.class, fieldName = "state_id"),
+        @OnDeleteSetParentNull(service = CityService.class, fieldName = "city_id")
 })
 public class Biodata extends BaseEntity {
 
