@@ -192,4 +192,10 @@ public class User extends BaseEntity implements UserDetails {
         this.roleGroups.add(roleGroup);
     }
 
+    public void removeRole(Role role) {
+        if (this.roleGroups != null) {
+            this.roleGroups.remove(this.roleGroups.stream().filter(roleGroup -> role.getId().equals(roleGroup.getRoleId())).findFirst().get());
+        }
+    }
+
 }

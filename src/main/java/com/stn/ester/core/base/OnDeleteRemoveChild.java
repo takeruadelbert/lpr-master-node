@@ -14,6 +14,8 @@ public @interface OnDeleteRemoveChild {
 
     String fieldName();
 
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
     @interface List {
         OnDeleteRemoveChild[] value();
     }

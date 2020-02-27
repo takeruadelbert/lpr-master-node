@@ -14,6 +14,8 @@ public @interface OnDeleteSetParentNull {
 
     String fieldName();
 
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
     @interface List {
         OnDeleteSetParentNull[] value();
     }

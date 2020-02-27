@@ -319,7 +319,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
                 Set<Long> newIds = new HashSet<>((Collection<? extends Long>) newObject.getAttribute(manyToManyByArray.attributeArrayName(), newObject));
                 Set<Long> newTargetIds = Sets.difference(newIds, currentJoinIds);
                 for (Long targetId : newTargetIds) {
-                    BaseEntity targetEntity = targetEntityRepository.findById(targetId).orElseThrow(() -> new BadRequestException(String.format("%s with id %D not found", manyToManyByArray.targetEntity().getSimpleName(), targetId)));
+                    BaseEntity targetEntity = targetEntityRepository.findById(targetId).orElseThrow(() -> new BadRequestException(String.format("%s with id %d not found", manyToManyByArray.targetEntity().getSimpleName(), targetId)));
                     BaseEntity joinEntity = null;
                     try {
                         joinEntity = manyToManyByArray.joinEntity().newInstance();
