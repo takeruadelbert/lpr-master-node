@@ -89,6 +89,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .sign(HMAC512(SECRET.getBytes()));
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
         res.addHeader(EXPOSE_HEADER_STRING, HEADER_STRING);
-        applicationEventPublisher.publishEvent(new LoginEvent(this, user));
+        LoginEvent loginEvent = new LoginEvent(this, user);
+        loginEvent.setAddress(req.getRemoteAddr());
+        loginEvent.setLoginTime(loginLocalDateTime);
+        applicationEventPublisher.publishEvent(loginEvent);
     }
 }
