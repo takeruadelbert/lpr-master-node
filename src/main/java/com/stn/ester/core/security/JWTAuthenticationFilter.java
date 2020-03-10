@@ -7,8 +7,7 @@ import com.stn.ester.entities.User;
 import com.stn.ester.helpers.DateTimeHelper;
 import com.stn.ester.services.AuthenticationService;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,6 +34,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private AuthenticationManager authenticationManager;
     private ApplicationEventPublisher applicationEventPublisher;
     private AuthenticationService authenticationService;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public JWTAuthenticationFilter(
             AuthenticationManager authenticationManager,
@@ -52,16 +52,24 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             User creds = new ObjectMapper()
                     .readValue(req.getInputStream(), User.class);
-
-            return authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            creds.getUsername(),
-                            creds.getPassword(),
-                            new ArrayList<>())
-            );
+            try {
+                return authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                creds.getUsername(),
+                                creds.getPassword(),
+                                new ArrayList<>())
+                );
+            } catch (LockedException e) {
+                res.sendError(401, "Account banned.");
+            } catch (BadCredentialsException e) {
+                res.sendError(401, "Username atau kata sandi salah.");
+            } catch (DisabledException e) {
+                res.sendError(401, "Account disbled.");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
 
     @Override

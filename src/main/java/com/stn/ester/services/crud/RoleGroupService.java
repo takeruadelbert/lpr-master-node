@@ -19,7 +19,7 @@ public class RoleGroupService extends CrudService<RoleGroup, RoleGroupRepository
         super(roleGroupRepository);
     }
 
-    @Scheduled(fixedDelay = 43_000, initialDelay = 1_000)
+    @Scheduled(fixedDelay = 43_000_000, initialDelay = 1_000)
     protected void deleteBroken() {
         Collection<RoleGroup> roleGroups = currentEntityRepository.findAllByUserIdIsNullAndRoleIdIsNull();
         currentEntityRepository.deleteAll(roleGroups);

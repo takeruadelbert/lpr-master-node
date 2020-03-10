@@ -5,10 +5,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.stn.ester.core.exceptions.MultipleLoginException;
+import com.stn.ester.entities.User;
 import com.stn.ester.helpers.DateTimeHelper;
 import com.stn.ester.services.AuthenticationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.stn.ester.services.crud.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,11 +32,14 @@ import static com.stn.ester.core.security.SecurityConstants.*;
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private AuthenticationService authenticationService;
+    private UserService userService;
 
-    @Autowired
-    public JWTAuthorizationFilter(AuthenticationManager authManager, AuthenticationService authenticationService) {
+    public JWTAuthorizationFilter(AuthenticationManager authManager,
+                                  AuthenticationService authenticationService,
+                                  UserService userService) {
         super(authManager);
         this.authenticationService = authenticationService;
+        this.userService = userService;
     }
 
     @Override
@@ -49,12 +55,22 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         try {
             UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
+            User user = (User) userService.loadUserByUsername(authentication.getPrincipal().toString());
+            if (!user.isAccountNonLocked()) {
+                throw new LockedException("Account banned.");
+            } else if (!user.isAccountNonExpired()) {
+                throw new LockedException("Account disbled.");
+            }
             SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(req, res);
         } catch (MultipleLoginException mle) {
             res.setStatus(440);
         } catch (TokenExpiredException ex) {
-            res.setStatus(401);
+            res.sendError(401, "Token expired.");
+        } catch (DisabledException e) {
+            res.sendError(401, "Account disbled.");
+        } catch (LockedException e) {
+            res.sendError(401, "Account banned.");
         }
     }
 

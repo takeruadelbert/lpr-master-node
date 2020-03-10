@@ -121,13 +121,13 @@ public class User extends BaseEntity implements UserDetails {
     @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return !userStatus.equals(UserStatus.EXPIRE);
     }
 
     @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !userStatus.equals(UserStatus.DISABLE);
     }
 
     @JsonIgnore
