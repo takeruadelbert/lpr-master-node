@@ -43,6 +43,8 @@ public class RoleGroup extends BaseEntity {
 
     @PreRemove
     private void removeAssociate() {
-        this.user.removeRole(this.role);
+        this.user = null;
+        this.role = null;
     }
+
 }

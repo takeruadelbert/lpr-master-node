@@ -17,4 +17,6 @@ public interface RoleGroupRepository extends BaseRepository<RoleGroup> {
     Optional<RoleGroup> findByRoleIdAndUserId(Long roleId, Long userId);
 
     Collection<RoleGroup> findAllByUserId(Long userId);
+
+    Collection<RoleGroup> findAllByUserIdIsNullAndRoleIdIsNull();
 }
