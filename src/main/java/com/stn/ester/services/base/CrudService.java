@@ -330,7 +330,9 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
                     }
                     if (joinEntity != null) {
                         joinEntity.setAttribute(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, manyToManyByArray.targetEntity().getSimpleName()), targetEntity);
+                        joinEntity.setAttribute(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, manyToManyByArray.targetEntity().getSimpleName()) + "Id", targetEntity.getId());
                         joinEntity.setAttribute(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entityClass.getSimpleName()), newObject);
+                        joinEntity.setAttribute(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entityClass.getSimpleName()) + "Id", newObject.getId());
                         Collection var = ((Collection) newObject.getAttribute(manyToManyByArray.attributeName(), newObject));
                         if (var == null) {
                             var = new ArrayList();
