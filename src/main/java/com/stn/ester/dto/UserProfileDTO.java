@@ -15,6 +15,7 @@ public class UserProfileDTO {
     String email;
     Collection<String> roleStrings;
     Collection<Role> roles;
+    Long id;
 
     public UserProfileDTO(User user) {
         profilePicture = user.getProfilePicture();
@@ -27,5 +28,6 @@ public class UserProfileDTO {
             roleStrings.add(roleGroup.getRole().getName());
             roles.add(roleGroup.getRole());
         }
+        id = user.getId();
     }
 }
