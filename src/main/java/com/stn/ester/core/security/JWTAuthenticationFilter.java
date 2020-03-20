@@ -98,7 +98,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
         res.addHeader(EXPOSE_HEADER_STRING, HEADER_STRING);
         LoginEvent loginEvent = new LoginEvent(this, user);
-        loginEvent.setAddress(req.getRemoteAddr());
+        String requestIp = req.getHeader("X-FORWARDED-FOR");
+        if (requestIp == null) {
+            requestIp = req.getRemoteAddr();
+        }
+        loginEvent.setAddress(requestIp);
         loginEvent.setLoginTime(loginLocalDateTime);
         applicationEventPublisher.publishEvent(loginEvent);
     }
