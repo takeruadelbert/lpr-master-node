@@ -40,6 +40,13 @@ public class RoleService extends CrudService<Role, RoleRepository> {
         return null;
     }
 
+    public Role getRoleByName(String name) {
+        Role role = roleRepository.findByName(name);
+        if (role != null)
+            return role;
+        return null;
+    }
+
     public Role getAccessGroup(Long id) {
         if (!this.roleRepository.existsById(id))
             throw new ResourceNotFoundException();
