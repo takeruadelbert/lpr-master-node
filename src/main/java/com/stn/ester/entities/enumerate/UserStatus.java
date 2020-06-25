@@ -7,7 +7,8 @@ import java.util.List;
 
 public enum UserStatus {
     ACTIVE("Aktif"),
-    DISABLE("Tidak Aktif"),
+    DISABLE("Non Aktif"),
+    NOTACTIVED("Belum Aktif"),
     EXPIRE("Expired");
 
     private String label;
