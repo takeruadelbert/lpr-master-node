@@ -335,7 +335,7 @@ public abstract class CrudService<T extends BaseEntity, U extends BaseRepository
                         joinEntity.setAttribute(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entityClass.getSimpleName()) + "Id", newObject.getId());
                         Collection var = ((Collection) newObject.getAttribute(manyToManyByArray.attributeName(), newObject));
                         if (var == null) {
-                            var = new ArrayList();
+                            var = new HashSet();
                         }
                         var.add(joinEntity);
                         newObject.setAttribute(manyToManyByArray.attributeName(), var);
