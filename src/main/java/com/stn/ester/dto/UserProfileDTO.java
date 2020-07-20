@@ -2,11 +2,13 @@ package com.stn.ester.dto;
 
 import com.stn.ester.entities.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
+@NoArgsConstructor
 public class UserProfileDTO {
 
     AssetFile profilePicture;
