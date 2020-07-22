@@ -36,6 +36,7 @@ public abstract class BaseEntity {
     public boolean isPreparedForUpdate = false;
 
     @JsonIgnore
+    @Column(columnDefinition="bit(1) default 0")
     public boolean deleted = false;
 
     @JsonIgnore

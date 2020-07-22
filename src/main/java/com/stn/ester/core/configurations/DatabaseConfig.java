@@ -6,6 +6,9 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import javax.sql.DataSource;
 import java.io.FileInputStream;
@@ -69,5 +72,18 @@ public class DatabaseConfig {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    @Bean
+    public DataSourceInitializer dataSourceInitializer() {
+        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
+        resourceDatabasePopulator.addScript(new ClassPathResource("data/country.sql"));
+        resourceDatabasePopulator.addScript(new ClassPathResource("data/state.sql"));
+        resourceDatabasePopulator.addScript(new ClassPathResource("data/city.sql"));
+
+        DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
+        dataSourceInitializer.setDataSource(getDataSource());
+        dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
+        return dataSourceInitializer;
     }
 }

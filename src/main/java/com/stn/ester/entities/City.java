@@ -20,6 +20,7 @@ public class City extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(columnDefinition = "int(11) default 0")
     private int postal_code;
 
     @Enumerated(EnumType.STRING)
