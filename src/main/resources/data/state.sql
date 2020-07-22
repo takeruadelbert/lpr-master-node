@@ -1,4 +1,4 @@
-INSERT INTO `state` (`id`, `name`,`country_id`) VALUES
+INSERT IGNORE  INTO `state` (`id`, `name`,`country_id`) VALUES
 ('11', 'Aceh', 1),
 ('12', 'Sumatera Utara', 1),
 ('13', 'Sumatera Barat', 1),

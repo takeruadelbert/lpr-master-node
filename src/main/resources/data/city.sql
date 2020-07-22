@@ -1,4 +1,4 @@
-INSERT INTO `city` (`id`, `state_id`, `name`) VALUES
+INSERT IGNORE INTO `city` (`id`, `state_id`, `name`) VALUES
 ('1101', '11', 'Kab. Simeulue'),
 ('1102', '11', 'Kab. Aceh Singkil'),
 ('1103', '11', 'Kab. Aceh Selatan'),
