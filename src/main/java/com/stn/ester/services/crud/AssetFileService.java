@@ -9,6 +9,7 @@ import com.stn.ester.entities.SystemProfile;
 import com.stn.ester.helpers.DateTimeHelper;
 import com.stn.ester.helpers.FileHelper;
 import com.stn.ester.helpers.GlobalFunctionHelper;
+import com.stn.ester.helpers.MimeHelper;
 import com.stn.ester.repositories.jpa.AssetFileRepository;
 import com.stn.ester.repositories.jpa.SystemProfileRepository;
 import com.stn.ester.services.base.CrudService;
@@ -203,6 +204,7 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
                 String[] temp = path.split("/");
                 String name = temp[temp.length - 1];
                 String extension = FileHelper.getExtensionFile(name);
+                String mimeType = MimeHelper.guess("." + extension);
                 if (is_download) {
                     headers.set("Content-Type", "application/x-javascript; charset=utf-8");
                     headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
@@ -210,6 +212,9 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
                     if (extension.matches("(.*)jpg(.*)") || extension.matches("(.*)jpeg(.*)") || extension.matches("(.*)png(.*)") || extension.matches("(.*)gif(.*)") || extension.matches("(.*)bmp(.*)")) {
                         headers.set("Content-Type", "image/" + extension);
                         headers.set("Content-Disposition", "inline; filename=\"" + name + "");
+                    } else if (mimeType != null) {
+                        headers.set("Content-Type", mimeType);
+                        headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
                     } else {
                         headers.set("Content-Type", "application/x-javascript; charset=utf-8");
                         headers.set("Content-Disposition", "attachment; filename=\"" + name + "");
