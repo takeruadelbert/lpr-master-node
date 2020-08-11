@@ -2,6 +2,7 @@ package com.stn.ester.controllers.crud;
 
 import com.stn.ester.controllers.base.CrudController;
 import com.stn.ester.core.base.AccessAllowed;
+import com.stn.ester.core.base.auth.RequireLogin;
 import com.stn.ester.dto.UserProfileDTO;
 import com.stn.ester.entities.User;
 import com.stn.ester.entities.enumerate.Gender;
@@ -49,19 +50,19 @@ public class UserController extends CrudController<UserService, User> {
         return super.service.update(id, user, requestBody);
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/heartbeat")
     public void isValid() {
 
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/profile")
     public UserProfileDTO getMyProfile() {
         return new UserProfileDTO(SessionHelper.getCurrentUser());
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/change-password", method = RequestMethod.PUT)
     public Object changePassword(@RequestBody Map<String, String> data) {
         String old_password = data.get("old_password");
@@ -78,19 +79,19 @@ public class UserController extends CrudController<UserService, User> {
         return service.changePassword(id, new_password, retype_new_password);
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/change-profile-picture", method = RequestMethod.POST)
     public Object changeProfilePicture(@RequestBody Map<String, String> data) {
         return service.changeProfilePicture(data.get("token"));
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/gender", method = RequestMethod.OPTIONS)
     public Map<Gender, String> getGenderList() {
         return this.biodataService.getGenderList();
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/status", method = RequestMethod.OPTIONS)
     public Map<UserStatus, String> getUserStatusList() {
         return this.userService.getUserStatusList();

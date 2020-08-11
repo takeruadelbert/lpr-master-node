@@ -1,6 +1,7 @@
 package com.stn.ester.controllers.crud;
 
 import com.stn.ester.controllers.base.CrudController;
+import com.stn.ester.core.base.auth.RequireLogin;
 import com.stn.ester.entities.News;
 import com.stn.ester.entities.enumerate.NewsStatus;
 import com.stn.ester.services.crud.NewsService;
@@ -30,13 +31,13 @@ public class NewsController extends CrudController<NewsService, News> {
         return service.update(id, news);
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/dashboard", method = RequestMethod.GET)
     public Page<News> dashboard(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUM) Integer page, @RequestParam(name = "size", defaultValue = "2") Integer size) throws Exception {
         return service.dashboard(page, size);
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/status", method = RequestMethod.OPTIONS)
     public Map<NewsStatus, String> getStatusList() {
         return service.getStatusList();
