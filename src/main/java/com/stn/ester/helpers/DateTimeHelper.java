@@ -33,11 +33,15 @@ public class DateTimeHelper {
     }
 
     public static String convertToDateString(LocalDate localDate) {
-        return localDate.format(DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATE));
+        if (localDate != null)
+            return localDate.format(DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATE));
+        return "";
     }
 
     public static String convertToDateTimeString(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATETIME));
+        if (localDateTime != null)
+            return localDateTime.format(DateTimeFormatter.ofPattern(DateTimeFormat.FORMAT_DATETIME));
+        return "";
     }
 
     public static String getCurrentTimeStamp() {
