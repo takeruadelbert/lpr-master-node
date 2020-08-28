@@ -3,6 +3,7 @@ package com.stn.ester.controllers.crud;
 import com.stn.ester.controllers.base.CrudController;
 import com.stn.ester.core.base.AccessAllowed;
 import com.stn.ester.core.base.auth.RequireLogin;
+import com.stn.ester.core.events.HeartbeatEvent;
 import com.stn.ester.dto.UserProfileDTO;
 import com.stn.ester.entities.User;
 import com.stn.ester.entities.enumerate.Gender;
@@ -13,6 +14,7 @@ import com.stn.ester.helpers.SessionHelper;
 import com.stn.ester.services.crud.BiodataService;
 import com.stn.ester.services.crud.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,12 +34,14 @@ public class UserController extends CrudController<UserService, User> {
     private static final String PAYLOAD_CONFIRM_PASSWORD = "confirm_password";
     private UserService userService;
     private BiodataService biodataService;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    public UserController(UserService userService, BiodataService biodataService) {
+    public UserController(UserService userService, BiodataService biodataService, ApplicationEventPublisher applicationEventPublisher) {
         super(userService);
         this.userService = userService;
         this.biodataService = biodataService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -52,8 +56,8 @@ public class UserController extends CrudController<UserService, User> {
 
     @RequireLogin
     @RequestMapping(value = "/heartbeat")
-    public void isValid() {
-
+    public void isValid(HttpServletRequest request) {
+        applicationEventPublisher.publishEvent(new HeartbeatEvent(this, SessionHelper.getUserID(), request));
     }
 
     @RequireLogin
