@@ -4,12 +4,14 @@ import com.stn.ester.core.search.AppSpecification;
 import com.stn.ester.core.search.SpecificationsBuilder;
 import com.stn.ester.core.search.util.SearchOperation;
 import com.stn.ester.core.search.util.SpecSearchCriteria;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+@Log4j2
 public class SearchAndFilterHelper {
 
     //input as string jsonobject
@@ -18,7 +20,7 @@ public class SearchAndFilterHelper {
         try {
             SearchAndFilterHelper.loopSpecToSpecBuilder(builder, GlobalFunctionHelper.jsonStringToMap(searchParameters), null);
         } catch (IOException ex) {
-            System.out.println(ex);
+            log.trace(ex);
         }
         return builder.build();
     }

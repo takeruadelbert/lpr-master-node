@@ -9,6 +9,7 @@ import com.stn.ester.entities.User;
 import com.stn.ester.helpers.DateTimeHelper;
 import com.stn.ester.services.AuthenticationService;
 import com.stn.ester.services.crud.UserService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static com.stn.ester.core.security.SecurityConstants.*;
 
+@Log4j2
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private AuthenticationService authenticationService;
@@ -92,7 +94,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 if (!authenticationService.isMultipleSessionAllowed() && !authenticationService.isNewestToken(username, DateTimeHelper.asLocalDateTime(iat))) {
                     throw new MultipleLoginException();
                 }
-                System.out.println("granted auth : " + authoritiesString);
+                log.debug("granted auth : " + authoritiesString);
                 return new UsernamePasswordAuthenticationToken(username, null, authorities);
             }
             return null;

@@ -40,7 +40,6 @@ public class RoleController extends CrudController<RoleService, Role> {
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole('editAccessGroup'))")
     @RequestMapping(value = "/{id}/access_groups", method = RequestMethod.PUT)
     public Object editAccessGroup(@PathVariable long id, @RequestBody HashMap<String, Object> o) {
-        System.out.println(o);
         ArrayList<HashMap> accessGroups = (ArrayList) o.get("accessGroups");
         Long roleId = Long.parseLong(o.get("id").toString());
         this.accessGroupService.updateAll(roleId, accessGroups);

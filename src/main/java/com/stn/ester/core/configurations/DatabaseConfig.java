@@ -1,6 +1,7 @@
 package com.stn.ester.core.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 @Configuration
 @PropertySource("classpath:application-development.properties")
+@Log4j2
 public class DatabaseConfig {
     @Value("${spring.datasource.url}")
     private String url;
@@ -48,7 +50,7 @@ public class DatabaseConfig {
                     }
                 }
             } else {
-                System.out.println("Error : can't read JSON file.");
+                log.error("Error : can't read JSON file.");
                 return null;
             }
         }
@@ -68,7 +70,7 @@ public class DatabaseConfig {
                 return null;
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            log.error(ex.getMessage());
             ex.printStackTrace();
             return null;
         }

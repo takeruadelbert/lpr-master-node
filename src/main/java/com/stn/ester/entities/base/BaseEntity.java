@@ -3,6 +3,7 @@ package com.stn.ester.entities.base;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @Data
+@Log4j2
 public abstract class BaseEntity {
 
     @Id
@@ -36,7 +38,7 @@ public abstract class BaseEntity {
     public boolean isPreparedForUpdate = false;
 
     @JsonIgnore
-    @Column(columnDefinition="bit(1) default 0")
+    @Column(columnDefinition = "bit(1) default 0")
     public boolean deleted = false;
 
     @JsonIgnore
@@ -71,7 +73,7 @@ public abstract class BaseEntity {
             attribute.setAccessible(true);
             attribute.set(this, value);
         } catch (Exception ex) {
-            System.out.println(ex);
+            log.trace(ex);
         }
     }
 

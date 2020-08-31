@@ -14,6 +14,7 @@ import com.stn.ester.repositories.jpa.AssetFileRepository;
 import com.stn.ester.repositories.jpa.SystemProfileRepository;
 import com.stn.ester.services.base.CrudService;
 import lombok.Data;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Log4j2
 public class AssetFileService extends CrudService<AssetFile, AssetFileRepository> {
 
     @Autowired
@@ -108,7 +110,7 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
                         data.add(savedAssetFile);
                         applicationEventPublisher.publishEvent(new FileUploadEvent(this, savedAssetFile, target));
                     } else {
-                        System.out.println("NULL");
+                        log.debug("Empty upload.");
                     }
                 }
                 result.put("status", HttpStatus.OK.value());

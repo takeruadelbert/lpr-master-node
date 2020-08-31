@@ -152,7 +152,6 @@ public class UserService extends CrudService<User, UserRepository> implements As
 
     @Transactional
     public Object changePassword(Long userID, String oldPassword, String newPassword, String retypeNewPassword) {
-        System.out.println(userID);
         // check if old password is same with the registered one
         User user = this.userRepository.findById(userID).orElse(null);
         if (user == null || !passwordEncoder.matches(oldPassword, user.getPassword())) {
