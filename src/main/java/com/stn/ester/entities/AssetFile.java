@@ -6,9 +6,12 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 @Data
 @Entity
+@Table(indexes = {@Index(columnList = "token")})
 public class AssetFile extends BaseEntity {
 
     private String path;
