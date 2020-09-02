@@ -66,6 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             web.ignoring().antMatchers(HttpMethod.resolve(pathMethod.requestMethod.toString()), pathMethod.Path);
         }
         web.ignoring().antMatchers("/error");
+        web.ignoring().antMatchers("/ws");
+        web.ignoring().antMatchers("/ws/**");
     }
 
     @Override

@@ -211,6 +211,11 @@ public class UserService extends CrudService<User, UserRepository> implements As
                 .get();
     }
 
+    public Long getUserIdByUsername(String username) {
+        User user = (User) loadUserByUsername(username);
+        return user.getId();
+    }
+
     @Transactional
     public Object createIfUsernameNotExist(User user, String username) {
         if (!this.userRepository.findByUsername(username).isPresent()) {

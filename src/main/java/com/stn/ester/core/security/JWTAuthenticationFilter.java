@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
+import static com.stn.ester.constants.AuthMessage.*;
 import static com.stn.ester.core.security.SecurityConstants.*;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -60,11 +61,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                 new ArrayList<>())
                 );
             } catch (LockedException e) {
-                res.sendError(401, "Account banned.");
+                res.sendError(401, ACCOUNT_BANNED_STRING);
             } catch (BadCredentialsException e) {
-                res.sendError(401, "Username atau kata sandi salah.");
+                res.sendError(401, BAD_CREDENTIAL_STRING);
             } catch (DisabledException e) {
-                res.sendError(401, "Account disbled.");
+                res.sendError(401, ACCOUNT_DISABLED_STRING);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -95,8 +96,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withClaim(AUTHORITIES_KEY, authoritiesString)
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(HMAC512(SECRET.getBytes()));
-        res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
-        res.addHeader(EXPOSE_HEADER_STRING, HEADER_STRING);
+        res.addHeader(AUTHORIZATION_HEADER_STRING, AUTHORIZATION_TOKEN_PREFIX + token);
+        res.addHeader(EXPOSE_HEADER_STRING, AUTHORIZATION_HEADER_STRING);
         LoginEvent loginEvent = new LoginEvent(this, user);
         String requestIp = req.getHeader("X-FORWARDED-FOR");
         if (requestIp == null) {
