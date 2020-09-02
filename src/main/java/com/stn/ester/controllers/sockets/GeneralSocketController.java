@@ -1,6 +1,7 @@
 package com.stn.ester.controllers.sockets;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +13,11 @@ public class GeneralSocketController {
     @Autowired
     public GeneralSocketController(SimpMessagingTemplate brokerMessagingTemplate) {
         this.brokerMessagingTemplate = brokerMessagingTemplate;
+    }
+
+    @SendTo("/topic/announcement")
+    public void announcementTopic(){
+
     }
 
 }
