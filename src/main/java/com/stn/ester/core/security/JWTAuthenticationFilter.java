@@ -3,6 +3,7 @@ package com.stn.ester.core.security;
 import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stn.ester.core.events.LoginEvent;
+import com.stn.ester.dto.LoginRequestDTO;
 import com.stn.ester.entities.User;
 import com.stn.ester.helpers.DateTimeHelper;
 import com.stn.ester.services.AuthenticationService;
@@ -51,8 +52,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
         try {
-            User creds = new ObjectMapper()
-                    .readValue(req.getInputStream(), User.class);
+            LoginRequestDTO creds = new ObjectMapper()
+                    .readValue(req.getInputStream(), LoginRequestDTO.class);
+            req.getSession().setAttribute("rememberMe", creds.getRememberMe());
             try {
                 return authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
@@ -79,10 +81,15 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
 
+        Boolean rememberMe = Boolean.parseBoolean(req.getSession().getAttribute("rememberMe").toString());
+        Long sessionLifeTime = EXPIRATION_TIME;
+        if (rememberMe == true) {
+            sessionLifeTime += 157_680_000_000L;
+        }
         User user = ((User) auth.getPrincipal());
         Collection<GrantedAuthority> authorities = new ArrayList();
         authorities.addAll(auth.getAuthorities());
-        //authorities.addAll(accessGroupService.buildAccessAuthorities(user.getUserGroupId()));
+
         final String authoritiesString = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -94,7 +101,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withIssuedAt(loginDate)
                 .withSubject(user.getUsername())
                 .withClaim(AUTHORITIES_KEY, authoritiesString)
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + sessionLifeTime))
                 .sign(HMAC512(SECRET.getBytes()));
         res.addHeader(AUTHORIZATION_HEADER_STRING, AUTHORIZATION_TOKEN_PREFIX + token);
         res.addHeader(EXPOSE_HEADER_STRING, AUTHORIZATION_HEADER_STRING);

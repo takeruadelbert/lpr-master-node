@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SecurityConstants {
-    public static final String SECRET = "SecretKeyToGenJWTs";
+    public static String SECRET;
     public static Long EXPIRATION_TIME;
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     public static final String AUTHORIZATION_HEADER_STRING = "Authorization";
@@ -21,4 +21,11 @@ public class SecurityConstants {
     public void setExpirationTime(Long expirationTime) {
         EXPIRATION_TIME = expirationTime;
     }
+
+    @Value("${ester.jwt.secret-key}")
+    public void setSecret(String secretKey) {
+        SECRET = secretKey;
+    }
+
+
 }
