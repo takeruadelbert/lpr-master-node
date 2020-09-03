@@ -1,6 +1,7 @@
 package com.stn.ester.controllers.base;
 
 import com.stn.ester.core.exceptions.NotFoundException;
+import com.stn.ester.dto.base.EntityDTO;
 import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.helpers.SearchAndFilterHelper;
 import com.stn.ester.services.base.CrudService;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -29,8 +32,16 @@ public abstract class CrudController<T extends CrudService, U extends BaseEntity
     @Autowired
     protected ModelMapper modelMapper;
 
+    private Boolean isReturnAsDTO = false;
+
+    private Class<? extends EntityDTO> dtoClass;
+
+    private Class<U> entityClass;
+
     public CrudController(T service) {
         this.service = service;
+        this.entityClass = (Class<U>) ((ParameterizedType) this.getClass().getGenericSuperclass())
+                .getActualTypeArguments()[1];
     }
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
@@ -40,25 +51,25 @@ public abstract class CrudController<T extends CrudService, U extends BaseEntity
             search = URLDecoder.decode(search, StandardCharsets.UTF_8.toString());
         }
         Specification<U> spec = SearchAndFilterHelper.resolveSpecification(search);
-        return service.index(page, size, spec);
+        return isCastToDTO(service.index(page, size, spec));
     }
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Object get(@PathVariable long id) {
-        return service.get(id);
+        return this.isCastToDTO(service.get(id));
     }
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "", method = RequestMethod.POST)
     public Object create(@Valid @RequestBody U domain) {
-        return service.create(domain);
+        return this.isCastToDTO(service.create(domain));
     }
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public Object update(@PathVariable long id, @Valid @RequestBody U domain, @RequestBody Map<String, Object> requestBody) {
-        return service.update(id, domain, requestBody);
+        return this.isCastToDTO(service.update(id, domain, requestBody));
     }
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole())")
@@ -83,4 +94,33 @@ public abstract class CrudController<T extends CrudService, U extends BaseEntity
         }
     }
 
+    private Object isCastToDTO(BaseEntity o) {
+        if (isReturnAsDTO) {
+            try {
+                return dtoClass.getConstructor(entityClass).newInstance(o);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        return o;
+    }
+
+    private Page<? extends Object> isCastToDTO(Page<BaseEntity> page){
+        return page.map(p-> isCastToDTO(p));
+    }
+
+    protected void enableReturnAsDTO(Class<? extends EntityDTO<U>> dtoClass) {
+        this.dtoClass = dtoClass;
+        this.isReturnAsDTO = true;
+    }
+
+    protected void disabledReturnAsDto() {
+        this.isReturnAsDTO = false;
+    }
 }
