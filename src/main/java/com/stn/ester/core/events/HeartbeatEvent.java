@@ -10,18 +10,11 @@ public class HeartbeatEvent extends ApplicationEvent {
 
     private Long userId;
     private HttpServletRequest request;
-    private String remoteAddress;
 
     public HeartbeatEvent(Object source, Long userId, HttpServletRequest request) {
         super(source);
         this.userId = userId;
         this.request = request;
-    }
-
-    public HeartbeatEvent(Object source, Long userId, String remoteAddress) {
-        super(source);
-        this.userId = userId;
-        this.remoteAddress = remoteAddress;
     }
 
 }
