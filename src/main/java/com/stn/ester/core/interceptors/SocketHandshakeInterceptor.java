@@ -6,13 +6,20 @@ import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 public class SocketHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Map<String, Object> attributes) throws Exception {
         if (serverHttpRequest instanceof ServletServerHttpRequest) {
-            attributes.put("request", ((ServletServerHttpRequest) serverHttpRequest).getServletRequest());
+            HttpServletRequest request = ((ServletServerHttpRequest) serverHttpRequest).getServletRequest();
+            String remoteAddress = request.getHeader("X-FORWARDED-FOR");
+            if (remoteAddress == null) {
+                remoteAddress = request.getRemoteAddr();
+            }
+            attributes.put("remoteAddress", remoteAddress);
+
         }
         return true;
     }
