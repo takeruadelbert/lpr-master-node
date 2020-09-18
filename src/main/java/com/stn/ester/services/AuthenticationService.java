@@ -79,7 +79,6 @@ public class AuthenticationService {
                 } else if (!user.isAccountNonExpired()) {
                     throw new LockedException(ACCOUNT_DISABLED_STRING);
                 }
-                log.info("granted auth : " + authoritiesString);
                 Map<String, Object> credentials = new HashMap<>();
                 credentials.put("jwtToken", jwtToken);
                 credentials.put("userId", userService.getUserIdByUsername(username));
