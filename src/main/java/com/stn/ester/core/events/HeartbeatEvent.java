@@ -2,7 +2,6 @@ package com.stn.ester.core.events;
 
 import lombok.Data;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.http.server.ServerHttpRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,7 +10,7 @@ public class HeartbeatEvent extends ApplicationEvent {
 
     private Long userId;
     private HttpServletRequest request;
-    private ServerHttpRequest request2;
+    private String remoteAddress;
 
     public HeartbeatEvent(Object source, Long userId, HttpServletRequest request) {
         super(source);
@@ -19,10 +18,10 @@ public class HeartbeatEvent extends ApplicationEvent {
         this.request = request;
     }
 
-    public HeartbeatEvent(Object source, Long userId, ServerHttpRequest request) {
+    public HeartbeatEvent(Object source, Long userId, String remoteAddress) {
         super(source);
         this.userId = userId;
-        this.request2 = request;
+        this.remoteAddress = remoteAddress;
     }
 
 }

@@ -8,7 +8,6 @@ import com.stn.ester.services.crud.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -63,8 +62,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             checkToken(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("jwtToken").toString(), accessor.getSessionId());
         }
         if (usernamePasswordAuthenticationToken != null) {
-            ServerHttpRequest request = (ServerHttpRequest) accessor.getSessionAttributes().get("request");
-            applicationEventPublisher.publishEvent(new HeartbeatEvent(this, Long.parseLong(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("userId").toString()), request));
+            applicationEventPublisher.publishEvent(new HeartbeatEvent(this, Long.parseLong(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("userId").toString()), (String) accessor.getSessionAttributes().get("ip")));
         }
         return message;
     }
