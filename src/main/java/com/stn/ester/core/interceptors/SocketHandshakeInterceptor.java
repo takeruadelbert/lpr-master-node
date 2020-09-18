@@ -12,8 +12,7 @@ public class SocketHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Map<String, Object> attributes) throws Exception {
         if (serverHttpRequest instanceof ServletServerHttpRequest) {
-            attributes.put("ip", serverHttpRequest.getRemoteAddress());
-            attributes.put("request", serverHttpRequest);
+            attributes.put("request", ((ServletServerHttpRequest) serverHttpRequest).getServletRequest());
         }
         return true;
     }

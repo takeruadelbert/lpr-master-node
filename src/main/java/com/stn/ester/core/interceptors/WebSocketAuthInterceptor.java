@@ -20,6 +20,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static com.stn.ester.constants.AuthMessage.*;
@@ -62,7 +63,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             checkToken(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("jwtToken").toString(), accessor.getSessionId());
         }
         if (usernamePasswordAuthenticationToken != null) {
-            applicationEventPublisher.publishEvent(new HeartbeatEvent(this, Long.parseLong(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("userId").toString()), accessor.getSessionAttributes().get("ip").toString()));
+            applicationEventPublisher.publishEvent(new HeartbeatEvent(this, Long.parseLong(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("userId").toString()), (HttpServletRequest) accessor.getSessionAttributes().get("request")));
         }
         return message;
     }
