@@ -8,6 +8,7 @@ import com.stn.ester.repositories.jpa.SystemProfileRepository;
 import com.stn.ester.services.base.CrudService;
 import com.stn.ester.services.base.traits.AssetFileClaimTrait;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -25,8 +26,13 @@ public class SystemProfileService extends CrudService implements AssetFileClaimT
     private final String logoType = "logo";
     private final String backgroundImageType = "bg-image";
 
+    @Value("${project.version}")
+    private String projectVersion;
+
     @Autowired
-    public SystemProfileService(SystemProfileRepository systemProfileRepository, AssetFileService assetFileService, AssetFileRepository assetFileRepository) {
+    public SystemProfileService(SystemProfileRepository systemProfileRepository,
+                                AssetFileService assetFileService,
+                                AssetFileRepository assetFileRepository) {
         super(systemProfileRepository);
         this.systemProfileRepository = systemProfileRepository;
         this.assetFileService = assetFileService;
@@ -89,7 +95,9 @@ public class SystemProfileService extends CrudService implements AssetFileClaimT
     }
 
     public SystemProfile get() {
-        return this.systemProfileRepository.findById(1L).get();
+        SystemProfile systemProfile = this.systemProfileRepository.findById(1L).get();
+        systemProfile.setVersion(projectVersion);
+        return systemProfile;
     }
 
     public BufferedImage getLogoImage() throws IOException {
