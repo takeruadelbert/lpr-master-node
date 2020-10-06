@@ -1,7 +1,7 @@
 package com.stn.ester.repositories.jpa;
 
-import com.stn.ester.repositories.jpa.base.BaseRepository;
 import com.stn.ester.entities.AccessGroup;
+import com.stn.ester.repositories.jpa.base.BaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -27,4 +27,6 @@ public interface AccessGroupRepository extends BaseRepository<AccessGroup> {
     Optional<AccessGroup> findByMenuIdAndRoleId(Long menuId, Long roleId);
 
     Collection<AccessGroup> findAllByMenuIdAndRoleIdIn(Long menuId, Collection<Long> roleIds);
+
+    Collection<AccessGroup> findAllByMenuIdInAndViewable(Collection<Long> menuIds, boolean viewable);
 }

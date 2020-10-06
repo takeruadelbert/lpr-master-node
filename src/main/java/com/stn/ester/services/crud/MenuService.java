@@ -3,15 +3,10 @@ package com.stn.ester.services.crud;
 import com.stn.ester.core.exceptions.BadRequestException;
 import com.stn.ester.core.exceptions.NotFoundException;
 import com.stn.ester.core.security.SecurityConstants;
-import com.stn.ester.dto.entity.MenuSimpleDTO;
 import com.stn.ester.dto.PrivilegeDTO;
-import com.stn.ester.entities.AccessGroup;
-import com.stn.ester.entities.Menu;
-import com.stn.ester.entities.Role;
-import com.stn.ester.repositories.jpa.AccessGroupRepository;
-import com.stn.ester.repositories.jpa.MenuRepository;
-import com.stn.ester.repositories.jpa.ModuleRepository;
-import com.stn.ester.repositories.jpa.RoleRepository;
+import com.stn.ester.dto.entity.MenuSimpleDTO;
+import com.stn.ester.entities.*;
+import com.stn.ester.repositories.jpa.*;
 import com.stn.ester.services.base.CrudService;
 import com.stn.ester.services.base.traits.SimpleSearchTrait;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MenuService extends CrudService<Menu, MenuRepository> implements SimpleSearchTrait<Menu, MenuSimpleDTO, MenuRepository> {
@@ -29,19 +25,23 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
     private AccessGroupRepository accessGroupRepository;
     private RoleRepository roleRepository;
     private ModuleRepository moduleRepository;
+    private RoleGroupRepository roleGroupRepository;
 
     @Autowired
     public MenuService(MenuRepository menuRepository,
                        RoleService roleService,
                        AccessGroupRepository accessGroupRepository,
                        RoleRepository roleRepository,
-                       ModuleRepository moduleRepository) {
+                       ModuleRepository moduleRepository,
+                       RoleGroupRepository roleGroupRepository
+    ) {
         super(menuRepository);
         this.menuRepository = menuRepository;
         this.roleService = roleService;
         this.accessGroupRepository = accessGroupRepository;
         this.roleRepository = roleRepository;
         this.moduleRepository = moduleRepository;
+        this.roleGroupRepository = roleGroupRepository;
     }
 
     @Override
@@ -163,5 +163,14 @@ public class MenuService extends CrudService<Menu, MenuRepository> implements Si
     @Override
     public MenuRepository getRepository() {
         return currentEntityRepository;
+    }
+
+    public Collection<User> getUserWhoHaveAccessTo(Menu... menus) {
+        List<Long> menuIds = Arrays.asList(menus).stream().map(Menu::getId).collect(Collectors.toList());
+        Collection<AccessGroup> accessGroups = accessGroupRepository.findAllByMenuIdInAndViewable(menuIds, true);
+        Collection<Long> roleIds = accessGroups.stream().map(o -> o.getRoleId()).collect(Collectors.toList());
+        Collection<RoleGroup> roleGroups = roleGroupRepository.findAllByRoleIdIn(roleIds);
+        Collection<User> users = roleGroups.stream().map(RoleGroup::getUser).collect(Collectors.toList());
+        return users;
     }
 }
