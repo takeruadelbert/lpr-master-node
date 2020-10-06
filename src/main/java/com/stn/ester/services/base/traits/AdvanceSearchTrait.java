@@ -48,12 +48,16 @@ public interface AdvanceSearchTrait<U extends BaseEntity, X extends BaseReposito
             throw new SimpleSearchException(String.format(MESSAGE_NO_SUCH_METHOD, targetClazz, clazz));
         }
         try {
-            for (U entity : getRepository().findAll(spec, PageRequest.of(0, 10))) {
+            for (U entity : getRepository().findAll(spec, PageRequest.of(0, getAdvanceSearchSize()))) {
                 result.add(constructor.newInstance(entity));
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new SimpleSearchException(String.format("Cannot instantiate instance of %s", clazz));
         }
         return result;
+    }
+
+    default int getAdvanceSearchSize() {
+        return 10;
     }
 }
