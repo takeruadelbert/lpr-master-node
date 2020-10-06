@@ -2,6 +2,7 @@ package com.stn.ester.services;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.stn.ester.core.exceptions.MultipleLoginException;
 import com.stn.ester.entities.User;
@@ -59,9 +60,17 @@ public class AuthenticationService {
     public UsernamePasswordAuthenticationToken getAuthentication(String jwtToken) {
         if (jwtToken != null) {
             // parse the token.
-            DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(jwtToken.replace(AUTHORIZATION_TOKEN_PREFIX, ""));
+            DecodedJWT decodedJWT = null;
+            try {
+                decodedJWT = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
+                        .build()
+                        .verify(jwtToken.replace(AUTHORIZATION_TOKEN_PREFIX, ""));
+            } catch (JWTDecodeException ex) {
+                log.error("Unable to decode JWT");
+            }
+            if (decodedJWT == null) {
+                return null;
+            }
             String username = decodedJWT.getSubject();
             String authoritiesString = decodedJWT.getClaim(AUTHORITIES_KEY).asString();
             Date iat = decodedJWT.getIssuedAt();

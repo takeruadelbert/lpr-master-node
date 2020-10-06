@@ -59,7 +59,13 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             }
         } else {
             usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) accessor.getUser();
-            checkToken(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("jwtToken").toString(), accessor.getSessionId());
+            if (usernamePasswordAuthenticationToken != null && usernamePasswordAuthenticationToken.getCredentials() != null) {
+                Map<String, Object> credentials = ((Map) usernamePasswordAuthenticationToken.getCredentials());
+                if (credentials.containsKey("jwtToken")) {
+                    checkToken(credentials.get("jwtToken").toString(), accessor.getSessionId());
+                    applicationEventPublisher.publishEvent(new HeartbeatEvent(this, Long.parseLong(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("userId").toString()), accessor.getSessionAttributes().get("remoteAddress").toString()));
+                }
+            }
         }
         if (usernamePasswordAuthenticationToken != null) {
             applicationEventPublisher.publishEvent(new HeartbeatEvent(this, Long.parseLong(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("userId").toString()), accessor.getSessionAttributes().get("remoteAddress").toString()));
