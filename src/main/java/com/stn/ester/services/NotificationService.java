@@ -14,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -79,11 +78,5 @@ public class NotificationService {
 
     public Long countUnseenNotificationByUserId(Long userId) {
         return this.notificationRepository.countAllByReceiverIdAndSeenIsFalse(userId);
-    }
-
-    @PostConstruct
-    public void populatePublishDt() {
-        this.notificationRepository.fixPublishDt();
-        updateNotification(1L, "ok", "#", "{}", "test");
     }
 }
