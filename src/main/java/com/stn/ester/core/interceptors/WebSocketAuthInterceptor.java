@@ -67,9 +67,6 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 }
             }
         }
-        if (usernamePasswordAuthenticationToken != null) {
-            applicationEventPublisher.publishEvent(new HeartbeatEvent(this, Long.parseLong(((Map) usernamePasswordAuthenticationToken.getCredentials()).get("userId").toString()), accessor.getSessionAttributes().get("remoteAddress").toString()));
-        }
         return message;
     }
 
