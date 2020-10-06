@@ -14,9 +14,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.Collection;
-
-import static com.stn.ester.entities.constant.EntityConstant.FIELD_CREATED_DATE;
 
 @Service
 public class NotificationService {
@@ -28,8 +29,33 @@ public class NotificationService {
     }
 
     public Object addNotification(Long receiver_id, String message, String url, String data, String type) {
-        Notification notification = new Notification(receiver_id, message, url, data, type);
+        return addNotification(receiver_id, message, url, data, type, LocalDateTime.now());
+    }
+
+    public Object addNotification(Long receiver_id, String message, String url, String data, String type, LocalDateTime publishDt) {
+        Notification notification = new Notification(receiver_id, message, url, data, type, publishDt);
         return notificationRepository.save(notification);
+    }
+
+    public void updateNotification(Long receiver_id, String message, String url, String data, String type) {
+        updateNotification(receiver_id, message, url, data, type, LocalDateTime.now());
+    }
+
+    @Transactional
+    public void updateNotification(Long receiver_id, String message, String url, String data, String type, LocalDateTime publishDt) {
+        Collection<Notification> notifications = this.notificationRepository.findAllByTypeAndReceiverId(type, receiver_id);
+        if (!notifications.isEmpty()) {
+            for (Notification notification : notifications) {
+                notification.setSeen(false);
+                notification.setUrl(url);
+                notification.setData(data);
+                notification.setMessage(message);
+                notification.setPublishDt(publishDt);
+                notificationRepository.save(notification);
+            }
+        } else {
+            addNotification(receiver_id, message, url, data, type, publishDt);
+        }
     }
 
     public Object setToHasSeen(Long notification_id) {
@@ -44,14 +70,20 @@ public class NotificationService {
     public Page<Notification> indexByUserId(Long userId, Integer page, Integer size, Specification specification) {
         AppSpecification<Notification> spec1 = new AppSpecification<>(new SpecSearchCriteria("receiverId", SearchOperation.EQUALITY, userId));
         Specification spec = Specification.where(spec1).and(specification);
-        return notificationRepository.findAll(spec, PageRequest.of(page, size, Sort.by(FIELD_CREATED_DATE).descending()));
+        return notificationRepository.findAll(spec, PageRequest.of(page, size, Sort.by("publishDt").descending()));
     }
 
     public Collection<Notification> getNotificationFeedByUserId(Long userId) {
-        return this.notificationRepository.findTop10ByReceiverIdOrderByCreatedDateDesc(userId);
+        return this.notificationRepository.findTop10ByReceiverIdAndSeenIsFalseOrderByCreatedDateDesc(userId);
     }
 
     public Long countUnseenNotificationByUserId(Long userId) {
         return this.notificationRepository.countAllByReceiverIdAndSeenIsFalse(userId);
+    }
+
+    @PostConstruct
+    public void populatePublishDt() {
+        this.notificationRepository.fixPublishDt();
+        updateNotification(1L, "ok", "#", "{}", "test");
     }
 }

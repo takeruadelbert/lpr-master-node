@@ -26,7 +26,7 @@ public class NotificationDTO implements Comparable<NotificationDTO> {
         this.message = notification.getMessage();
         this.url = notification.getUrl();
         this.seen = notification.getSeen();
-        this.publishTime = notification.getCreatedDate();
+        this.publishTime = notification.getPublishDt();
         this.type = notification.getType();
         this.notificationId = notification.getId();
         try {

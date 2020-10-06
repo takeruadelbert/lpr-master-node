@@ -7,6 +7,7 @@ import com.stn.ester.entities.constant.EntityConstant;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -31,21 +32,24 @@ public class Notification extends BaseEntity {
     }
 
     @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_BOOLEAN_FALSE, nullable = false)
-    private Boolean seen=false;
+    private Boolean seen = false;
 
     private String data;
     private String type;
+
+    private LocalDateTime publishDt;
 
     public Notification() {
 
     }
 
-    public Notification(Long receiverId, String message, String url, String data, String type) {
+    public Notification(Long receiverId, String message, String url, String data, String type, LocalDateTime publishDt) {
         this.receiverId = receiverId;
         this.message = message;
         this.url = url;
         this.data = data;
         this.type = type;
+        this.publishDt = publishDt;
     }
 
 }
