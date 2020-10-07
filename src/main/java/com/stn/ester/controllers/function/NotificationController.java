@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 public class NotificationController extends SecuredController {
@@ -31,17 +30,7 @@ public class NotificationController extends SecuredController {
     @PreAuthorize("hasPermission(null,'allowall')")
     @RequestMapping(value = "/notifications/feed/me", method = RequestMethod.GET)
     public Map<String, Object> getNotification() {
-        Map<String, Object> result = new HashMap<>();
-        Collection<Notification> notifications = notificationService.getNotificationFeedByUserId(SessionHelper.getUserID());
-        List<NotificationDTO> notificationDTOS = notifications.stream().map(
-                n -> {
-                    NotificationDTO notificationDTO = new NotificationDTO(n);
-                    return notificationDTO;
-                }).collect(Collectors.toList());
-        Collections.sort(notificationDTOS);
-        result.put("notifications", notificationDTOS);
-        result.put("unseen", notificationService.countUnseenNotificationByUserId(SessionHelper.getUserID()));
-        return result;
+        return notificationService.notificationFeedMe();
     }
 
     @PreAuthorize("hasPermission(null,'allowall')")

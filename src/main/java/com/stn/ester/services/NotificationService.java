@@ -4,6 +4,7 @@ import com.stn.ester.core.exceptions.BadRequestException;
 import com.stn.ester.core.search.AppSpecification;
 import com.stn.ester.core.search.util.SearchOperation;
 import com.stn.ester.core.search.util.SpecSearchCriteria;
+import com.stn.ester.dto.entity.NotificationDTO;
 import com.stn.ester.entities.Notification;
 import com.stn.ester.helpers.SessionHelper;
 import com.stn.ester.repositories.jpa.NotificationRepository;
@@ -16,7 +17,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class NotificationService {
@@ -78,5 +80,19 @@ public class NotificationService {
 
     public Long countUnseenNotificationByUserId(Long userId) {
         return this.notificationRepository.countAllByReceiverIdAndSeenIsFalse(userId);
+    }
+
+    public Map<String, Object> notificationFeedMe(){
+        Map<String, Object> result = new HashMap<>();
+        Collection<Notification> notifications = this.getNotificationFeedByUserId(SessionHelper.getUserID());
+        List<NotificationDTO> notificationDTOS = notifications.stream().map(
+                n -> {
+                    NotificationDTO notificationDTO = new NotificationDTO(n);
+                    return notificationDTO;
+                }).collect(Collectors.toList());
+        Collections.sort(notificationDTOS);
+        result.put("notifications", notificationDTOS);
+        result.put("unseen", this.countUnseenNotificationByUserId(SessionHelper.getUserID()));
+        return result;
     }
 }
