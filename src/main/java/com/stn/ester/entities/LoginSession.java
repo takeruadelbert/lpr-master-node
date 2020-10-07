@@ -18,7 +18,8 @@ public class LoginSession extends BaseEntity {
     @ManyToOne
     private User user;
 
-    private LoginSession(){}
+    public LoginSession() {
+    }
 
     public LoginSession(String token, Date expire, User user) {
         this.token = token;

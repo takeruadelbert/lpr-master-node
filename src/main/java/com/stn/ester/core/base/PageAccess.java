@@ -9,11 +9,11 @@ public enum PageAccess {
         this.name = name;
     }
 
-    String getName(){
+    String getName() {
         return name;
     }
 
-    public boolean isEqual(String s){
+    public boolean isEqual(String s) {
         return getName().equals(s);
     }
 }

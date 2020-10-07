@@ -12,5 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocialMediaController extends CrudController<SocialMediaService, SocialMedia> {
 
     @Autowired
-    public SocialMediaController(SocialMediaService socialMediaService) { super(socialMediaService);}
+    public SocialMediaController(SocialMediaService socialMediaService) {
+        super(socialMediaService);
+    }
 }

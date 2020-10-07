@@ -27,7 +27,7 @@ public class CityController extends CrudController<CityService, City> {
 
     @RequireLogin
     @RequestMapping(value = "/city_status", method = RequestMethod.OPTIONS)
-    public Map<CityStatus,String> getCityStatusList() {
+    public Map<CityStatus, String> getCityStatusList() {
         return service.getCityStatusList();
     }
 }

@@ -27,13 +27,13 @@ public class SpecSearchCriteria {
         this.value = value;
     }
 
-    public SpecSearchCriteria(final String orPredicate, final String key, final SearchOperation operation, final Object value,final String classJoin) {
+    public SpecSearchCriteria(final String orPredicate, final String key, final SearchOperation operation, final Object value, final String classJoin) {
         super();
         this.orPredicate = orPredicate != null && orPredicate.equals(SearchOperation.OR_PREDICATE_FLAG);
         this.key = key;
         this.operation = operation;
         this.value = value;
-        this.classJoin=classJoin;
+        this.classJoin = classJoin;
     }
 
     public SpecSearchCriteria(String key, SearchOperation op, String prefix, String value, String suffix) {
@@ -97,8 +97,8 @@ public class SpecSearchCriteria {
     }
 
     @Override
-    public String toString(){
-        return key+operation+value;
+    public String toString() {
+        return key + operation + value;
     }
 
 }

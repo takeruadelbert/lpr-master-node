@@ -69,7 +69,7 @@ public class EmailHelper {
         imgBodyPart.addAll(Arrays.asList(imgBody, imgBody2, imgBody3, imgBody4));
 
         // loop each image and actually will display all inline image/logo on template mail
-        for (int i=0, k=0, l=0; i<imgPath.size() && k<contentID.size() && l<imgBodyPart.size(); i++,k++,l++) {
+        for (int i = 0, k = 0, l = 0; i < imgPath.size() && k < contentID.size() && l < imgBodyPart.size(); i++, k++, l++) {
             imgBodyPart.get(l).attachFile(imgPath.get(i).toString());
             imgBodyPart.get(l).setContentID("<" + contentID.get(k) + ">");
             imgBodyPart.get(l).setDisposition(MimeBodyPart.INLINE);

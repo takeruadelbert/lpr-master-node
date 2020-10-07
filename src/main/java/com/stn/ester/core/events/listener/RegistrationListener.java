@@ -5,6 +5,7 @@ import com.stn.ester.core.events.RegistrationEvent;
 import com.stn.ester.entities.User;
 import com.stn.ester.services.NotificationService;
 import com.stn.ester.services.crud.UserService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Log4j2
 public class RegistrationListener implements ApplicationListener<RegistrationEvent> {
 
     private NotificationService notificationService;
@@ -28,7 +30,7 @@ public class RegistrationListener implements ApplicationListener<RegistrationEve
     @Override
     public void onApplicationEvent(RegistrationEvent registrationEvent) {
         User user = registrationEvent.getUser();
-        System.out.printf("New User Register : %s %n", user.getUsername());
+        log.info(String.format("New User Register : %s %n", user.getUsername()));
         String message = String.format("%s registered", user.getBiodata().getFullname());
         Map<String, Object> data = new HashMap<>();
         Map<String, String> filter = new HashMap<>();

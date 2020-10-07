@@ -1,7 +1,9 @@
 package com.stn.ester.services.crud;
 
 import com.google.common.collect.Iterables;
-import com.stn.ester.entities.*;
+import com.stn.ester.entities.AccessGroup;
+import com.stn.ester.entities.Menu;
+import com.stn.ester.entities.ModuleLink;
 import com.stn.ester.entities.enumerate.RequestMethod;
 import com.stn.ester.helpers.SessionHelper;
 import com.stn.ester.repositories.jpa.*;
@@ -12,10 +14,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 

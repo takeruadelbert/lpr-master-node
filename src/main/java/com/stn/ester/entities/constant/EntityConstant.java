@@ -12,5 +12,5 @@ public class EntityConstant {
     public static final String COLUMN_DEFINITION_BOOLEAN_FALSE = "tinyint(1) default 0";
     public static final String COLUMN_DEFINITION_BOOLEAN_TRUE = "tinyint(1) default 1";
     public static final String FIELD_CREATED_DATE = "createdDate";
-    public static final String FIELD_ID= "id";
+    public static final String FIELD_ID = "id";
 }

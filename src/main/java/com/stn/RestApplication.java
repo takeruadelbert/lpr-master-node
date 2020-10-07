@@ -1,9 +1,8 @@
 package com.stn;
 
-import com.stn.ester.core.configurations.DatabaseConfig;
 import com.stn.ester.entities.Biodata;
-import com.stn.ester.entities.User;
 import com.stn.ester.entities.Role;
+import com.stn.ester.entities.User;
 import com.stn.ester.services.crud.*;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -46,19 +45,8 @@ public class RestApplication extends SpringBootServletInitializer {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ModuleService moduleService;
-
-    @Autowired
-    private MenuService menuService;
 
     public static void main(String[] args) {
-        if (args.length > 0) {
-            String extJsonFile = args[0];
-            if (!extJsonFile.isEmpty()) {
-                DatabaseConfig.extJsonFileConfigPath = extJsonFile;
-            }
-        }
         SpringApplication.run(RestApplication.class, args);
     }
 

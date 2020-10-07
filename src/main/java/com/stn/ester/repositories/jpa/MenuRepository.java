@@ -1,9 +1,9 @@
 package com.stn.ester.repositories.jpa;
 
+import com.stn.ester.entities.Menu;
 import com.stn.ester.repositories.jpa.base.BaseRepository;
 import com.stn.ester.repositories.jpa.base.traits.RepositoryListTrait;
 import com.stn.ester.repositories.jpa.projections.IdLabelOption;
-import com.stn.ester.entities.Menu;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -15,7 +15,7 @@ public interface MenuRepository extends BaseRepository<Menu>, RepositoryListTrai
 
     List<Menu> findAllByParentMenuId(Long parentMenuId);
 
-    List<Menu> findAllByIdInAndParentMenuIdOrderByOrderingNumber(Set<Long> id,Long parentId);
+    List<Menu> findAllByIdInAndParentMenuIdOrderByOrderingNumber(Set<Long> id, Long parentId);
 
     List<Menu> findAllByParentMenuIdIsNull();
 

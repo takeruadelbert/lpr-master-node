@@ -116,7 +116,7 @@ public class SystemProfile extends BaseEntity {
     private Date startYear;
 
     @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_BOOLEAN_TRUE)
-    private Boolean multipleSession = true;
+    private Boolean multipleSession=true;
 
     @Transient
     private String version;

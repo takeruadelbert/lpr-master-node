@@ -1,9 +1,9 @@
 package com.stn.ester.controllers.function;
 
 import com.stn.ester.core.base.AccessAllowed;
+import com.stn.ester.core.base.auth.RequireLogin;
 import com.stn.ester.services.crud.AssetFileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,19 +21,19 @@ public class AssetFileController {
         this.assetFileService = assetFileService;
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public Object uploadFile(@RequestParam MultipartFile[] files, @RequestParam(defaultValue = DEFAULT_TARGET) String target) {
         return assetFileService.uploadFile(files, target);
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/upload-encoded", method = RequestMethod.POST)
     public Object uploadEncodedFile(@RequestParam String filename, @RequestParam String files, @RequestParam(defaultValue = DEFAULT_TARGET) String target) {
         return assetFileService.uploadEncodedFile(filename, files, target);
     }
 
-    @PreAuthorize("hasPermission(null,'allowall')")
+    @RequireLogin
     @RequestMapping(value = "/upload-url", method = RequestMethod.POST)
     public Object uploadViaUrl(@RequestParam URL url, @RequestParam(defaultValue = DEFAULT_TARGET) String target) {
         return assetFileService.uploadViaUrl(url, target);

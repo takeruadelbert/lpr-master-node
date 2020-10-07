@@ -19,11 +19,11 @@ public class DisabledPageInterceptor extends HandlerInterceptorAdapter {
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Annotation disabledAccessAnnotation = handlerMethod.getBeanType().getDeclaredAnnotation(DisabledAccess.class);
-            String methodName=handlerMethod.getMethod().getName();
+            String methodName = handlerMethod.getMethod().getName();
             if (disabledAccessAnnotation != null) {
-                PageAccess[] pageAccesses=handlerMethod.getBeanType().getDeclaredAnnotation(DisabledAccess.class).value();
-                for (PageAccess pageAccess:pageAccesses){
-                    if (pageAccess.isEqual(methodName)){
+                PageAccess[] pageAccesses = handlerMethod.getBeanType().getDeclaredAnnotation(DisabledAccess.class).value();
+                for (PageAccess pageAccess : pageAccesses) {
+                    if (pageAccess.isEqual(methodName)) {
                         throw new DisabledAccessException();
                     }
                 }

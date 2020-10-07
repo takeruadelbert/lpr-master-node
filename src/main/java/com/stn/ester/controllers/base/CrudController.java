@@ -111,8 +111,8 @@ public abstract class CrudController<T extends CrudService, U extends BaseEntity
         return o;
     }
 
-    private Page<? extends Object> isCastToDTO(Page<BaseEntity> page){
-        return page.map(p-> isCastToDTO(p));
+    private Page<? extends Object> isCastToDTO(Page<BaseEntity> page) {
+        return page.map(p -> isCastToDTO(p));
     }
 
     protected void enableReturnAsDTO(Class<? extends EntityDTO<U>> dtoClass) {

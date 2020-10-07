@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DisabledAccess {
 
-    PageAccess[] value() default{};
+    PageAccess[] value() default {};
 }

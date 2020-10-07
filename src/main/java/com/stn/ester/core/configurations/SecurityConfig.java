@@ -5,7 +5,6 @@ import com.stn.ester.core.security.JWTAuthenticationFilter;
 import com.stn.ester.core.security.JWTAuthorizationFilter;
 import com.stn.ester.helpers.GlobalFunctionHelper;
 import com.stn.ester.services.AuthenticationService;
-import com.stn.ester.services.crud.AccessGroupService;
 import com.stn.ester.services.crud.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -43,9 +42,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserService userService;
 
     @Autowired
-    private AccessGroupService accessGroupService;
-
-    @Autowired
     private AuthenticationService authenticationService;
 
     @Autowired
@@ -62,7 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        for (PathMethod pathMethod : findPathAnnotedAccessAllowed()) {
+        for (PathMethod pathMethod : findPathAnnotatedAccessAllowed()) {
             web.ignoring().antMatchers(HttpMethod.resolve(pathMethod.requestMethod.toString()), pathMethod.Path);
         }
         web.ignoring().antMatchers("/error");
@@ -94,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return source;
     }
 
-    private List<PathMethod> findPathAnnotedAccessAllowed() {
+    private List<PathMethod> findPathAnnotatedAccessAllowed() {
         ApplicationContext applicationContext = super.getApplicationContext();
         List<PathMethod> result = new ArrayList<>();
         for (Map.Entry<String, Object> entryBean : applicationContext.getBeansWithAnnotation(RestController.class).entrySet()) {

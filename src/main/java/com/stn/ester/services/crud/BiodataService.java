@@ -1,9 +1,5 @@
 package com.stn.ester.services.crud;
 
-import com.stn.ester.entities.Biodata;
-import com.stn.ester.entities.City;
-import com.stn.ester.entities.Country;
-import com.stn.ester.entities.State;
 import com.stn.ester.entities.enumerate.Gender;
 import com.stn.ester.repositories.jpa.BiodataRepository;
 import com.stn.ester.repositories.jpa.CityRepository;

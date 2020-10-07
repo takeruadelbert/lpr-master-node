@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class DisabledAccessException extends RuntimeException{
+public class DisabledAccessException extends RuntimeException {
     public DisabledAccessException() {
         super("Page is disabled");
     }

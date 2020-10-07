@@ -3,7 +3,6 @@ package com.stn.ester.core.configurations;
 import com.stn.ester.core.interceptors.AuthInterceptor;
 import com.stn.ester.core.interceptors.DisabledPageInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

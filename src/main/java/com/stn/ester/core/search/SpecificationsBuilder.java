@@ -1,8 +1,8 @@
 package com.stn.ester.core.search;
 
-import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.core.search.util.SearchOperation;
 import com.stn.ester.core.search.util.SpecSearchCriteria;
+import com.stn.ester.entities.base.BaseEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

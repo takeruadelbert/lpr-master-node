@@ -32,7 +32,7 @@ public abstract class SecuredController implements BeanNameAware {
         String role = "NOACCESS";
         if (!SessionHelper.isSuperAdmin()) {
             Boolean isCrud = false;
-            if (moduleName=="") {
+            if (moduleName == "") {
                 moduleName = getBeanName().replace("Controller", "");
                 isCrud = true;
             }

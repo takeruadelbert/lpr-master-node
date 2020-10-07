@@ -7,5 +7,5 @@ public class LoginRequestDTO {
 
     private String username;
     private String password;
-    private Boolean rememberMe=false;
+    private Boolean rememberMe = false;
 }

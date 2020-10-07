@@ -6,10 +6,10 @@ import java.nio.file.Paths;
 
 public class LogoResource {
     private static final Path ROOT = FileSystems.getDefault().getPath("").toAbsolutePath();
-    public static final Path FILE_PATH_ICON_FACEBOOK = Paths.get(ROOT.toString(),"src", "main", "resources", "static", "images", "facebook.png");
-    public static final Path FILE_PATH_ICON_TWITTER = Paths.get(ROOT.toString(),"src", "main", "resources", "static", "images", "twitter.png");
-    public static final Path FILE_PATH_ICON_LINKEDIN = Paths.get(ROOT.toString(),"src", "main", "resources", "static", "images", "linkedin.png");
-    public static final Path FILE_PATH_ICON_MY_WEBSITE = Paths.get(ROOT.toString(),"src", "main", "resources", "static", "images", "my_website.png");
+    public static final Path FILE_PATH_ICON_FACEBOOK = Paths.get(ROOT.toString(), "src", "main", "resources", "static", "images", "facebook.png");
+    public static final Path FILE_PATH_ICON_TWITTER = Paths.get(ROOT.toString(), "src", "main", "resources", "static", "images", "twitter.png");
+    public static final Path FILE_PATH_ICON_LINKEDIN = Paths.get(ROOT.toString(), "src", "main", "resources", "static", "images", "linkedin.png");
+    public static final Path FILE_PATH_ICON_MY_WEBSITE = Paths.get(ROOT.toString(), "src", "main", "resources", "static", "images", "my_website.png");
     public static final String CONTENT_ID_FACEBOOK = "facebook";
     public static final String CONTENT_ID_TWITTER = "twitter";
     public static final String CONTENT_ID_LINKEDIN = "linkedin";

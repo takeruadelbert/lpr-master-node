@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportTesterController extends SecuredController {
 
     @PreAuthorize("hasRole(#this.this.readCurrentUserRole('testPOST'))")
-    @RequestMapping(value="/report/test",method = RequestMethod.POST)
-    public void testAccessGroup(){
+    @RequestMapping(value = "/report/test", method = RequestMethod.POST)
+    public void testAccessGroup() {
 
     }
 }

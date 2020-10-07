@@ -6,7 +6,8 @@ import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 public class RequestWrapper extends HttpServletRequestWrapper {
     private byte[] body;
@@ -42,7 +43,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
                 throw new RuntimeException("Not implemented");
             }
 
-            public int read () throws IOException {
+            public int read() throws IOException {
                 return byteArrayInputStream.read();
             }
         };

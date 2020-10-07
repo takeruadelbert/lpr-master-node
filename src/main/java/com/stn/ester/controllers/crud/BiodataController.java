@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/biodatas")
-public class BiodataController extends CrudController<BiodataService,Biodata> {
+public class BiodataController extends CrudController<BiodataService, Biodata> {
 
     @Autowired
-    public BiodataController(BiodataService biodataService){
+    public BiodataController(BiodataService biodataService) {
         super(biodataService);
     }
 }

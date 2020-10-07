@@ -6,10 +6,10 @@ import com.stn.ester.entities.base.BaseEntity;
 import com.stn.ester.entities.constant.EntityConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import org.hibernate.validator.constraints.URL;
 
 @Data
 @Entity

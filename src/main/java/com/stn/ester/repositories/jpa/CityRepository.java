@@ -1,9 +1,9 @@
 package com.stn.ester.repositories.jpa;
 
+import com.stn.ester.entities.City;
 import com.stn.ester.repositories.jpa.base.BaseRepository;
 import com.stn.ester.repositories.jpa.base.traits.RepositoryListTrait;
 import com.stn.ester.repositories.jpa.projections.IdNameOption;
-import com.stn.ester.entities.City;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

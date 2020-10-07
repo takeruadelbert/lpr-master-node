@@ -1,11 +1,13 @@
 package com.stn.ester.core.events;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Data
+@Getter
+@Setter
 public class HeartbeatEvent extends ApplicationEvent {
 
     private Long userId;

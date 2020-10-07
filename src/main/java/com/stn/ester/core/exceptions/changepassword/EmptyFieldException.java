@@ -3,7 +3,7 @@ package com.stn.ester.core.exceptions.changepassword;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value= HttpStatus.UNAUTHORIZED)
+@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
 public class EmptyFieldException extends RuntimeException {
     public EmptyFieldException() {
         super("Column is empty!");

@@ -361,7 +361,7 @@ public class AssetFileService extends CrudService<AssetFile, AssetFileRepository
                 e.printStackTrace();
             }
         }
-        System.out.printf("Temp File Cleaner : %d file(s) have been clean up.", cleanCount);
+        log.debug(String.format("Temp File Cleaner : %d file(s) have been clean up.", cleanCount));
         currentEntityRepository.saveAll(assetFiles);
     }
 

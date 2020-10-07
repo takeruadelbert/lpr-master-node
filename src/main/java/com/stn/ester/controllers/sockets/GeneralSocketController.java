@@ -22,11 +22,6 @@ public class GeneralSocketController {
         this.notificationService = notificationService;
     }
 
-    @SendTo("/topic/announcement")
-    public void announcementTopic() {
-
-    }
-
     @MessageMapping("/notification/feed/me")
     @SendTo("/topic/notification/feed")
     public Map<String, Object> notificationFeedMe() {
