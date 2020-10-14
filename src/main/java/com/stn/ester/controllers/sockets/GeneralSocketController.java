@@ -3,8 +3,8 @@ package com.stn.ester.controllers.sockets;
 import com.stn.ester.services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -23,7 +23,7 @@ public class GeneralSocketController {
     }
 
     @MessageMapping("/notification/feed/me")
-    @SendTo("/topic/notification/feed")
+    @SendToUser("/topic/notification/feed")
     public Map<String, Object> notificationFeedMe() {
         return notificationService.notificationFeedMe();
     }
