@@ -25,4 +25,9 @@ public class GeneralController extends SecuredController {
         return generalService.getStatus();
     }
 
+    @AccessAllowed
+    @RequestMapping(value = "/license", method = RequestMethod.GET)
+    public Object getLicense() {
+        return generalService.getLicense();
+    }
 }
