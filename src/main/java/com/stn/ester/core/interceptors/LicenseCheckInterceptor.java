@@ -19,7 +19,6 @@ public class LicenseCheckInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String currentRequest = request.getMethod() + " " + request.getRequestURI();
-        System.out.println(currentRequest);
         if (handler instanceof HandlerMethod) {
             if (esterLicenseService.isExpired() &&
                     !currentRequest.equals("GET /status") &&
