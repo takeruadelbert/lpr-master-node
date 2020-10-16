@@ -1,4 +1,4 @@
-package com.stn.ester.core.base;
+package com.stn.ester.core.base.auth;
 
 
 import java.lang.annotation.ElementType;

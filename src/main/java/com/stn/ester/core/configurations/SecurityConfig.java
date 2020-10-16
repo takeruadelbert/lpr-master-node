@@ -1,6 +1,6 @@
 package com.stn.ester.core.configurations;
 
-import com.stn.ester.core.base.AccessAllowed;
+import com.stn.ester.core.base.auth.AccessAllowed;
 import com.stn.ester.core.security.JWTAuthenticationFilter;
 import com.stn.ester.core.security.JWTAuthorizationFilter;
 import com.stn.ester.helpers.GlobalFunctionHelper;

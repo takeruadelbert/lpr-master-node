@@ -1,7 +1,7 @@
 package com.stn.ester.controllers.crud;
 
 import com.stn.ester.controllers.base.SecuredController;
-import com.stn.ester.core.base.AccessAllowed;
+import com.stn.ester.core.base.auth.AccessAllowed;
 import com.stn.ester.core.base.auth.RequireSuperAdmin;
 import com.stn.ester.entities.SystemProfile;
 import com.stn.ester.services.crud.SystemProfileService;

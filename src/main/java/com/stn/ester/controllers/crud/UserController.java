@@ -1,7 +1,7 @@
 package com.stn.ester.controllers.crud;
 
 import com.stn.ester.controllers.base.CrudController;
-import com.stn.ester.core.base.AccessAllowed;
+import com.stn.ester.core.base.auth.AccessAllowed;
 import com.stn.ester.core.base.auth.RequireLogin;
 import com.stn.ester.core.events.HeartbeatEvent;
 import com.stn.ester.dto.UserProfileDTO;
