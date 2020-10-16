@@ -77,6 +77,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             errorAccessor.setMessage("FORBIDDEN");
             errorAccessor.addNativeHeader("code", "403");
             this.clientOutboundChannel.send(MessageBuilder.createMessage(new byte[0], errorAccessor.getMessageHeaders()));
+            return null;
         }
         try {
             return authenticationService.getAuthentication(jwtToken);
