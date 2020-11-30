@@ -118,6 +118,9 @@ public class SystemProfile extends BaseEntity {
     @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_BOOLEAN_TRUE)
     private Boolean multipleSession=true;
 
+    @Column(columnDefinition = EntityConstant.COLUMN_DEFINITION_BOOLEAN_FALSE)
+    private Boolean liveUpdateDashboard=false;
+
     @Transient
     private String version;
 
