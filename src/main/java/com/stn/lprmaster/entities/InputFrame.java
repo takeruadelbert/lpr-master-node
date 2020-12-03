@@ -31,4 +31,9 @@ public class InputFrame extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = COLUMN_MAPPED_INPUT_FRAME, cascade = CascadeType.ALL)
     @JsonManagedReference
     private OutputFrame outputFrame;
+
+    public InputFrame(Long dataStateId, String token) {
+        this.dataStateId = dataStateId;
+        this.token = token;
+    }
 }

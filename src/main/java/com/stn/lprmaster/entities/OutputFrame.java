@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 @Data
 @Entity
@@ -22,4 +25,11 @@ public class OutputFrame extends BaseEntity {
     private String vehicleType;
     private String licensePlateNumber;
     private String token;
+
+    public OutputFrame(String vehicleType, String licensePlateNumber, String token, InputFrame inputFrame) {
+        this.vehicleType = vehicleType;
+        this.licensePlateNumber = licensePlateNumber;
+        this.token = token;
+        this.inputFrame = inputFrame;
+    }
 }
