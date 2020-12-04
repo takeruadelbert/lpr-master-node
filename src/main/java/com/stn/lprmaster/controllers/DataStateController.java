@@ -1,13 +1,12 @@
 package com.stn.lprmaster.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.stn.ester.controllers.base.CrudController;
 import com.stn.ester.core.base.auth.RequireLogin;
 import com.stn.lprmaster.entities.DataState;
 import com.stn.lprmaster.entities.enumerate.DataStateStatus;
 import com.stn.lprmaster.services.DataStateService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -22,5 +21,11 @@ public class DataStateController extends CrudController<DataStateService, DataSt
     @GetMapping("/status")
     public Map<DataStateStatus, String> getDataStateStatus() {
         return service.getDataStateStatus();
+    }
+
+    @RequireLogin
+    @PostMapping("/last-state")
+    public Map<String, Object> getLastStateByIdGate(@RequestBody Map<String, String> data) throws JsonProcessingException {
+        return service.getDataLastStateByIdGate(data.get("gate_id"));
     }
 }

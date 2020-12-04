@@ -18,6 +18,7 @@ import javax.persistence.Enumerated;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataState extends BaseEntity {
+    private static final String COLUMN_MAPPED_DATA_STATE = "dataState";
 
     @NotBlank(message = EntityConstant.MESSAGE_NOT_BLANK)
     @Column(unique = true)

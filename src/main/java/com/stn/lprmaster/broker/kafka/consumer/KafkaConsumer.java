@@ -66,9 +66,9 @@ public class KafkaConsumer {
     }
 
     private void updateLastState(DataState dataState, String status, FrameResult frameResult) {
-        Map<String, String> lastState = new HashMap<>();
+        Map<String, Object> lastState = new HashMap<>();
         lastState.put("status", status);
-        lastState.put("result", gson.toJson(frameResult));
+        lastState.put("result", gson.toJsonTree(frameResult));
         dataState.setLastState(gson.toJson(lastState));
         dataStateRepository.save(dataState);
     }
