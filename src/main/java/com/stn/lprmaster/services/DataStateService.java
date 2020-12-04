@@ -5,13 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stn.ester.core.exceptions.NotFoundException;
 import com.stn.ester.services.base.CrudService;
 import com.stn.lprmaster.entities.DataState;
-import com.stn.lprmaster.entities.dto.LastState;
+import com.stn.lprmaster.entities.dto.LastStateDTO;
 import com.stn.lprmaster.entities.enumerate.DataStateStatus;
 import com.stn.lprmaster.repositories.DataStateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,19 +31,13 @@ public class DataStateService extends CrudService<DataState, DataStateRepository
         return DataStateStatus.toList().stream().collect(Collectors.toMap(status -> status, DataStateStatus::getLabel));
     }
 
-    public Map<String, Object> getDataLastStateByIdGate(String idGate) throws JsonProcessingException {
+    public LastStateDTO getDataLastStateByIdGate(String idGate) throws JsonProcessingException {
         Optional<DataState> dataStateOptional = dataStateRepository.findFirstByIdGate(idGate);
         if (!dataStateOptional.isPresent()) {
             throw new NotFoundException(String.format("ID Gate %s does not exists.", idGate));
         }
         DataState dataState = dataStateOptional.get();
-        LastState lastState = objectMapper.readValue(dataState.getLastState(), LastState.class);
-        return new HashMap<String, Object>() {{
-            put("id", dataState.getId());
-            put("gate_id", dataState.getIdGate());
-            put("url", dataState.getUrl());
-            put("status", dataState.getStatus());
-            put("last_state", lastState);
-        }};
+        LastStateDTO.LastState lastState = objectMapper.readValue(dataState.getLastState(), LastStateDTO.LastState.class);
+        return new LastStateDTO(dataState, lastState);
     }
 }
