@@ -1,5 +1,6 @@
 package com.stn.ester.core.filters;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
@@ -79,7 +80,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
                 mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
                 Map jsonMap = mapper.readValue(copiedRequest.getInputStream(), Map.class);
                 requestBody = this.gson.toJson(jsonMap);
-            } catch (MismatchedInputException ex) {
+            } catch (MismatchedInputException | JsonParseException ex) {
                 requestBody = null;
             }
         }
