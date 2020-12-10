@@ -6,7 +6,7 @@ import com.stn.lprmaster.broker.kafka.model.frame.FrameResult;
 import com.stn.lprmaster.entities.DataState;
 import com.stn.lprmaster.entities.InputFrame;
 import com.stn.lprmaster.entities.OutputFrame;
-import com.stn.lprmaster.misc.Value;
+import com.stn.lprmaster.misc.ConstantValue;
 import com.stn.lprmaster.repositories.DataStateRepository;
 import com.stn.lprmaster.repositories.InputFrameRepository;
 import com.stn.lprmaster.repositories.OutputFrameRepository;
@@ -51,13 +51,13 @@ public class KafkaConsumer {
             DataState dataState = dataStateOptional.get();
             String vehicleType = frame.getResult().getVehicleType();
             String licensePlateNumber = frame.getResult().getLicensePlateNumber();
-            if (!licensePlateNumber.equals(Value.STATUS_UNDETECTED)) {
+            if (!licensePlateNumber.equals(ConstantValue.STATUS_UNDETECTED)) {
                 String tokenOutput = frame.getResult().getTokenOutput();
                 InputFrame savedInputFrame = inputFrameRepository.save(new InputFrame(dataState.getId(), frame.getTokenInput()));
                 outputFrameRepository.save(new OutputFrame(vehicleType, licensePlateNumber, tokenOutput, savedInputFrame));
-                updateLastState(dataState, Value.STATUS_DETECTED, frame.getResult());
+                updateLastState(dataState, ConstantValue.STATUS_DETECTED, frame.getResult());
             } else {
-                updateLastState(dataState, Value.STATUS_UNDETECTED, frame.getResult());
+                updateLastState(dataState, ConstantValue.STATUS_UNDETECTED, frame.getResult());
             }
         } catch (Exception ex) {
             log.error("Error has occurred when consuming data from broker : {}", ex.getMessage());

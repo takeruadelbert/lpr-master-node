@@ -14,6 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/data-state")
 public class DataStateController extends CrudController<DataStateService, DataState> {
+
     public DataStateController(DataStateService dataStateService) {
         super(dataStateService);
     }

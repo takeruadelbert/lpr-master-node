@@ -37,7 +37,8 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             RequestMethod.POST + WHITESPACE + "/users/login",
             RequestMethod.POST + WHITESPACE + "/asset_files/upload",
             RequestMethod.POST + WHITESPACE + "/asset_files/upload-encoded",
-            RequestMethod.POST + WHITESPACE + "/asset_files/upload-url"
+            RequestMethod.POST + WHITESPACE + "/asset_files/upload-url",
+            RequestMethod.POST + WHITESPACE + "/upload"
     );
     private boolean accessLogEnabled;
 

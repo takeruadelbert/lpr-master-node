@@ -8,3 +8,5 @@ kafka:
     input-frame: ${KAFKA_CONSUME_TOPIC_INPUT_FRAME:LPRResult}
     input-image: ${KAFKA_CONSUME_TOPIC_INPUT_IMAGE:LPRImageServiceResult}
   group: ${KAFKA_CONSUME_TOPIC_GROUP_ID:lpr-service-result}
+client:
+  base-url: ${BASE_URL}
