@@ -15,9 +15,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -30,7 +28,7 @@ public class ClientUploadService {
 
     public ResponseEntity uploadRaw(MultipartFile multipartFile) throws IOException {
         Map<String, Object> result = new HashMap<>();
-        HttpStatus httpStatus = null;
+        HttpStatus httpStatus;
         if (multipartFile == null) {
             throw new BadRequestException("No file provided.");
         }
