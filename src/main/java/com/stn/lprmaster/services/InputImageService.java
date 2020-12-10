@@ -1,5 +1,6 @@
 package com.stn.lprmaster.services;
 
+import com.stn.ester.core.exceptions.BadRequestException;
 import com.stn.ester.services.base.CrudService;
 import com.stn.lprmaster.entities.InputImage;
 import com.stn.lprmaster.entities.enumerate.InputImageStatus;
@@ -22,5 +23,9 @@ public class InputImageService extends CrudService<InputImage, InputImageReposit
 
     public Map<InputImageStatus, String> getInputImageStatus() {
         return InputImageStatus.toList().stream().collect(Collectors.toMap(status -> status, InputImageStatus::getLabel));
+    }
+
+    public InputImage getResult(String ticketNumber) {
+        return inputImageRepository.findFirstByTicketNumber(ticketNumber).orElseThrow(() -> new BadRequestException(String.format("Ticket Number %s does not exists.", ticketNumber)));
     }
 }
