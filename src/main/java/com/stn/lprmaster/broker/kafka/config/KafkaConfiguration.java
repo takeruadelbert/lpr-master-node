@@ -1,6 +1,7 @@
 package com.stn.lprmaster.broker.kafka.config;
 
 import com.stn.lprmaster.broker.kafka.model.frame.Frame;
+import com.stn.lprmaster.broker.kafka.model.image.Image;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,9 +45,22 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    public ConsumerFactory<String, Image> consumerFactoryImage() {
+        Map<String, Object> config = setupConsumerConfiguration();
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(Image.class));
+    }
+
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Frame> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Frame> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Image> kafkaListenerContainerFactoryImage() {
+        ConcurrentKafkaListenerContainerFactory<String, Image> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryImage());
         return factory;
     }
 }

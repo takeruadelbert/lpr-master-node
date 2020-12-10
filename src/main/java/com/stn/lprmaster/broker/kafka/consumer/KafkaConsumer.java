@@ -3,13 +3,11 @@ package com.stn.lprmaster.broker.kafka.consumer;
 import com.google.gson.Gson;
 import com.stn.lprmaster.broker.kafka.model.frame.Frame;
 import com.stn.lprmaster.broker.kafka.model.frame.FrameResult;
-import com.stn.lprmaster.entities.DataState;
-import com.stn.lprmaster.entities.InputFrame;
-import com.stn.lprmaster.entities.OutputFrame;
+import com.stn.lprmaster.broker.kafka.model.image.Image;
+import com.stn.lprmaster.entities.*;
+import com.stn.lprmaster.entities.enumerate.InputImageStatus;
 import com.stn.lprmaster.misc.ConstantValue;
-import com.stn.lprmaster.repositories.DataStateRepository;
-import com.stn.lprmaster.repositories.InputFrameRepository;
-import com.stn.lprmaster.repositories.OutputFrameRepository;
+import com.stn.lprmaster.repositories.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -36,6 +34,12 @@ public class KafkaConsumer {
 
     @Autowired
     private OutputFrameRepository outputFrameRepository;
+
+    @Autowired
+    private InputImageRepository inputImageRepository;
+
+    @Autowired
+    private OutputImageRepository outputImageRepository;
 
     @Autowired
     private Gson gson;
@@ -71,5 +75,26 @@ public class KafkaConsumer {
         lastState.put("result", gson.toJsonTree(frameResult));
         dataState.setLastState(gson.toJson(lastState));
         dataStateRepository.save(dataState);
+    }
+
+    @KafkaListener(id = "consumerImageID", topics = "${kafka.topic.input-image}", groupId = "${kafka.group}", containerFactory = "kafkaListenerContainerFactoryImage", autoStartup = "false")
+    public void consumeImageResult(@Payload Image image) {
+        try {
+            Optional<InputImage> inputImageOptional = inputImageRepository.findFirstByTicketNumber(image.getTicketNumber());
+            if (!inputImageOptional.isPresent()) {
+                log.error("Ticket Number {} does not exists.", image.getTicketNumber());
+            } else {
+                outputImageRepository.save(new OutputImage(inputImageOptional.get(), image.getResult().getVehicleType(), image.getResult().getLicensePlateNumber(), image.getResult().getTokenOutput()));
+                updateInputImageStatus(inputImageOptional.get());
+            }
+        } catch (Exception ex) {
+            log.error("Error has occurred when consuming data Image Result from broker : {}", ex.getMessage());
+            registry.getListenerContainer("consumerImageID").stop();
+        }
+    }
+
+    private InputImage updateInputImageStatus(InputImage inputImage) {
+        inputImage.setStatus(InputImageStatus.DONE);
+        return inputImageRepository.save(inputImage);
     }
 }
