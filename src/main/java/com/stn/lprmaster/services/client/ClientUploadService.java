@@ -4,6 +4,7 @@ import com.stn.ester.core.exceptions.BadRequestException;
 import com.stn.ester.helpers.FileHelper;
 import com.stn.lprmaster.client.ServiceGenerator;
 import com.stn.lprmaster.client.request.UploadEncoded;
+import com.stn.lprmaster.client.request.UploadViaUrl;
 import com.stn.lprmaster.client.response.UploadResponse;
 import com.stn.lprmaster.client.service.UploadService;
 import com.stn.lprmaster.misc.MasterNodeHelper;
@@ -16,6 +17,7 @@ import retrofit2.Response;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -30,19 +32,26 @@ public class ClientUploadService {
         if (multipartFile == null) {
             throw new BadRequestException("No file provided.");
         }
-        String extensionFile = FileHelper.getExtensionFile(multipartFile.getOriginalFilename());
+        String filename = multipartFile.getOriginalFilename();
+        String extensionFile = FileHelper.getExtensionFile(filename);
         String encodedBase64 = MasterNodeHelper.convertBytesToBase64(extensionFile, multipartFile.getBytes());
-        return doUploadEncoded(multipartFile.getOriginalFilename(), encodedBase64);
+        Call<UploadResponse> uploadResponseCall = uploadService.uploadEncoded(new UploadEncoded(filename, encodedBase64));
+        return doUpload(uploadResponseCall);
     }
 
     public ResponseEntity uploadEncoded(String filename, String encodedFile) {
-        return doUploadEncoded(filename, encodedFile);
+        Call<UploadResponse> uploadResponseCall = uploadService.uploadEncoded(new UploadEncoded(filename, encodedFile));
+        return doUpload(uploadResponseCall);
     }
 
-    private ResponseEntity doUploadEncoded(String filename, String encodedFile) {
+    public ResponseEntity uploadViaUrl(List<String> url) {
+        Call<UploadResponse> uploadResponseCall = uploadService.uploadViaUrl(new UploadViaUrl(url));
+        return doUpload(uploadResponseCall);
+    }
+
+    private ResponseEntity doUpload(Call<UploadResponse> uploadResponseCall) {
         Map<String, Object> result = new HashMap<>();
         HttpStatus httpStatus;
-        Call<UploadResponse> uploadResponseCall = uploadService.uploadEncoded(new UploadEncoded(filename, encodedFile));
         try {
             Response<UploadResponse> response = uploadResponseCall.execute();
             UploadResponse uploadResponse = response.body();

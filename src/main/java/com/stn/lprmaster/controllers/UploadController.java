@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -41,5 +42,12 @@ public class UploadController {
             throw new BadRequestException("Invalid 'encoded_file'.");
         }
         return clientUploadService.uploadEncoded(filename, encodedFile);
+    }
+
+    @RequireLogin
+    @PostMapping("/upload-url")
+    public ResponseEntity uploadViaUrl(@RequestBody Map<String, List<String>> data) {
+        List<String> url = data.get("url");
+        return clientUploadService.uploadViaUrl(url);
     }
 }
