@@ -27,14 +27,22 @@ public class ClientUploadService {
     }
 
     public ResponseEntity uploadRaw(MultipartFile multipartFile) throws IOException {
-        Map<String, Object> result = new HashMap<>();
-        HttpStatus httpStatus;
         if (multipartFile == null) {
             throw new BadRequestException("No file provided.");
         }
         String extensionFile = FileHelper.getExtensionFile(multipartFile.getOriginalFilename());
         String encodedBase64 = MasterNodeHelper.convertBytesToBase64(extensionFile, multipartFile.getBytes());
-        Call<UploadResponse> uploadResponseCall = uploadService.uploadRaw(new UploadEncoded(multipartFile.getOriginalFilename(), encodedBase64));
+        return doUploadEncoded(multipartFile.getOriginalFilename(), encodedBase64);
+    }
+
+    public ResponseEntity uploadEncoded(String filename, String encodedFile) {
+        return doUploadEncoded(filename, encodedFile);
+    }
+
+    private ResponseEntity doUploadEncoded(String filename, String encodedFile) {
+        Map<String, Object> result = new HashMap<>();
+        HttpStatus httpStatus;
+        Call<UploadResponse> uploadResponseCall = uploadService.uploadEncoded(new UploadEncoded(filename, encodedFile));
         try {
             Response<UploadResponse> response = uploadResponseCall.execute();
             UploadResponse uploadResponse = response.body();
