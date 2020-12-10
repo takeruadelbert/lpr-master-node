@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum InputImageStatus {
-    WAITING("Waiting"),
+    PROCESSING("Processing"),
     DONE("Done");
 
     private String label;
