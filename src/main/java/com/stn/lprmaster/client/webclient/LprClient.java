@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -24,7 +23,7 @@ public class LprClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    public UploadResponse uploadRaw(MultipartFile multipartFile) throws IOException {
+    public UploadResponse uploadRaw(MultipartFile multipartFile) {
         try {
             if (multipartFile == null) {
                 throw new BadRequestException("No file provided.");
