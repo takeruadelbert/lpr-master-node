@@ -1,4 +1,4 @@
-package com.stn.lprmaster.client;
+package com.stn.lprmaster.client.retrofit;
 
 import com.stn.lprmaster.misc.ConstantValue;
 import okhttp3.OkHttpClient;
