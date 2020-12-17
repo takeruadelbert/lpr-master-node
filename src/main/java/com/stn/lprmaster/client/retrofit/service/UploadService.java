@@ -1,4 +1,4 @@
-package com.stn.lprmaster.client.service;
+package com.stn.lprmaster.client.retrofit.service;
 
 import com.stn.lprmaster.client.endpoint.Endpoint;
 import com.stn.lprmaster.client.request.UploadEncoded;
