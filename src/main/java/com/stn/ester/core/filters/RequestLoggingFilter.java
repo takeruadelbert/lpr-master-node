@@ -80,7 +80,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
                 mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
                 Map jsonMap = mapper.readValue(copiedRequest.getInputStream(), Map.class);
                 requestBody = this.gson.toJson(jsonMap);
-            } catch (MismatchedInputException | JsonParseException ex) {
+            } catch (MismatchedInputException ex) {
                 requestBody = null;
             }
         }
