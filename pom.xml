@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.stn</groupId>
-    <artifactId>ester</artifactId>
-    <version>0.3.01</version>
-    <name>ester</name>
+    <artifactId>lpr-master-node</artifactId>
+    <version>0.0.1</version>
+    <name>lpr-master-node</name>
     <description>STN</description>
     <packaging>war</packaging>
 
